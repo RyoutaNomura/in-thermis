@@ -1,0 +1,52 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="./search-box.html">
+<link rel="import" href="./search-result-card-list.html">
+
+<dom-module id="inthermis-app"> 
+<template>
+  <search-service id="service" params={{params}} results={{searchResult}}></search-service>
+  
+  <paper-toolbar>
+    <span class="title">
+      <h3>IN-THERMIS</h3>
+    </span>
+    <search-box value={{queryString}}></search-box>
+  </paper-toolbar>
+  <search-result-card-list results={{searchResult}}></search-result-card-list>
+</template>
+
+<style>
+:host {
+  display: block;
+}
+
+search-box {
+  width: 60%;
+  margin-right: 10%; 
+  --search-box-background-color: white;
+  --serch-box-icon-color: black;
+}
+</style>
+
+<script>
+	Polymer({
+		is : "inthermis-app",
+		properties:{
+			queryString:{
+				type: String,
+				observer: 'onQueryStringChanged'
+			},
+			params: {
+				type: Object,
+				value: {},
+				notify: true
+			}
+		},
+		onQueryStringChanged: function(newValue, oldValue) {
+			this.params = {"text": newValue};
+		}
+	});
+</script> </dom-module>

@@ -1,0 +1,29 @@
+{
+  "name": "public",
+  "authors": [
+    "RyoutaNomura <ryouta.nomura@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [
+    "amd",
+    "es6",
+    "globals",
+    "node",
+    "yui"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.2.4",
+    "polymer-starter-kit": "PolymerElements/polymer-starter-kit#^1.2.3",
+    "font-awesome": "^4.5.0"
+  }
+}

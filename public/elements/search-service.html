@@ -1,0 +1,47 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="search-service">
+
+<template>
+  <iron-ajax
+    id="search-service"
+    auto=true
+    url="/search"
+    params={{params}}
+    handle-as="json"
+    on-response="responseHandler"
+    debounce-duration="300">
+  </iron-ajax>
+</template>
+
+<style>
+  :host {
+    display: none;
+  }
+</style>
+
+<script>
+	Polymer({
+		is : 'search-service',
+		properties: {
+			params: {
+				type: Object,
+				value:{}
+			},
+			results: {
+				type: Array,
+				notify: true
+			}
+		},
+		responseHandler : function(e, detail) {
+			if (this.$['search-service'].lastResponse) {
+				this.results = this.$['search-service'].lastResponse.slice(0);
+			} else {
+				this.results = [];
+			}
+		}
+	});
+</script>
+
+</dom-module>

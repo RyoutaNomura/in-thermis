@@ -1,0 +1,61 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+
+<dom-module id="search-box">
+<template>
+  <iron-a11y-keys id="a11y" target="{{target}}" keys="enter" on-keys-pressed="onEnterInput"></iron-a11y-keys>
+  <paper-input
+    id="input-search-word"
+    placeholder="検索ワードを入力してください。"
+    type="search"
+    no-label-float=true>
+  <div prefix>
+    <iron-icon icon="icons:search"></iron-icon>
+  </div>
+  </paper-input>
+</template>
+
+<style>
+:host {
+  display: block;
+}
+
+paper-input {
+  --paper-input-container: { 
+    background-color : var(--search-box-background-color);
+    padding: 7px;
+    box-shadow: 0 5px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0
+      rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+  }
+  --paper-input-container-focus-color: none;
+  --paper-input-container-color: none;
+}
+
+iron-icon {
+  color:var(--serch-box-icon-color);
+}
+</style>
+
+<script>
+	Polymer({
+		is : "search-box",
+		properties : {
+			value : {
+				type : String,
+				notify : true
+			},
+			target : {
+				type : Object,
+				value : function() {
+					return this.$['input-search-word'];
+				}
+			}
+		},
+		onEnterInput: function() {
+			this.value=this.$['input-search-word'].value;
+		}
+	});
+</script>
+
+</dom-module>

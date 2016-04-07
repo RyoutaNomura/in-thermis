@@ -1,0 +1,51 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="./search-service.html">
+<link rel="import" href="./search-result-card.html">
+
+
+<dom-module id="search-result-card-list"> 
+<template> 
+  <template is="dom-repeat" items="{{results}}"> 
+    <search-result-card
+      uri={{item.uri}}
+      resource-name={{item.resourceName}}
+      resource-size={{item.resourceSize}}
+      resource-type-name={{item.resourceTypeName}}
+      resource-created={{item.resourceCreated}}
+      resource-modified={{item.resourceModified}}
+      keys={{item.keys}}
+      content={{item.content}}
+      positions={{item.positions}}
+      indexer-class-name={{item.indexerClassName}}
+      index-generated={{item.indexGenerated}}>
+    </search-result-card>
+  </template>
+</template>
+
+<style>
+:host {
+  display: block;
+}
+
+search-box {
+  margin: 10px 10% 10px 10%;
+}
+
+search-result-card {
+  margin: 14px;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+<script>
+	Polymer({
+		is : 'search-result-card-list',
+		properties: {
+			results: Array
+		},
+		created : function() {
+			console.log("search-result-card-list created.")
+		}
+	});
+</script></dom-module>
