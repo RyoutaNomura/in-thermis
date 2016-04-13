@@ -42,6 +42,8 @@ case class IndexerResult(
       content.key2,
       content.key3,
       content.content,
+      content.prevContent,
+      content.nextContent,
       locationId)
   }.toSeq
 
@@ -89,16 +91,6 @@ case class IndexerResult(
   }
 }
 
-case class Content(
-    key1: String,
-    key2: String,
-    key3: String,
-    content: String,
-    // word, start, length
-//    indices: Map[String, Set[Tuple2[Int, Int]]])
-    indices: Seq[Tuple3[String, Int, Int]]
-)
- 
 object IndexerResult {
   def apply(): IndexerResult = {
     IndexerResult(
@@ -112,3 +104,27 @@ object IndexerResult {
       new Date)
   }
 }
+
+case class Content(
+    var key1: String,
+    var key2: String,
+    var key3: String,
+    var content: String,
+    var prevContent: String,
+    var nextContent: String,
+    // word, start, length
+//    indices: Map[String, Set[Tuple2[Int, Int]]])
+    indices: Seq[Tuple3[String, Int, Int]]
+)
+
+object Content {
+  def apply(): Content = Content(
+      StringUtils.EMPTY, 
+      StringUtils.EMPTY, 
+      StringUtils.EMPTY, 
+      StringUtils.EMPTY, 
+      StringUtils.EMPTY, 
+      StringUtils.EMPTY, 
+      Seq.empty)
+}
+ 

@@ -23,77 +23,45 @@ import com.datastax.driver.core.BoundStatement
 import com.datastax.driver.core.Metadata
 
 object CassandraHelper {
-  def apply() = new CassandraHelper
-}
-class CassandraHelper {
 
   private val runtimeMirror = ru.runtimeMirror(Thread.currentThread.getContextClassLoader)
 
   private var cluster: Cluster = _
-  
+
   private var keyspace = "mykeyspace"
-  
+
   var metadata: Metadata = _
-  
+
   def open(node: String, port: Int, keyspace: String) {
     cluster = Cluster.builder.addContactPoint(node).withPort(port).build
-    
+
     metadata = cluster.getMetadata
     println(s"Connected to cluster: ${metadata.getClusterName}");
     metadata.getAllHosts.foreach { host => println(s"Datatacenter: ${host.getDatacenter}; Host: ${host.getAddress}; Rack: ${host.getRack}") }
   }
-  
-  def close {
-    cluster.close
+
+  def close() {
+    cluster.close()
+    println(s"CassandraHelper.cluster closed.")
   }
 
-  def execCql(cql: String, params: AnyRef*) = {
-//        println(s"try to execute CQL: $cql with $params" )
-    val start = System.currentTimeMillis
+  def getSession: Session = cluster.connect(keyspace)
 
-    val session = cluster.connect(keyspace)
+  def execCql(session: Session, cql: String, params: AnyRef*) = {
     try {
       val stmt = session.prepare(cql)
-      session.execute(new BoundStatement(stmt).bind(params:_*))
+      session.execute(new BoundStatement(stmt).bind(params: _*))
     } catch {
       case t: Throwable => throw t
-    } finally {
-      session.close
-//      println(s"time:${System.currentTimeMillis - start}ms")
-    }
+    } 
   }
 
-//  def execCql(cql: String): ResultSet = {
-//    println(s"try to execute CQL: $cql")
-//    val start = System.currentTimeMillis
-//
-//    val session = cluster.connect(keyspace)
-//    try {
-//      session.execute(new SimpleStatement(cql))
-//    } catch {
-//      case t: Throwable => throw t
-//    } finally {
-//      session.close
-//      println(s"time:${System.currentTimeMillis - start}ms")
-//    }
-//  }
-
-    def getRows[T: TypeTag: ClassTag](clazz: Class[T], cql: String, params: AnyRef*): Seq[T] = {
+  def getRows[T: TypeTag: ClassTag](session: Session, clazz: Class[T], cql: String, params: AnyRef*): Seq[T] = {
     val seq = Seq.empty
-    
-//    def wrapper(args: Any*) = execCql(cql, args:_*)
-//    val cqlResult = wrapper(params:_*)
-    val cqlResult = execCql(cql, params:_*)
+    val cqlResult = execCql(session, cql, params: _*)
     val types = cqlResult.getColumnDefinitions.map { definition => (definition.getName, definition.getType) }.toMap
     cqlResult.map { cqlrow => convert(cqlrow, clazz, types) }.toSeq
   }
-    
-//  def getRows[T: TypeTag: ClassTag](cql: String, clazz: Class[T]): Seq[T] = {
-//    val seq = Seq.empty
-//    val cqlResult = execCql(cql)
-//    val types = cqlResult.getColumnDefinitions.map { definition => (definition.getName, definition.getType) }.toMap
-//    cqlResult.map { cqlrow => convert(cqlrow, clazz, types) }.toSeq
-//  }
 
   private def convert[T: TypeTag: ClassTag](row: Row, c: Class[T], types: Map[String, DataType]): T = {
     val t = ru.typeOf[T]
@@ -126,7 +94,7 @@ class CassandraHelper {
         }
         val tupleClass = Class.forName("scala.Tuple" + values.size)
         val tupleType = runtimeMirror.classSymbol(tupleClass).toType
-        ReflectionUtils.createInstance(tupleType, values.map(cast):_*).get
+        ReflectionUtils.createInstance(tupleType, values.map(cast): _*).get
       }
       case _ => javaValue
     }

@@ -52,9 +52,11 @@ object OdsIndexer extends FileIndexer {
   override def getKeyTitles: Tuple3[String, String, String] = ("Sheet: ", "Row: ", StringUtils.EMPTY)
   override def getResourceTypeName: String = "OpenDocument SpreadSheet"
 
-  private def generateIndex(uri: URI, sheet: Table): Stream[Content] =
-    getRows(sheet).map { row => generateIndex(uri, sheet, row) }.collect { case Some(s) => s }
-
+  private def generateIndex(uri: URI, sheet: Table): Seq[Content] = {
+    val indices = getRows(sheet).map { row => generateIndex(uri, sheet, row) }.collect { case Some(s) => s }.toList
+    fillSibilingContent(indices)
+    indices
+  }
   private def generateIndex(uri: URI, sheet: Table, row: Row): Option[Content] = {
     val line = getCells(row)
       .map(_.getStringValue)
@@ -64,24 +66,24 @@ object OdsIndexer extends FileIndexer {
       None
     } else {
       val indices = StringAnalyzer.analyze(line).map { x => (x.word, x.start, x.length) }
-      Some(Content(sheet.getTableName, row.getRowIndex.toString, StringUtils.EMPTY, line, indices))
+      Some(Content(sheet.getTableName, row.getRowIndex.toString, StringUtils.EMPTY, line, StringUtils.EMPTY, StringUtils.EMPTY, indices))
     }
   }
 
-  private def getRows(sheet: Table): Stream[Row] = {
+  private def getRows(sheet: Table): Seq[Row] = {
     val rows = sheet.getOdfElement.getElementsByTagName("table:table-row")
     (0 until rows.getLength)
       .map { i => rows.item(i) match { case t: TableTableRowElement => t } }
       .map { Row.getInstance }
-      .toStream
+      .toSeq
   }
 
-  private def getCells(row: Row): Stream[Cell] = {
+  private def getCells(row: Row): Seq[Cell] = {
     val cells = row.getOdfElement.getElementsByTagName("table:table-cell")
     (0 until cells.getLength)
       .map { i => cells.item(i) match { case t: TableTableCellElementBase => t } }
       .map { Cell.getInstance }
-      .toStream
+      .toSeq
   }
 
 }

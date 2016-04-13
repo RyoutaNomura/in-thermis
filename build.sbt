@@ -24,3 +24,5 @@ routesGenerator := InjectedRoutesGenerator
 libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "3.0.0"
 libraryDependencies += "com.google.code" % "lucene-gosen-ipadic" % "1.2.1"
 libraryDependencies += "org.apache.odftoolkit" % "simple-odf" % "0.8.1-incubating"
+libraryDependencies += "org.apache.pdfbox" % "pdfbox" % "2.0.0"
+libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.1"

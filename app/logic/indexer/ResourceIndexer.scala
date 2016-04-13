@@ -15,34 +15,29 @@ import dtos.ResourceLocationDTO
 import java.util.UUID
 import java.time.ZoneOffset
 import java.time.ZoneId
+import com.datastax.driver.core.Session
 
 object ResourceIndexer {
 
-  def createIndex(helper: CassandraHelper, uri: URI) {
+  def generateIndex(session: Session, uri: URI) {
     uri.getScheme match {
-      case "file" => createFileIndex(helper, uri)
+      case "file" => generateFileIndex(session, uri)
       case _      => println("Only file scheme allowed.")
     }
   }
 
-  private def createFileIndex(helper: CassandraHelper, uri: URI) {
-
-    val locationDAO = ResourceLocationDAO(helper)
-    val contentDAO = ResourceContentDAO(helper)
-    val wordIndiceDAO = WordIndicesDAO(helper)
-    
-    def createAndPersistIndex(uri: URI) {
-      val indexer = FileIndexerFactory.create(uri)
-      val indexerResult = indexer.generateIndex(uri)
-      locationDAO.insert(indexerResult.locationDTO)
-      indexerResult.contentDTOs.foreach { contentDAO.insert }
-      indexerResult.wordIndicesDTOs.foreach { wordIndiceDAO.insert }
+  private def generateFileIndex(session: Session, uri: URI) {
+    def generateAndPersistIndex(uri: URI) {
+      val indexerResult = FileIndexerFactory.create(uri).generateIndex(uri)
+      ResourceLocationDAO.insert(session, indexerResult.locationDTO)
+      indexerResult.contentDTOs.foreach { dto => ResourceContentDAO.insert(session, dto) }
+      indexerResult.wordIndicesDTOs.foreach { dto => WordIndicesDAO.insert(session, dto) }
     }
-    
-    def deleteIndex(id: UUID) {
-      locationDAO.delete(id)
-      contentDAO.delete(id)
-      wordIndiceDAO.delete(id)
+
+    def deleteIndex(session: Session, id: UUID) {
+      ResourceLocationDAO.delete(session, id)
+      ResourceContentDAO.delete(session, id)
+      WordIndicesDAO.delete(session, id)
       println(s"resource_location found. deleted ${id}")
     }
 
@@ -51,16 +46,16 @@ object ResourceIndexer {
       .foreach { p =>
         val lastModified = new Date(Files.getLastModifiedTime(p).toMillis)
 
-        locationDAO.find(p.toUri.toString) match {
+        ResourceLocationDAO.find(session, p.toUri.toString) match {
           case Some(s) if s.indexGenerated.before(lastModified) =>
-            println(s"resource_location found.")
-            deleteIndex(s.id)
-            createAndPersistIndex(p.toUri)
+            println(s"resource_location found. " + p)
+            deleteIndex(session, s.id)
+            generateAndPersistIndex(p.toUri)
           case Some(s) =>
-            println(s"resource_location found. index creaion skipped.")
+            println(s"resource_location found. index creaion skipped. " + p)
           case None =>
-            println(s"resource_location not found")
-            createAndPersistIndex(p.toUri)
+            println(s"resource_location not found. " + p)
+            generateAndPersistIndex(p.toUri)
         }
       }
   }

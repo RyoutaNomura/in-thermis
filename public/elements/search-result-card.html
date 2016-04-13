@@ -11,7 +11,11 @@
   <div class="date">{{resourceModified}}</div>
 </div>
 
-<div id='content' class="font-mincho"></div>
+<div class="content font-mincho">
+  <div>{{prevContent}}</div>
+  <div id='content'></div>
+  <div>{{nextContent}}</div>
+</div>
 
 <div class="footer">
   <resource-location
@@ -50,15 +54,21 @@
   font-size: small;
 }
 
-#content {
-  padding: 15px 0;
+div.content {
+  font-size: smaller;
+  color: gray;
+  padding: 10px 0;
+}
+
+div#content {
+  color: black;
 }
 
 span.highlightend-text {
   background-color: yellow;
 }
 
-.footer {
+div.footer {
   border-top: dashed 1px gray;
   padding-top: 10px;
 }
@@ -80,6 +90,8 @@ span.highlightend-text {
 				type: String,
 				observer: 'contentChanged',
 			},
+			prevContent: String,
+			nextContent: String,
 			positions : Array,
 			indexerClassName: String,
 			indexGenerated : Date,

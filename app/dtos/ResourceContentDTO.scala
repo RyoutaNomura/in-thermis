@@ -9,10 +9,14 @@ case class ResourceContentDTO(
     var key2: String,
     var key3: String,
     var content: String,
+    var prevContent: String,
+    var nextContent: String,
     var resourceLocationId: UUID) {
 
   def this() = this(
     UUID.randomUUID,
+    StringUtils.EMPTY,
+    StringUtils.EMPTY,
     StringUtils.EMPTY,
     StringUtils.EMPTY,
     StringUtils.EMPTY,

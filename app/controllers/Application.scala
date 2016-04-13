@@ -23,23 +23,16 @@ class Application extends Controller {
   }
 
   def doSearch(word: String) = Action {
-
-    val start = System.currentTimeMillis
-
-    val helper = CassandraHelper()
-    helper.open(DBSettings.host, DBSettings.port, DBSettings.keyspace)
+    val start1 = System.currentTimeMillis
+    val session = CassandraHelper.getSession
 
     try {
-      val start2 = System.currentTimeMillis
-
-      val wordIndices = WordIndicesDAO(helper).select(word).sortBy { x => x.count }.reverse
-//      println(wordIndices)
-
+      val wordIndices = WordIndicesDAO.select(session, word).sortBy { x => x.count }.reverse
       val locationIds = wordIndices.map { x => x.resourceLocationId }.toSet
-      val locations = ResourceLocationDAO(helper).select(locationIds)
+      val locations = ResourceLocationDAO.select(session, locationIds)
 
       val contentIds = wordIndices.map { x => x.indices.maxBy(_._2.size)._1 }.toSet
-      val contents = ResourceContentDAO(helper).select(contentIds)
+      val contents = ResourceContentDAO.select(session, contentIds)
 
       val results = wordIndices.map { x =>
         {
@@ -57,7 +50,7 @@ class Application extends Controller {
             case Some(v) => v
             case None    => throw new RuntimeException(s"indices not found by resourceContentId:$resourceContentId")
           }
-          
+
           // ファイル以外のリソースも考慮
           val indexer = FileIndexerFactory.create(location.indexerClassName)
           val keyStr = Seq(
@@ -78,34 +71,30 @@ class Application extends Controller {
             location.modified,
             keyStr,
             content.content,
+            content.prevContent,
+            content.nextContent,
             indices,
             location.indexerClassName,
             location.indexGenerated)
         }
       }.toSeq
 
-//      println(Json.toJson(results))
-      println(s"${System.currentTimeMillis() - start2}ms")
-
+      println(s"ellapsed ${System.currentTimeMillis() - start1}ms for ${results.size} results.")
       Ok(Json.toJson(results))
 
     } finally {
-      Akka.system.scheduler.scheduleOnce(0.second) {
-        helper.close
-        println("helper closed.")
-      }
-      println(s"${System.currentTimeMillis() - start}ms in total")
+      session.closeAsync()
     }
+
   }
 
   def runIndexer = Action {
     request =>
-      val helper = CassandraHelper()
-      helper.open(DBSettings.host, DBSettings.port, DBSettings.keyspace)
+      val session = CassandraHelper.getSession
       try {
-        ResourceIndexer.createIndex(helper, Paths.get("/Users/RyoutaNomura/Desktop/odssample").toUri)
+        ResourceIndexer.generateIndex(session, Paths.get("/Users/RyoutaNomura/Desktop/odssample").toUri)
       } finally {
-        helper.close
+        session.closeAsync()
       }
       Ok
   }

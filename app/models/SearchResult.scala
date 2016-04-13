@@ -17,6 +17,8 @@ case class SearchResult(
     resourceModified: Date,
     keys: String,
     content: String,
+    prevContent: String,
+    nextContent: String,
     positions: Set[Tuple2[Int, Int]],
     indexerClassName: String,
     indexGenerated: Date) {
@@ -29,6 +31,8 @@ case class SearchResult(
     StringUtils.EMPTY,
     new Date,
     new Date,
+    StringUtils.EMPTY,
+    StringUtils.EMPTY,
     StringUtils.EMPTY,
     StringUtils.EMPTY,
     Set.empty,
@@ -51,6 +55,8 @@ object SearchResult {
     (__ \ "resourceModified").write[Date](Writes.dateWrites("yyyy-MM-dd")) and
     (__ \ "keys").write[String] and
     (__ \ "content").write[String] and
+    (__ \ "prevContent").write[String] and
+    (__ \ "nextContent").write[String] and
     (__ \ "positions").lazyWrite(Writes.traversableWrites[Tuple2[Int, Int]](JsonCombinators.tuple2Writes)) and
     (__ \ "indexerClassName").write[String] and
     (__ \ "indexGenerated").write[Date](Writes.dateWrites("yyyy-MM-dd"))
