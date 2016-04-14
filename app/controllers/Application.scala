@@ -4,7 +4,7 @@ import java.net.URI
 import java.nio.file.Paths
 import scala.collection.JavaConversions._
 import daos._
-import logic.indexer.ResourceIndexer
+import logic.ResourceIndexer
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc.Action
 import play.api.mvc.Controller
@@ -85,7 +85,6 @@ class Application extends Controller {
     } finally {
       session.closeAsync()
     }
-
   }
 
   def runIndexer = Action {

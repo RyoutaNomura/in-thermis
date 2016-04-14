@@ -6,6 +6,6 @@ import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Paths
 
-class FileWalker extends ResourceWalker {
-  override def walk(uri: URI, f: => Unit): Unit = Files.walk(Paths.get(uri)).iterator().foreach(_ => f)
+object FileWalker extends ResourceWalker {
+  override def walk(uri: URI, foreach: URI => Unit): Unit = Files.walk(Paths.get(uri)).iterator().map(_.toUri).foreach(foreach)
 }

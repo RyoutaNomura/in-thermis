@@ -3,6 +3,9 @@ package logic.indexer
 import java.net.URI
 import models.IndexerResult
 import models.Content
+import java.util.Date
+import java.nio.file.Files
+import java.nio.file.Paths
 
 trait FileIndexer {
   def getResourceTypeName: String
@@ -10,6 +13,10 @@ trait FileIndexer {
   def getPriority: Int
   def isTarget(uri: URI): Boolean
   def generateIndex(uri: URI): IndexerResult
+  
+  def getLastModified(uri: URI): Date = {
+    new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis)
+  }
   
   def fillSibilingContent(contents: Seq[Content]) = {
     contents.sliding(2).foreach {
