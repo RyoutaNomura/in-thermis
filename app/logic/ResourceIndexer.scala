@@ -8,6 +8,7 @@ import logic.walker.ResourceWalkerFactory
 object ResourceIndexer {
 
   def generateIndex(session: Session, uri: URI) {
-    ResourceWalkerFactory.create(uri).walk(session, uri)
+    var walker = ResourceWalkerFactory.create(uri)
+    walker.walk(session, uri)
   }
 }
