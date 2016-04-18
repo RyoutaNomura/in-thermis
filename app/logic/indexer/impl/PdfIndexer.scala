@@ -22,8 +22,6 @@ import com.google.common.base.Strings
 import com.google.common.base.Splitter
 
 object PdfIndexer extends FileIndexer {
-  val className = ReflectionUtils.toType(PdfIndexer.getClass).typeSymbol.fullName
-
   override def getPriority: Int = 0
   override def getResourceTypeName: String = "Adobe PDF Document"
   override def getKeyTitles: Tuple3[String, String, String] = ("Page: ", "Line: ", StringUtils.EMPTY)
@@ -65,7 +63,7 @@ object PdfIndexer extends FileIndexer {
         new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis()),
         new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis()),
         contents,
-        className,
+        this.getClassName,
         new Date)
 
     } finally {

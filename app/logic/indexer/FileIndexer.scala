@@ -6,6 +6,7 @@ import models.Content
 import java.util.Date
 import java.nio.file.Files
 import java.nio.file.Paths
+import utils.ReflectionUtils
 
 trait FileIndexer {
   def getResourceTypeName: String
@@ -13,6 +14,8 @@ trait FileIndexer {
   def getPriority: Int
   def isTarget(uri: URI): Boolean
   def generateIndex(uri: URI): IndexerResult
+  
+  def getClassName = ReflectionUtils.toType(this.getClass).typeSymbol.fullName
   
   def getLastModified(uri: URI): Date = {
     new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis)

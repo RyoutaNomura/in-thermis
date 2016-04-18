@@ -15,11 +15,13 @@ import models.IndexerResult
 import java.io.File
 
 object TextIndexer extends FileIndexer {
-  val className = ReflectionUtils.toType(TextIndexer.getClass).typeSymbol.fullName
 
   override def getPriority: Int = 0
+  
   override def getResourceTypeName: String = "Plain Text File"
+  
   override def getKeyTitles: Tuple3[String, String, String] = ("Line: ", StringUtils.EMPTY, StringUtils.EMPTY)
+  
   override def isTarget(uri: URI): Boolean = uri.toString() match {
     case s if s.endsWith(".txt") => true
     case s if s.endsWith(".md")  => true
@@ -44,7 +46,7 @@ object TextIndexer extends FileIndexer {
         new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis()),
         new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis()),
         contents,
-        className,
+        this.getClassName,
         new Date)
     } finally {
       source.close()

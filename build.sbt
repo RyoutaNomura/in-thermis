@@ -27,6 +27,9 @@ libraryDependencies += "org.apache.odftoolkit" % "simple-odf" % "0.8.1-incubatin
 libraryDependencies += "org.apache.pdfbox" % "pdfbox" % "2.0.0"
 libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.1"
 libraryDependencies += "com.taskadapter" % "redmine-java-api" % "2.6.0"
+libraryDependencies += "org.apache.poi" % "poi" % "3.14"
 libraryDependencies += "org.apache.poi" % "poi-ooxml" % "3.14"
+libraryDependencies += "org.apache.poi" % "poi-scratchpad" % "3.14"
+
 
 

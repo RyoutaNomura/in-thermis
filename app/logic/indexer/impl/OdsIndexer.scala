@@ -22,8 +22,6 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
 
 object OdsIndexer extends FileIndexer {
-  val className = ReflectionUtils.toType(OdsIndexer.getClass).typeSymbol.fullName
-
   override def getPriority: Int = 0
 
   override def isTarget(uri: URI): Boolean = uri.toString match {
@@ -45,7 +43,7 @@ object OdsIndexer extends FileIndexer {
       new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis()),
       new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis()),
       contents,
-      className,
+      this.getClassName,
       new Date)
   }
 
