@@ -23,3 +23,7 @@ target
 # Play
 logs
 RUNNING_PID
+
+# bower
+
+public/bower_components
