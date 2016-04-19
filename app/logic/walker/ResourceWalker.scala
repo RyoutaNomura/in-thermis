@@ -29,7 +29,7 @@ trait ResourceWalker {
           persistIndex(session, indexer.generateIndex(uri))
         }
         case Some(s) => {
-                    // 何もしない
+          // 何もしない
           println(s"latest index fount at ${uri}.")
         }
         case None => {

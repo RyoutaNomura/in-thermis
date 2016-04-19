@@ -1,7 +1,8 @@
 package dtos
 
-import org.apache.commons.lang3.StringUtils
 import java.util.UUID
+
+import org.apache.commons.lang3.StringUtils
 
 case class ResourceContentDTO(
     var id: UUID,

@@ -1,10 +1,11 @@
 package models
 
-import java.net.URI
 import java.util.Date
+
 import org.apache.commons.lang3.StringUtils
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
+
+import play.api.libs.functional.syntax.{ toFunctionalBuilderOps, unlift }
+import play.api.libs.json.{ Writes, __ }
 import utils.JsonCombinators
 
 case class SearchResult(
@@ -59,6 +60,5 @@ object SearchResult {
     (__ \ "nextContent").write[String] and
     (__ \ "positions").lazyWrite(Writes.traversableWrites[Tuple2[Int, Int]](JsonCombinators.tuple2Writes)) and
     (__ \ "indexerClassName").write[String] and
-    (__ \ "indexGenerated").write[Date](Writes.dateWrites("yyyy-MM-dd"))
-  )(unlift(SearchResult.unapply))
+    (__ \ "indexGenerated").write[Date](Writes.dateWrites("yyyy-MM-dd")))(unlift(SearchResult.unapply))
 }

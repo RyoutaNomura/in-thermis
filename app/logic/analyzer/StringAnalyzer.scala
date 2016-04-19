@@ -1,12 +1,12 @@
 package logic.analyzer
 
-import scala.collection.JavaConversions._
-import org.apache.commons.lang3.StringUtils
-import net.java.sen.SenFactory
-import scala.collection.mutable.Buffer
 import java.util.ArrayList
-import com.google.common.collect.Lists
-import scala.collection.mutable.ArrayBuffer
+
+import scala.collection.JavaConversions._
+
+import org.apache.commons.lang3.StringUtils
+
+import net.java.sen.SenFactory
 import net.java.sen.dictionary.Token
 
 case class AnalyzeResult(
@@ -24,10 +24,10 @@ object StringAnalyzer {
     }
 
     val tagger = SenFactory.getStringTagger(dictDir)
-    
+
     tagger.analyze(text, reuseList)
       .filter(x => StringUtils.startsWithAny(x.getMorpheme.getPartOfSpeech, "名詞", "動詞"))
-      .map{x => 
+      .map { x =>
         x.getMorpheme.getBasicForm match {
           case "*" => AnalyzeResult(x.toString, x.getStart, x.getLength)
           case _   => AnalyzeResult(x.getMorpheme.getBasicForm, x.getStart, x.getLength)

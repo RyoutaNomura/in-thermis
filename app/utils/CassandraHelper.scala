@@ -1,26 +1,13 @@
 package utils
 
-import collection.JavaConversions._
-import scala.collection.JavaConverters._
-import java.nio.ByteBuffer
-import java.nio.charset.Charset
+import scala.annotation.migration
+import scala.collection.JavaConversions._
+import scala.reflect.ClassTag
 import scala.reflect.runtime.{ universe => ru }
 import ru._
-import scala.reflect.ClassTag
-import scala.util.{ Try, Success, Failure }
+import scala.util.{ Failure, Success }
+import com.datastax.driver.core.{ BoundStatement, Cluster, DataType, Metadata, Row, Session }
 import com.google.common.base.CaseFormat
-import com.datastax.driver.core.Cluster
-import com.datastax.driver.core.ResultSet
-import com.datastax.driver.core.Statement
-import com.datastax.driver.core.SimpleStatement
-import com.datastax.driver.core.PreparedStatement
-import com.datastax.driver.core.Row
-import com.datastax.driver.core.DataType
-import java.util.Collection
-import com.datastax.driver.core.Session
-import play.api.libs.concurrent.Akka
-import com.datastax.driver.core.BoundStatement
-import com.datastax.driver.core.Metadata
 
 object CassandraHelper {
 
@@ -53,7 +40,7 @@ object CassandraHelper {
       session.execute(new BoundStatement(stmt).bind(params: _*))
     } catch {
       case t: Throwable => throw t
-    } 
+    }
   }
 
   def getRows[T: TypeTag: ClassTag](session: Session, clazz: Class[T], cql: String, params: AnyRef*): Seq[T] = {

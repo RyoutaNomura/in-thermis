@@ -1,25 +1,23 @@
 package logic.indexer.impl
 
-import scala.collection.JavaConversions._
-import logic.indexer.FileIndexer
-import java.net.URI
 import java.io.File
-import org.apache.commons.lang3.StringUtils
-import org.apache.pdfbox.pdmodel.PDDocument
-import org.apache.pdfbox.pdfparser.PDFParser
-import org.apache.pdfbox.io.RandomAccessFile
-import org.apache.pdfbox.text.PDFTextStripper
-import models.IndexerResult
-import java.nio.file.Paths
-import java.nio.file.Path
-import java.nio.file.Files
-import org.apache.commons.io.FilenameUtils
+import java.net.URI
+import java.nio.file.{ Files, Paths }
 import java.util.Date
-import utils.ReflectionUtils
-import models.Content
-import logic.analyzer.StringAnalyzer
-import com.google.common.base.Strings
+
+import scala.collection.JavaConversions._
+
+import org.apache.commons.io.FilenameUtils
+import org.apache.commons.lang3.StringUtils
+import org.apache.pdfbox.io.RandomAccessFile
+import org.apache.pdfbox.pdfparser.PDFParser
+import org.apache.pdfbox.text.PDFTextStripper
+
 import com.google.common.base.Splitter
+
+import logic.analyzer.StringAnalyzer
+import logic.indexer.FileIndexer
+import models.{ Content, IndexerResult }
 
 object PdfIndexer extends FileIndexer {
   override def getPriority: Int = 0
@@ -51,7 +49,7 @@ object PdfIndexer extends FileIndexer {
                   val indices = StringAnalyzer.analyze(line).map { x => (x.word, x.start, x.length) }
                   Content(pageIndex.toString, lineNo.toString, StringUtils.EMPTY, line, StringUtils.EMPTY, StringUtils.EMPTY, indices)
               }.toList
-              
+
             fillSibilingContent(pageContents)
             pageContents
           }

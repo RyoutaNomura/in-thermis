@@ -1,20 +1,14 @@
 package controllers
 
-import java.net.URI
 import java.nio.file.Paths
-import scala.collection.JavaConversions._
-import daos._
+
+import daos.{ ResourceContentDAO, ResourceLocationDAO, WordIndicesDAO }
 import logic.ResourceIndexer
-import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.Action
-import play.api.mvc.Controller
-import settings.DBSettings
-import utils.CassandraHelper
-import play.libs.Akka
-import scala.concurrent.duration._
-import play.api.libs.json.Json
-import models.SearchResult
 import logic.indexer.FileIndexerFactory
+import models.SearchResult
+import play.api.libs.json.Json
+import play.api.mvc.{ Action, Controller }
+import utils.CassandraHelper
 
 class Application extends Controller {
 

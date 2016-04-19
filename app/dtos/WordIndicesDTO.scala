@@ -1,12 +1,8 @@
 package dtos
 
-import org.apache.commons.lang3.StringUtils
-import com.datastax.driver.core.TupleValue
-import com.datastax.driver.core.Metadata
-import com.datastax.driver.core.DataType
-import com.datastax.driver.core.TupleType
 import java.util.UUID
-import java.util.HashMap
+
+import org.apache.commons.lang3.StringUtils
 
 case class WordIndicesDTO(
     var resourceLocationId: UUID,

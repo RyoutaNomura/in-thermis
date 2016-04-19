@@ -1,16 +1,14 @@
 package daos
 
-import scala.collection.JavaConversions._
-import utils.CassandraHelper
-import settings.DBSettings
-import dtos.WordIndicesDTO
-import dtos.WordIndicesDTO
-import utils.JsonCombinators
-import play.api.libs.json.Json
 import java.util.UUID
-import com.datastax.driver.core.DataType
-import com.datastax.driver.core.TupleValue
-import com.datastax.driver.core.Session
+
+import scala.collection.JavaConversions._
+import scala.reflect.runtime.universe
+
+import com.datastax.driver.core.{ Session, TupleValue, DataType }
+
+import dtos.WordIndicesDTO
+import utils.CassandraHelper
 
 object WordIndicesDAO {
 

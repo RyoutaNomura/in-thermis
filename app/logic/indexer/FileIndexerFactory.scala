@@ -1,14 +1,15 @@
 package logic.indexer
 
 import java.net.URI
+
 import scala.collection.JavaConversions._
+import scala.collection.mutable.LinkedHashMap
 import scala.reflect.runtime.universe
-import scala.util.Success
+
 import com.google.common.reflect.ClassPath
+
 import logic.indexer.impl.NullIndexer
 import utils.ReflectionUtils
-import scala.util.Failure
-import scala.collection.mutable.LinkedHashMap
 
 object FileIndexerFactory {
 

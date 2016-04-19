@@ -2,24 +2,18 @@ package logic.indexer.impl
 
 import java.io.File
 import java.net.URI
-import java.nio.file.Files
-import java.nio.file.Paths
+import java.nio.file.{ Files, Paths }
 import java.util.Date
+
+import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
-import org.odftoolkit.odfdom.dom.element.table.TableTableCellElementBase
-import org.odftoolkit.odfdom.dom.element.table.TableTableRowElement
+import org.odftoolkit.odfdom.dom.element.table.{ TableTableCellElementBase, TableTableRowElement }
 import org.odftoolkit.simple.SpreadsheetDocument
-import org.odftoolkit.simple.table.Cell
-import org.odftoolkit.simple.table.Row
-import org.odftoolkit.simple.table.Table
+import org.odftoolkit.simple.table.{ Cell, Row, Table }
+
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
-import models.Content
-import models.IndexerResult
-import org.apache.commons.io.FilenameUtils
-import utils.ReflectionUtils
-import scala.collection.mutable.HashMap
-import scala.collection.mutable.HashSet
+import models.{ Content, IndexerResult }
 
 object OdsIndexer extends FileIndexer {
   override def getPriority: Int = 0

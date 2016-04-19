@@ -1,11 +1,14 @@
 package daos
 
+import java.util.UUID
+
 import scala.collection.JavaConversions._
+import scala.reflect.runtime.universe
+
+import com.datastax.driver.core.Session
+
 import dtos.ResourceContentDTO
 import utils.CassandraHelper
-import java.util.UUID
-import utils.CassandraHelper
-import com.datastax.driver.core.Session
 
 object ResourceContentDAO {
 
@@ -22,7 +25,7 @@ object ResourceContentDAO {
     }
   }
 
-  def insert(session: Session,dto: ResourceContentDTO) {
+  def insert(session: Session, dto: ResourceContentDTO) {
     CassandraHelper.execCql(session, "INSERT INTO resource_content(id, key1, key2, key3, content, prev_content, next_content, resource_location_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
       dto.id,
       dto.key1,
