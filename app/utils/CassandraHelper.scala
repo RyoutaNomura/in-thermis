@@ -1,21 +1,21 @@
 package utils
 
-import scala.annotation.migration
 import scala.collection.JavaConversions._
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{ universe => ru }
 import ru._
 import scala.util.{ Failure, Success }
+
 import com.datastax.driver.core.{ BoundStatement, Cluster, DataType, Metadata, Row, Session }
 import com.google.common.base.CaseFormat
+
+import settings.DBSettings
 
 object CassandraHelper {
 
   private val runtimeMirror = ru.runtimeMirror(Thread.currentThread.getContextClassLoader)
 
   private var cluster: Cluster = _
-
-  private var keyspace = "mykeyspace"
 
   var metadata: Metadata = _
 
@@ -32,7 +32,7 @@ object CassandraHelper {
     println(s"CassandraHelper.cluster closed.")
   }
 
-  def getSession: Session = cluster.connect(keyspace)
+  def getSession: Session = cluster.connect(DBSettings.keyspace)
 
   def execCql(session: Session, cql: String, params: AnyRef*) = {
     try {

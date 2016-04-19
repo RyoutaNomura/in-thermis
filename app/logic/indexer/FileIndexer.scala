@@ -16,10 +16,6 @@ trait FileIndexer {
 
   def getClassName = ReflectionUtils.toType(this.getClass).typeSymbol.fullName
 
-  def getLastModified(uri: URI): Date = {
-    new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis)
-  }
-
   def fillSibilingContent(contents: Seq[Content]) = {
     contents.sliding(2).foreach {
       case elm1 :: elm2 :: Nil => {

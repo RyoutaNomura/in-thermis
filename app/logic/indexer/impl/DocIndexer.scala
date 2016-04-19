@@ -14,6 +14,7 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
 import models.{ Content, IndexerResult }
+import utils.FileTimeUtils
 
 object DocIndexer extends FileIndexer {
 
@@ -46,8 +47,8 @@ object DocIndexer extends FileIndexer {
         uri,
         FilenameUtils.getBaseName(Paths.get(uri).toString()),
         Files.size(Paths.get(uri)),
-        new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis()),
-        new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis()),
+        FileTimeUtils.getCreated(uri),
+        FileTimeUtils.getLastModified(uri),
         contents,
         this.getClassName,
         new Date)

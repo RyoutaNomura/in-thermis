@@ -9,6 +9,7 @@ import daos.ResourceContentDAO
 import daos.WordIndicesDAO
 import logic.indexer.FileIndexerFactory
 import logic.indexer.FileIndexer
+import utils.FileTimeUtils
 
 trait ResourceWalker {
 
@@ -18,7 +19,7 @@ trait ResourceWalker {
     walk(uri, uri => {
       val indexer = FileIndexerFactory.create(uri)
       // リソースの最終更新日時を取得      
-      val lastModified = indexer.getLastModified(uri)
+      val lastModified = FileTimeUtils.getLastModified(uri)
 
       // DBのインデックスを取得
       ResourceLocationDAO.find(session, uri.toString) match {
