@@ -1,8 +1,8 @@
 package utils
 
-import language.higherKinds
-import play.api.libs.json.JsArray
-import play.api.libs.json.Writes
+import scala.language.higherKinds
+
+import play.api.libs.json.{ JsArray, Writes }
 
 object JsonCombinators {
   implicit def tuple2Writes[A, B](implicit a: Writes[A], b: Writes[B]): Writes[Tuple2[A, B]] = new Writes[Tuple2[A, B]] {

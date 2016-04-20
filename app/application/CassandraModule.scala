@@ -1,12 +1,12 @@
 package application
 
-import play.api._
-import javax.inject._
-import play.api.inject._
-import scala.concurrent._
-import scala.concurrent.ExecutionContext.Implicits.global
-import utils.CassandraHelper
+import scala.concurrent.Future
+
+import javax.inject.{ Inject, Singleton }
+import play.api.{ Configuration, Environment }
+import play.api.inject.{ ApplicationLifecycle, Module }
 import settings.DBSettings
+import utils.CassandraHelper
 
 class CassandraModule extends Module {
   def bindings(environment: Environment, configuration: Configuration) = {

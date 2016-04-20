@@ -1,16 +1,15 @@
 package utils
 
+import scala.reflect.ClassTag
 import scala.reflect.runtime.{ universe => ru }
 import ru._
-
-import scala.util.{ Try, Success, Failure }
-import scala.reflect.ClassTag
+import scala.util.Try
 
 object ReflectionUtils {
 
   private val runtimeMirror = ru.runtimeMirror(Thread.currentThread.getContextClassLoader)
 
-  def getObjectInstance[T: TypeTag](t: Type):T = {
+  def getObjectInstance[T: TypeTag](t: Type): T = {
     val moduleSymbol = runtimeMirror.staticModule(t.typeSymbol.fullName)
     val module = runtimeMirror.reflectModule(moduleSymbol)
     module.instance.asInstanceOf[T]

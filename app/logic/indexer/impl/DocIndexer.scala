@@ -1,21 +1,22 @@
 package logic.indexer.impl
 
 import java.net.URI
-import org.apache.commons.lang3.StringUtils
-import models.IndexerResult
-import org.apache.poi.xwpf.usermodel.XWPFDocument
-import org.apache.poi.hwpf.HWPFDocument
-import logic.analyzer.StringAnalyzer
-import models.Content
-import org.apache.poi.hwpf.extractor.WordExtractor
-import org.apache.poi.xwpf.extractor.XWPFWordExtractor
-import logic.indexer.FileIndexer
-import org.apache.commons.io.FilenameUtils
-import java.nio.file.Paths
-import java.nio.file.Files
+import java.nio.file.{ Files, Paths }
 import java.util.Date
 
-class DocIndexer extends FileIndexer {
+import org.apache.commons.io.FilenameUtils
+import org.apache.commons.lang3.StringUtils
+import org.apache.poi.hwpf.HWPFDocument
+import org.apache.poi.hwpf.extractor.WordExtractor
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor
+import org.apache.poi.xwpf.usermodel.XWPFDocument
+
+import logic.analyzer.StringAnalyzer
+import logic.indexer.FileIndexer
+import models.{ Content, IndexerResult }
+import utils.FileTimeUtils
+
+object DocIndexer extends FileIndexer {
 
   override def getResourceTypeName: String = "Microsoft Word Document"
 
@@ -29,9 +30,9 @@ class DocIndexer extends FileIndexer {
 
     val stream = uri.toURL.openStream
     val extractor = uri.toString match {
-      case s if s.endsWith(".doc") => new WordExtractor(new HWPFDocument(stream))
+      case s if s.endsWith(".doc")  => new WordExtractor(new HWPFDocument(stream))
       case s if s.endsWith(".docx") => new XWPFWordExtractor(new XWPFDocument(stream))
-      case _ => throw new IllegalArgumentException(s"$uri is not supported.")
+      case _                        => throw new IllegalArgumentException(s"$uri is not supported.")
     }
 
     try {
@@ -46,8 +47,8 @@ class DocIndexer extends FileIndexer {
         uri,
         FilenameUtils.getBaseName(Paths.get(uri).toString()),
         Files.size(Paths.get(uri)),
-        new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis()),
-        new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis()),
+        FileTimeUtils.getCreated(uri),
+        FileTimeUtils.getLastModified(uri),
         contents,
         this.getClassName,
         new Date)

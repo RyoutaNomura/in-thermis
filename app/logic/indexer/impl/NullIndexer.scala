@@ -1,10 +1,11 @@
 package logic.indexer.impl
 
 import java.net.URI
-import models.IndexerResult
-import models.IndexerResult
-import logic.indexer.FileIndexer
+
 import org.apache.commons.lang3.StringUtils
+
+import logic.indexer.FileIndexer
+import models.IndexerResult
 
 object NullIndexer extends FileIndexer {
 

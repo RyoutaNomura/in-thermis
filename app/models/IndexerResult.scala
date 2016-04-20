@@ -1,14 +1,13 @@
 package models
 
 import java.net.URI
-import java.util.Date
-import java.util.UUID
-import scala.collection.mutable.HashMap
-import scala.collection.mutable.HashSet
-import dtos.ResourceContentDTO
-import dtos.ResourceLocationDTO
-import dtos.WordIndicesDTO
+import java.util.{ Date, UUID }
+
+import scala.collection.mutable.{ HashMap, HashSet }
+
 import org.apache.commons.lang3.StringUtils
+
+import dtos.{ ResourceContentDTO, ResourceLocationDTO, WordIndicesDTO }
 
 case class IndexerResult(
     uri: URI,
@@ -50,7 +49,7 @@ case class IndexerResult(
   val wordIndicesDTOs = {
     generateIndexMap.map { i =>
       val word = i._1
-      val count = i._2.values.foldLeft(0)((acc,i) => acc + i.size)
+      val count = i._2.values.foldLeft(0)((acc, i) => acc + i.size)
       val indices = i._2.map { idx => (idx._1, idx._2.toSet) }.toMap
       WordIndicesDTO(
         locationId,
@@ -78,7 +77,7 @@ case class IndexerResult(
         val word = pair._1
         val contentId = pair._2
         val indices = pair._3
-        
+
         val contents = acc.getOrElseUpdate(word, HashMap.empty)
         val contentIndices = contents.getOrElseUpdate(contentId, HashSet.empty)
         contentIndices.add(indices)
@@ -106,25 +105,24 @@ object IndexerResult {
 }
 
 case class Content(
-    var key1: String,
-    var key2: String,
-    var key3: String,
-    var content: String,
-    var prevContent: String,
-    var nextContent: String,
-    // word, start, length
-//    indices: Map[String, Set[Tuple2[Int, Int]]])
-    indices: Seq[Tuple3[String, Int, Int]]
-)
+  var key1: String,
+  var key2: String,
+  var key3: String,
+  var content: String,
+  var prevContent: String,
+  var nextContent: String,
+  // word, start, length
+  //    indices: Map[String, Set[Tuple2[Int, Int]]])
+  indices: Seq[Tuple3[String, Int, Int]])
 
 object Content {
   def apply(): Content = Content(
-      StringUtils.EMPTY, 
-      StringUtils.EMPTY, 
-      StringUtils.EMPTY, 
-      StringUtils.EMPTY, 
-      StringUtils.EMPTY, 
-      StringUtils.EMPTY, 
-      Seq.empty)
+    StringUtils.EMPTY,
+    StringUtils.EMPTY,
+    StringUtils.EMPTY,
+    StringUtils.EMPTY,
+    StringUtils.EMPTY,
+    StringUtils.EMPTY,
+    Seq.empty)
 }
- 
+

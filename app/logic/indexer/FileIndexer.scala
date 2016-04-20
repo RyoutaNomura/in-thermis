@@ -1,11 +1,10 @@
 package logic.indexer
 
 import java.net.URI
-import models.IndexerResult
-import models.Content
+import java.nio.file.{ Files, Paths }
 import java.util.Date
-import java.nio.file.Files
-import java.nio.file.Paths
+
+import models.{ Content, IndexerResult }
 import utils.ReflectionUtils
 
 trait FileIndexer {
@@ -14,13 +13,8 @@ trait FileIndexer {
   def getPriority: Int
   def isTarget(uri: URI): Boolean
   def generateIndex(uri: URI): IndexerResult
-  
+
   def getClassName = ReflectionUtils.toType(this.getClass).typeSymbol.fullName
-  
-  def getLastModified(uri: URI): Date = {
-    new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis)
-  }
-  
   def fillSibilingContent(contents: Seq[Content]) = {
     contents.sliding(2).foreach {
       case elm1 :: elm2 :: Nil => {
