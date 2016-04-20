@@ -15,7 +15,6 @@ trait FileIndexer {
   def generateIndex(uri: URI): IndexerResult
 
   def getClassName = ReflectionUtils.toType(this.getClass).typeSymbol.fullName
-
   def fillSibilingContent(contents: Seq[Content]) = {
     contents.sliding(2).foreach {
       case elm1 :: elm2 :: Nil => {
