@@ -4,7 +4,7 @@ version := "1.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
 
 //scalacOptions += "-Ylog-classpath"
 
@@ -30,6 +30,7 @@ libraryDependencies += "com.taskadapter" % "redmine-java-api" % "2.6.0"
 libraryDependencies += "org.apache.poi" % "poi" % "3.14"
 libraryDependencies += "org.apache.poi" % "poi-ooxml" % "3.14"
 libraryDependencies += "org.apache.poi" % "poi-scratchpad" % "3.14"
+libraryDependencies += "com.ibm.icu" % "icu4j" % "57.1"
 
 
 
