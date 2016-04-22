@@ -1,27 +1,26 @@
 package logic.indexer.impl
 
-import collection.JavaConversions._
 import java.net.URI
 import java.nio.file.{ Files, Paths }
 import java.util.Date
+
+import scala.collection.JavaConversions._
+
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
-import org.apache.poi.hslf.extractor.PowerPointExtractor
-import org.apache.poi.xslf.extractor.XSLFPowerPointExtractor
-import org.apache.poi.xslf.usermodel.XSLFSlideShow
+import org.apache.poi.hslf.usermodel.{ HSLFSlideShow, HSLFTextParagraph }
+import org.apache.poi.xslf.usermodel.XMLSlideShow
+
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
 import models.{ Content, IndexerResult }
 import utils.FileTimeUtils
-import org.apache.poi.xslf.usermodel.XMLSlideShow
-import org.apache.poi.hslf.usermodel.HSLFSlideShow
-import org.apache.poi.hslf.usermodel.HSLFTextParagraph
 
 object PptIndexer extends FileIndexer {
 
   override def getResourceTypeName: String = "Microsoft PowerPoint Document"
 
-  override def getKeyTitles: Tuple3[String, String, String] = ("Page: ", StringUtils.EMPTY, StringUtils.EMPTY)
+  override def getKeyTitles: Tuple3[String, String, String] = ("Slide: ", StringUtils.EMPTY, StringUtils.EMPTY)
 
   override def getPriority: Int = 0
 
@@ -58,7 +57,7 @@ object PptIndexer extends FileIndexer {
             case (line, lineNo) =>
               val indices = StringAnalyzer.analyze(line).map { x => (x.word, x.start, x.length) }
               Content(
-                slideNo.toString,
+                slideNo + 1.toString,
                 lineNo.toString,
                 StringUtils.EMPTY,
                 line,

@@ -99,6 +99,8 @@
  | OpenDocument Text         | .odt        |
  | OpenDocument Presentation | .odp        |
  | PDF                       | .pdf        |
+ | HTML                      | .html, .htm |
+ | Rich Text                 | .rtf        |
 
 ##### A.2 未対応ファイルをテキストとしてインデクシング
 上記フォーマットと認識できない場合に、テキストファイルと解釈してインデクシングする。

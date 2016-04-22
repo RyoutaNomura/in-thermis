@@ -39,7 +39,7 @@ object DocIndexer extends FileIndexer {
       val contents = extractor.getText.lines.zipWithIndex.map {
         case (line, lineNo) =>
           val indices = StringAnalyzer.analyze(line).map { x => (x.word, x.start, x.length) }
-          Content(lineNo.toString, StringUtils.EMPTY, StringUtils.EMPTY, line, StringUtils.EMPTY, StringUtils.EMPTY, indices)
+          Content(lineNo + 1.toString, StringUtils.EMPTY, StringUtils.EMPTY, line, StringUtils.EMPTY, StringUtils.EMPTY, indices)
       }.toList
       fillSibilingContent(contents)
 
