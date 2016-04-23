@@ -21,9 +21,13 @@ import models.{ Content, IndexerResult }
 import utils.FileTimeUtils
 
 object PdfIndexer extends FileIndexer {
-  override def getPriority: Int = 0
+
   override def getResourceTypeName: String = "Adobe PDF Document"
+
   override def getKeyTitles: Tuple3[String, String, String] = ("Page: ", "Line: ", StringUtils.EMPTY)
+
+  override def getPriority: Int = 0
+
   override def isTarget(uri: URI): Boolean = uri.toString().endsWith(".pdf")
 
   override def generateIndex(uri: URI): IndexerResult = {
@@ -48,7 +52,7 @@ object PdfIndexer extends FileIndexer {
               .map {
                 case (line, lineNo) =>
                   val indices = StringAnalyzer.analyze(line).map { x => (x.word, x.start, x.length) }
-                  Content(pageIndex.toString, lineNo.toString, StringUtils.EMPTY, line, StringUtils.EMPTY, StringUtils.EMPTY, indices)
+                  Content(pageIndex + 1.toString, lineNo.toString, StringUtils.EMPTY, line, StringUtils.EMPTY, StringUtils.EMPTY, indices)
               }.toList
 
             fillSibilingContent(pageContents)

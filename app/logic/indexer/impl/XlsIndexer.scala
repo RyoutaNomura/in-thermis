@@ -53,6 +53,7 @@ object XlsIndexer extends FileIndexer {
                 case _                      => StringUtils.EMPTY
               }))
               val indices = StringAnalyzer.analyze(rowStr).map { x => (x.word, x.start, x.length) }
+              // TODO rownumがずれているかもしれない
               Content(sheet.getSheetName, row.getRowNum.toString(), StringUtils.EMPTY, rowStr, StringUtils.EMPTY, StringUtils.EMPTY, indices)
             }
         }.toList

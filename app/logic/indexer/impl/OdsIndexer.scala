@@ -17,6 +17,11 @@ import models.{ Content, IndexerResult }
 import utils.FileTimeUtils
 
 object OdsIndexer extends FileIndexer {
+
+  override def getResourceTypeName: String = "OpenDocument SpreadSheet"
+
+  override def getKeyTitles: Tuple3[String, String, String] = ("Sheet: ", "Row: ", StringUtils.EMPTY)
+
   override def getPriority: Int = 0
 
   override def isTarget(uri: URI): Boolean = uri.toString match {
@@ -42,9 +47,6 @@ object OdsIndexer extends FileIndexer {
       new Date)
   }
 
-  override def getKeyTitles: Tuple3[String, String, String] = ("Sheet: ", "Row: ", StringUtils.EMPTY)
-  override def getResourceTypeName: String = "OpenDocument SpreadSheet"
-
   private def generateIndex(uri: URI, sheet: Table): Seq[Content] = {
     val indices = getRows(sheet).map { row => generateIndex(uri, sheet, row) }.collect { case Some(s) => s }.toList
     fillSibilingContent(indices)
@@ -59,6 +61,7 @@ object OdsIndexer extends FileIndexer {
       None
     } else {
       val indices = StringAnalyzer.analyze(line).map { x => (x.word, x.start, x.length) }
+      // TODO rownumがずれているかもしれない
       Some(Content(sheet.getTableName, row.getRowIndex.toString, StringUtils.EMPTY, line, StringUtils.EMPTY, StringUtils.EMPTY, indices))
     }
   }
