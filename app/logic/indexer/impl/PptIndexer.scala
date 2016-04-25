@@ -20,7 +20,7 @@ object PptIndexer extends FileIndexer {
 
   override def getResourceTypeName: String = "Microsoft PowerPoint Document"
 
-  override def getKeyTitles: Tuple3[String, String, String] = ("Slide: ", StringUtils.EMPTY, StringUtils.EMPTY)
+  override def getKeyTitles: Tuple3[String, String, String] = ("Slide", StringUtils.EMPTY, StringUtils.EMPTY)
 
   override def getPriority: Int = 0
 

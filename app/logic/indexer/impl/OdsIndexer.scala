@@ -20,7 +20,7 @@ object OdsIndexer extends FileIndexer {
 
   override def getResourceTypeName: String = "OpenDocument SpreadSheet"
 
-  override def getKeyTitles: Tuple3[String, String, String] = ("Sheet: ", "Row: ", StringUtils.EMPTY)
+  override def getKeyTitles: Tuple3[String, String, String] = ("Sheet", "Row", StringUtils.EMPTY)
 
   override def getPriority: Int = 0
 
