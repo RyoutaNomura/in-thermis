@@ -80,7 +80,7 @@ object CassandraHelper {
           case t: Throwable => //t.printStackTrace()
         }
         val tupleClass = Class.forName("scala.Tuple" + values.size)
-        val tupleType = runtimeMirror.classSymbol(tupleClass).toType
+        val tupleType = ReflectionUtils.toType(tupleClass)
         ReflectionUtils.createInstance(tupleType, values.map(cast): _*).get
       }
       case _ => javaValue

@@ -9,25 +9,27 @@ object ReflectionUtils {
 
   private val runtimeMirror = ru.runtimeMirror(Thread.currentThread.getContextClassLoader)
 
-  def getObjectInstance[T: TypeTag](t: Type): T = {
-    val moduleSymbol = runtimeMirror.staticModule(t.typeSymbol.fullName)
+  def getObjectInstance[A: TypeTag](t: Type): A = {
+    val typeName = t.typeSymbol.fullName
+    val moduleSymbol = runtimeMirror.staticModule(typeName)
     val module = runtimeMirror.reflectModule(moduleSymbol)
-    module.instance.asInstanceOf[T]
+    val instance = module.instance
+    instance.asInstanceOf[A]
   }
 
-  def createInstance[T: TypeTag](t: Type): Try[T] = Try {
-    val classMirror = runtimeMirror.reflectClass(t.typeSymbol.asClass)
+  def createInstance[A: TypeTag](t: Type): Try[A] = Try {
     val constructor = t.member(ru.termNames.CONSTRUCTOR).filter {
       _.asMethod.paramLists match {
         case List(Nil) => true
         case _         => false
       }
     }.asMethod
+    val classMirror = runtimeMirror.reflectClass(t.typeSymbol.asClass)
     val constructorMirror = classMirror.reflectConstructor(constructor)
-    constructorMirror().asInstanceOf[T]
+    constructorMirror().asInstanceOf[A]
   }
 
-  def createInstance[T: TypeTag](t: Type, args: Any*): Try[T] = Try {
+  def createInstance[A: TypeTag](t: Type, args: Any*): Try[A] = Try {
     val classMirror = runtimeMirror.reflectClass(t.typeSymbol.asClass)
     val constructor = t.member(ru.termNames.CONSTRUCTOR).filter {
       _.asMethod.paramLists match {
@@ -36,13 +38,13 @@ object ReflectionUtils {
       }
     }.asMethod
     def wrapper(args: Any*) = classMirror.reflectConstructor(constructor)(args: _*)
-    wrapper(args: _*).asInstanceOf[T]
+    wrapper(args: _*).asInstanceOf[A]
   }
 
-  def setValueToInstance[T: TypeTag: ClassTag](instance: T, name: String, value: Option[Any]) {
+  def setValueToInstance[A: TypeTag: ClassTag](instance: A, name: String, value: Option[Any]) {
     value match {
       case Some(v) =>
-        val t = ru.typeOf[T]
+        val t = ru.typeOf[A]
         val instanceMirror = runtimeMirror.reflect(instance)
 
         val symbol = t.decl(ru.TermName(name))

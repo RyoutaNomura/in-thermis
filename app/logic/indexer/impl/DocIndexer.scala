@@ -24,7 +24,11 @@ object DocIndexer extends FileIndexer {
 
   override def getPriority: Int = 0
 
-  override def isTarget(uri: URI): Boolean = uri.toString.endsWith(".doc") || uri.toString.endsWith(".docx")
+  override def isTarget(uri: URI): Boolean = uri.toString match {
+    case s if s.endsWith(".doc")  => true
+    case s if s.endsWith(".docx") => true
+    case _                        => false
+  }
 
   override def generateIndex(uri: URI): IndexerResult = {
 
