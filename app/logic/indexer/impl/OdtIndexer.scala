@@ -17,7 +17,7 @@ object OdtIndexer extends FileIndexer {
 
   override def getResourceTypeName: String = "OpenDocument Word Processor Document"
 
-  override def getKeyTitles: Tuple3[String, String, String] = ("Paragraph: ", StringUtils.EMPTY, StringUtils.EMPTY)
+  override def getKeyTitles: Tuple3[String, String, String] = ("Paragraph", StringUtils.EMPTY, StringUtils.EMPTY)
 
   override def getPriority: Int = 0
 

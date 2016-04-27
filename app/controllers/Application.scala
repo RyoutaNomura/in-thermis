@@ -48,9 +48,9 @@ class Application extends Controller {
           // ファイル以外のリソースも考慮
           val indexer = FileIndexerFactory.create(location.indexerClassName)
           val keyStr = Seq(
-            indexer.getKeyTitles._1 + content.key1,
-            indexer.getKeyTitles._2 + content.key2,
-            indexer.getKeyTitles._3 + content.key3)
+            s"${indexer.getKeyTitles._1}: ${content.key1}",
+            s"${indexer.getKeyTitles._2}: ${content.key2}",
+            s"${indexer.getKeyTitles._3}: ${content.key3}")
             .filter { x => !x.isEmpty }
             .mkString(" / ")
           val resourceTypeName = indexer.getResourceTypeName

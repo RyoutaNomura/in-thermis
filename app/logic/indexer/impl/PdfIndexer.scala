@@ -21,7 +21,7 @@ object PdfIndexer extends FileIndexer {
 
   override def getResourceTypeName: String = "Adobe PDF Document"
 
-  override def getKeyTitles: Tuple3[String, String, String] = ("Page: ", "Line: ", StringUtils.EMPTY)
+  override def getKeyTitles: Tuple3[String, String, String] = ("Page", "Line", StringUtils.EMPTY)
 
   override def getPriority: Int = 0
 
