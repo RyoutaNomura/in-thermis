@@ -1,16 +1,11 @@
 package logic.walker.impl
 
-import collection.JavaConversions._
-import logic.walker.ResourceWalker
 import java.net.URI
-import com.taskadapter.redmineapi.RedmineManager
-import com.taskadapter.redmineapi.RedmineManagerFactory
-import settings.RedmineSettings
+
+import logic.indexer.entity.IndexerResource
+import logic.walker.ResourceWalker
 
 object RedmineWalker extends ResourceWalker {
-  override def walk(uri: URI, foreach: URI => Unit): Unit = {
-    val mgr = RedmineManagerFactory.createWithApiKey(RedmineSettings.uri, RedmineSettings.apiAccessKey);
-
-
+  override def walk(uri: URI, generateIndex: IndexerResource => Unit): Unit = {
   }
 }

@@ -5,6 +5,7 @@ import java.net.URI
 import org.apache.commons.lang3.StringUtils
 
 import logic.indexer.FileIndexer
+import logic.indexer.entity.IndexerResource
 import models.IndexerResult
 
 object NullIndexer extends FileIndexer {
@@ -18,5 +19,5 @@ object NullIndexer extends FileIndexer {
 
   override def isTarget(uri: URI): Boolean = false
 
-  override def generateIndex(uri: URI): IndexerResult = IndexerResult()
+  override def generateIndex(resource: IndexerResource): IndexerResult = IndexerResult()
 }

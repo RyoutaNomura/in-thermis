@@ -1,15 +1,12 @@
 package logic.indexer.impl
 
-import java.io.File
 import java.net.URI
-import java.nio.file.{ Files, Paths }
 import java.util.Date
 
 import scala.collection.JavaConversions._
 
-import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
-import org.apache.pdfbox.io.RandomAccessFile
+import org.apache.pdfbox.io.RandomAccessBufferedFileInputStream
 import org.apache.pdfbox.pdfparser.PDFParser
 import org.apache.pdfbox.text.PDFTextStripper
 
@@ -17,8 +14,8 @@ import com.google.common.base.Splitter
 
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
+import logic.indexer.entity.IndexerResource
 import models.{ Content, IndexerResult }
-import utils.FileTimeUtils
 
 object PdfIndexer extends FileIndexer {
 
@@ -30,11 +27,13 @@ object PdfIndexer extends FileIndexer {
 
   override def isTarget(uri: URI): Boolean = uri.toString().endsWith(".pdf")
 
-  override def generateIndex(uri: URI): IndexerResult = {
+  override def generateIndex(resource: IndexerResource): IndexerResult = {
 
-    val file = new RandomAccessFile(new File(uri), "r")
+    val is = resource.getInputStream
+    val rabfis = new RandomAccessBufferedFileInputStream(is)
+
     try {
-      val parser = new PDFParser(file)
+      val parser = new PDFParser(rabfis)
       parser.parse
       val pd = parser.getPDDocument
 
@@ -60,17 +59,14 @@ object PdfIndexer extends FileIndexer {
           }
 
       IndexerResult(
-        uri,
-        FilenameUtils.getBaseName(Paths.get(uri).toString()),
-        Files.size(Paths.get(uri)),
-        FileTimeUtils.getCreated(uri),
-        FileTimeUtils.getLastModified(uri),
+        resource,
         contents,
         this.getClassName,
         new Date)
 
     } finally {
-      file.close
+      rabfis.close()
+      is.close()
     }
 
   }

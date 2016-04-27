@@ -1,11 +1,8 @@
 package logic.indexer.impl
 
-import java.io.File
 import java.net.URI
-import java.nio.file.{ Files, Paths }
 import java.util.Date
 
-import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
 import org.odftoolkit.odfdom.dom.element.table.{ TableTableCellElementBase, TableTableRowElement }
 import org.odftoolkit.simple.SpreadsheetDocument
@@ -13,8 +10,8 @@ import org.odftoolkit.simple.table.{ Cell, Row, Table }
 
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
+import logic.indexer.entity.IndexerResource
 import models.{ Content, IndexerResult }
-import utils.FileTimeUtils
 
 object OdsIndexer extends FileIndexer {
 
@@ -29,22 +26,25 @@ object OdsIndexer extends FileIndexer {
     case _                       => false
   }
 
-  override def generateIndex(uri: URI): IndexerResult = {
-    val document = SpreadsheetDocument.loadDocument(new File(uri))
-    val contents = (0 until document.getSheetCount)
-      .map(document.getSheetByIndex)
-      .flatMap { sheet => generateIndex(uri, sheet) }
-      .toSeq
+  override def generateIndex(resource: IndexerResource): IndexerResult = {
+    var is = resource.getInputStream
 
-    IndexerResult(
-      uri,
-      FilenameUtils.getBaseName(Paths.get(uri).toString()),
-      Files.size(Paths.get(uri)),
-      FileTimeUtils.getCreated(uri),
-      FileTimeUtils.getLastModified(uri),
-      contents,
-      this.getClassName,
-      new Date)
+    try {
+      val document = SpreadsheetDocument.loadDocument(is)
+      val contents = (0 until document.getSheetCount)
+        .map(document.getSheetByIndex)
+        .flatMap { sheet => generateIndex(resource.uri, sheet) }
+        .toSeq
+
+      IndexerResult(
+        resource,
+        contents,
+        this.getClassName,
+        new Date)
+
+    } finally {
+      is.close()
+    }
   }
 
   private def generateIndex(uri: URI, sheet: Table): Seq[Content] = {

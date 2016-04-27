@@ -2,15 +2,14 @@ package models
 
 import java.net.URI
 import java.util.{ Date, UUID }
-
 import scala.collection.mutable.{ HashMap, HashSet }
-
 import org.apache.commons.lang3.StringUtils
-
 import dtos.{ ResourceContentDTO, ResourceLocationDTO, WordIndicesDTO }
+import logic.indexer.entity.IndexerResource
 
 case class IndexerResult(
     uri: URI,
+    displayLocation: String,
     name: String,
     size: Long,
     resourceCreated: Date,
@@ -25,6 +24,7 @@ case class IndexerResult(
   val locationDTO = ResourceLocationDTO(
     locationId,
     uri.toString,
+    displayLocation,
     name,
     size,
     resourceCreated,
@@ -91,17 +91,30 @@ case class IndexerResult(
 }
 
 object IndexerResult {
-  def apply(): IndexerResult = {
-    IndexerResult(
-      URI.create(StringUtils.EMPTY),
-      StringUtils.EMPTY,
-      -1,
-      new Date,
-      new Date,
-      Seq.empty,
-      StringUtils.EMPTY,
-      new Date)
-  }
+  def apply(): IndexerResult = IndexerResult(
+    URI.create(StringUtils.EMPTY),
+    StringUtils.EMPTY,
+    StringUtils.EMPTY,
+    -1,
+    new Date,
+    new Date,
+    Seq.empty,
+    StringUtils.EMPTY,
+    new Date)
+
+  def apply(resource: IndexerResource,
+            contents: Seq[Content],
+            indexerClassName: String,
+            indexerGenerated: Date): IndexerResult = IndexerResult(
+    resource.uri,
+    resource.displayLocation,
+    resource.name,
+    resource.size,
+    resource.created,
+    resource.lastModified,
+    contents,
+    indexerClassName,
+    indexerGenerated)
 }
 
 case class Content(
@@ -111,8 +124,6 @@ case class Content(
   var content: String,
   var prevContent: String,
   var nextContent: String,
-  // word, start, length
-  //    indices: Map[String, Set[Tuple2[Int, Int]]])
   indices: Seq[Tuple3[String, Int, Int]])
 
 object Content {

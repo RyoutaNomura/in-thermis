@@ -1,20 +1,19 @@
 package logic.indexer.impl
 
-import java.io.File
 import java.net.URI
-import java.nio.file.{ Files, Paths }
+import java.nio.file.Paths
 import java.util.Date
 
 import scala.collection.JavaConversions._
 
-import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.Jsoup
 
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
+import logic.indexer.entity.IndexerResource
 import models.{ Content, IndexerResult }
-import utils.{ CharsetUtils, FileTimeUtils }
+import utils.CharsetUtils
 
 object HtmlIndexer extends FileIndexer {
 
@@ -30,34 +29,30 @@ object HtmlIndexer extends FileIndexer {
     case _                        => false
   }
 
-  override def generateIndex(uri: URI): IndexerResult = {
-    val file = new File(uri)
-    val charset = CharsetUtils.detectEncoding(uri)
-    val document = Jsoup.parse(file, charset)
+  override def generateIndex(resource: IndexerResource): IndexerResult = {
+    val is = resource.getInputStream
 
-    val contents = document.text().lines.zipWithIndex
-      .map {
-        case (line, lineNo) =>
-          val indices = StringAnalyzer.analyze(line).map { x => (x.word, x.start, x.length) }
-          Content(lineNo + 1.toString, StringUtils.EMPTY, StringUtils.EMPTY, line, StringUtils.EMPTY, StringUtils.EMPTY, indices)
-      }.toList
-    fillSibilingContent(contents)
-    //    val contents = document.textNodes.zipWithIndex
-    //      .map {
-    //        case (node, nodeNo) =>
-    //          val indices = StringAnalyzer.analyze(node.text).map { x => (x.word, x.start, x.length) }
-    //          Content(nodeNo + 1.toString, StringUtils.EMPTY, StringUtils.EMPTY, node.text, StringUtils.EMPTY, StringUtils.EMPTY, indices)
-    //      }.toList
-    //    fillSibilingContent(contents)
+    try {
+      val charset = CharsetUtils.detectEncoding(is)
+      val document = Jsoup.parse(is, charset, Paths.get(resource.uri).toAbsolutePath().toString)
 
-    IndexerResult(
-      uri,
-      FilenameUtils.getBaseName(Paths.get(uri).toString()),
-      Files.size(Paths.get(uri)),
-      FileTimeUtils.getCreated(uri),
-      FileTimeUtils.getLastModified(uri),
-      contents,
-      this.getClassName,
-      new Date)
+      val contents = document.text().lines.zipWithIndex
+        .map {
+          case (line, lineNo) =>
+            val indices = StringAnalyzer.analyze(line).map { x => (x.word, x.start, x.length) }
+            Content(lineNo + 1.toString, StringUtils.EMPTY, StringUtils.EMPTY, line, StringUtils.EMPTY, StringUtils.EMPTY, indices)
+        }.toList
+      fillSibilingContent(contents)
+
+      IndexerResult(
+        resource,
+        contents,
+        this.getClassName,
+        new Date)
+
+    } finally {
+      is.close()
+    }
+
   }
 }

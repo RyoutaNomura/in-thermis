@@ -1,18 +1,17 @@
 package logic.indexer.impl
 
 import java.net.URI
-import java.nio.file.{ Files, Paths }
 import java.util.Date
 
 import scala.io.Source
 
-import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
 
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
+import logic.indexer.entity.IndexerResource
 import models.{ Content, IndexerResult }
-import utils.{ CharsetUtils, FileTimeUtils }
+import utils.CharsetUtils
 
 object TextIndexer extends FileIndexer {
 
@@ -28,8 +27,10 @@ object TextIndexer extends FileIndexer {
     case _                       => false
   }
 
-  override def generateIndex(uri: URI): IndexerResult = {
-    val source = Source.fromFile(uri)(CharsetUtils.getCodec(uri));
+  override def generateIndex(resource: IndexerResource): IndexerResult = {
+    var is = resource.getInputStream
+    val source = Source.fromInputStream(is)(CharsetUtils.getCodec(is))
+
     try {
       val contents = source.getLines.zipWithIndex
         .map {
@@ -40,16 +41,14 @@ object TextIndexer extends FileIndexer {
       fillSibilingContent(contents)
 
       IndexerResult(
-        uri,
-        FilenameUtils.getBaseName(Paths.get(uri).toString()),
-        Files.size(Paths.get(uri)),
-        FileTimeUtils.getCreated(uri),
-        FileTimeUtils.getLastModified(uri),
+        resource,
         contents,
         this.getClassName,
         new Date)
+
     } finally {
       source.close()
+      is.close()
     }
   }
 }

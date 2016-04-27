@@ -1,20 +1,18 @@
 package logic.indexer.impl
 
 import java.net.URI
-import java.nio.file.{ Files, Paths }
 import java.util.Date
 
 import scala.collection.JavaConversions._
 
-import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.poi.hslf.usermodel.{ HSLFSlideShow, HSLFTextParagraph }
 import org.apache.poi.xslf.usermodel.XMLSlideShow
 
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
+import logic.indexer.entity.IndexerResource
 import models.{ Content, IndexerResult }
-import utils.FileTimeUtils
 
 object PptIndexer extends FileIndexer {
 
@@ -30,25 +28,25 @@ object PptIndexer extends FileIndexer {
     case _                        => false
   }
 
-  override def generateIndex(uri: URI): IndexerResult = {
+  override def generateIndex(resource: IndexerResource): IndexerResult = {
 
-    val stream = uri.toURL.openStream
+    val is = resource.getInputStream
 
     try {
-      val slides = uri.toString() match {
+      val slides = resource.uri.toString match {
         case s if s.endsWith(".ppt") => {
-          val slideshow = new HSLFSlideShow(stream)
+          val slideshow = new HSLFSlideShow(is)
           slideshow.getSlides.map { slide =>
             slide.getTextParagraphs.foldLeft(StringBuilder.newBuilder)((sb, plist) => sb.append(HSLFTextParagraph.getText(plist))).toString
           }.toList
         }
         case s if s.endsWith(".pptx") => {
-          val slideshow = new XMLSlideShow(stream)
+          val slideshow = new XMLSlideShow(is)
           slideshow.getSlides.map { slide =>
             slide.getCommonSlideData.getText.foldLeft(StringBuilder.newBuilder)((sb, p) => sb.append(p.getText)).toString
           }.toList
         }
-        case _ => throw new RuntimeException(s"not support type: $uri")
+        case _ => throw new RuntimeException(s"not support type: ${resource.uri}")
       }
 
       val contents = slides.zipWithIndex.flatMap {
@@ -69,17 +67,13 @@ object PptIndexer extends FileIndexer {
       fillSibilingContent(contents)
 
       IndexerResult(
-        uri,
-        FilenameUtils.getBaseName(Paths.get(uri).toString()),
-        Files.size(Paths.get(uri)),
-        FileTimeUtils.getCreated(uri),
-        FileTimeUtils.getLastModified(uri),
+        resource,
         contents,
         this.getClassName,
         new Date)
 
     } finally {
-      stream.close()
+      is.close()
     }
   }
 }

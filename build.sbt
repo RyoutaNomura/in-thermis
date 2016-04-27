@@ -33,6 +33,7 @@ libraryDependencies += "org.apache.poi" % "poi-ooxml" % "3.14"
 libraryDependencies += "org.apache.poi" % "poi-scratchpad" % "3.14"
 libraryDependencies += "com.ibm.icu" % "icu4j" % "57.1"
 libraryDependencies += "org.jsoup" % "jsoup" % "1.9.1"
+libraryDependencies += "jcifs" % "jcifs" % "1.3.17"
 
 
 

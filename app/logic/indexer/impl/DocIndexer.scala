@@ -3,18 +3,17 @@ package logic.indexer.impl
 import java.net.URI
 import java.nio.file.{ Files, Paths }
 import java.util.Date
-
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.poi.hwpf.HWPFDocument
 import org.apache.poi.hwpf.extractor.WordExtractor
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor
 import org.apache.poi.xwpf.usermodel.XWPFDocument
-
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
 import models.{ Content, IndexerResult }
 import utils.FileTimeUtils
+import logic.indexer.entity.IndexerResource
 
 object DocIndexer extends FileIndexer {
 
@@ -30,13 +29,13 @@ object DocIndexer extends FileIndexer {
     case _                        => false
   }
 
-  override def generateIndex(uri: URI): IndexerResult = {
+  override def generateIndex(resource: IndexerResource): IndexerResult = {
 
-    val stream = uri.toURL.openStream
-    val extractor = uri.toString match {
-      case s if s.endsWith(".doc")  => new WordExtractor(new HWPFDocument(stream))
-      case s if s.endsWith(".docx") => new XWPFWordExtractor(new XWPFDocument(stream))
-      case _                        => throw new IllegalArgumentException(s"$uri is not supported.")
+    val is = resource.getInputStream
+    val extractor = resource.uri.toString match {
+      case s if s.endsWith(".doc")  => new WordExtractor(new HWPFDocument(is))
+      case s if s.endsWith(".docx") => new XWPFWordExtractor(new XWPFDocument(is))
+      case _                        => throw new IllegalArgumentException(s"${resource.uri} is not supported.")
     }
 
     try {
@@ -48,18 +47,14 @@ object DocIndexer extends FileIndexer {
       fillSibilingContent(contents)
 
       IndexerResult(
-        uri,
-        FilenameUtils.getBaseName(Paths.get(uri).toString()),
-        Files.size(Paths.get(uri)),
-        FileTimeUtils.getCreated(uri),
-        FileTimeUtils.getLastModified(uri),
+        resource,
         contents,
         this.getClassName,
         new Date)
 
     } finally {
       extractor.close()
-      stream.close()
+      is.close()
     }
   }
 }

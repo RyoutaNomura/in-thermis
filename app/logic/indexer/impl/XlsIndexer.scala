@@ -1,12 +1,10 @@
 package logic.indexer.impl
 
 import java.net.URI
-import java.nio.file.{ Files, Paths }
 import java.util.Date
 
 import scala.collection.JavaConversions._
 
-import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
@@ -16,8 +14,8 @@ import com.google.common.base.Joiner
 
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
+import logic.indexer.entity.IndexerResource
 import models.{ Content, IndexerResult }
-import utils.FileTimeUtils
 
 object XlsIndexer extends FileIndexer {
 
@@ -29,12 +27,12 @@ object XlsIndexer extends FileIndexer {
 
   override def isTarget(uri: URI): Boolean = uri.toString.endsWith(".xls") || uri.toString.endsWith(".xlsx")
 
-  override def generateIndex(uri: URI): IndexerResult = {
-    val stream = uri.toURL.openStream
-    val workbook = uri.toString match {
-      case s if s.endsWith(".xls")  => new HSSFWorkbook(stream)
-      case s if s.endsWith(".xlsx") => new XSSFWorkbook(stream)
-      case _                        => throw new IllegalArgumentException(s"$uri is not supported.")
+  override def generateIndex(resource: IndexerResource): IndexerResult = {
+    val is = resource.getInputStream
+    val workbook = resource.uri.toString match {
+      case s if s.endsWith(".xls")  => new HSSFWorkbook(is)
+      case s if s.endsWith(".xlsx") => new XSSFWorkbook(is)
+      case _                        => throw new IllegalArgumentException(s"${resource.uri} is not supported.")
     }
 
     try {
@@ -60,18 +58,14 @@ object XlsIndexer extends FileIndexer {
       fillSibilingContent(contents)
 
       IndexerResult(
-        uri,
-        FilenameUtils.getBaseName(Paths.get(uri).toString()),
-        Files.size(Paths.get(uri)),
-        FileTimeUtils.getCreated(uri),
-        FileTimeUtils.getLastModified(uri),
+        resource,
         contents,
         this.getClassName,
         new Date)
 
     } finally {
-      workbook.close
-      stream.close()
+      workbook.close()
+      is.close()
     }
   }
 }

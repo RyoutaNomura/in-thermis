@@ -1,9 +1,8 @@
 package logic.indexer
 
 import java.net.URI
-import java.nio.file.{ Files, Paths }
-import java.util.Date
 
+import logic.indexer.entity.IndexerResource
 import models.{ Content, IndexerResult }
 import utils.ReflectionUtils
 
@@ -12,7 +11,7 @@ trait FileIndexer {
   def getKeyTitles: Tuple3[String, String, String]
   def getPriority: Int
   def isTarget(uri: URI): Boolean
-  def generateIndex(uri: URI): IndexerResult
+  def generateIndex(resource: IndexerResource): IndexerResult
 
   def getClassName = ReflectionUtils.toType(this.getClass).typeSymbol.fullName
 
@@ -31,5 +30,4 @@ trait FileIndexer {
       case _ =>
     }
   }
-
 }

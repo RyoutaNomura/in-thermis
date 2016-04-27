@@ -1,6 +1,6 @@
 package utils
 
-import java.net.URI
+import java.io.InputStream
 import java.nio.charset.CodingErrorAction
 
 import scala.io.Codec
@@ -8,8 +8,7 @@ import scala.io.Codec
 import com.ibm.icu.text.CharsetDetector
 
 object CharsetUtils {
-  def detectEncoding(uri: URI): String = {
-    val is = uri.toURL.openStream
+  def detectEncoding(is: InputStream): String = {
 
     try {
       var ret = Some(new CharsetDetector().setText(is).detect)
@@ -25,8 +24,8 @@ object CharsetUtils {
     }
   }
 
-  def getCodec(uri: URI): Codec =
-    Codec(CharsetUtils.detectEncoding(uri))
+  def getCodec(is: InputStream): Codec =
+    Codec(CharsetUtils.detectEncoding(is))
       .onUnmappableCharacter(CodingErrorAction.IGNORE)
       .onMalformedInput(CodingErrorAction.IGNORE)
 
