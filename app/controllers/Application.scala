@@ -1,7 +1,6 @@
 package controllers
 
 import java.nio.file.Paths
-
 import daos.{ ResourceContentDAO, ResourceLocationDAO, WordIndicesDAO }
 import logic.ResourceIndexer
 import logic.indexer.FileIndexerFactory
@@ -9,6 +8,7 @@ import models.SearchResult
 import play.api.libs.json.Json
 import play.api.mvc.{ Action, Controller }
 import utils.CassandraHelper
+import org.apache.commons.lang3.StringUtils
 
 class Application extends Controller {
 
@@ -48,9 +48,9 @@ class Application extends Controller {
           // ファイル以外のリソースも考慮
           val indexer = FileIndexerFactory.create(location.indexerClassName)
           val keyStr = Seq(
-            s"${indexer.getKeyTitles._1}: ${content.key1}",
-            s"${indexer.getKeyTitles._2}: ${content.key2}",
-            s"${indexer.getKeyTitles._3}: ${content.key3}")
+            if (StringUtils.isNotEmpty(content.key1)) { s"${indexer.getKeyTitles._1}: ${content.key1}" } else { StringUtils.EMPTY },
+            if (StringUtils.isNotEmpty(content.key2)) { s"${indexer.getKeyTitles._2}: ${content.key2}" } else { StringUtils.EMPTY },
+            if (StringUtils.isNotEmpty(content.key3)) { s"${indexer.getKeyTitles._3}: ${content.key3}" } else { StringUtils.EMPTY })
             .filter { x => !x.isEmpty }
             .mkString(" / ")
           val resourceTypeName = indexer.getResourceTypeName

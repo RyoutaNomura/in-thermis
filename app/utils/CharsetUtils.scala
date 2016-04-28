@@ -10,17 +10,13 @@ import com.ibm.icu.text.CharsetDetector
 object CharsetUtils {
   def detectEncoding(is: InputStream): String = {
 
-    try {
-      var ret = Some(new CharsetDetector().setText(is).detect)
-      ret match {
-        case Some(s) => s.getName match {
-          case "Shift_JIS" => "MS932"
-          case _           => s.getName
-        }
-        case _ => throw new RuntimeException("Cannot detect source charset.")
+    var ret = Some(new CharsetDetector().setText(is).detect)
+    ret match {
+      case Some(s) => s.getName match {
+        case "Shift_JIS" => "MS932"
+        case _           => s.getName
       }
-    } finally {
-      is.close()
+      case _ => throw new RuntimeException("Cannot detect source charset.")
     }
   }
 

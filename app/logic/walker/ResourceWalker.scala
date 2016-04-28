@@ -33,11 +33,11 @@ trait ResourceWalker {
         }
         case Some(s) => {
           // 何もしない
-          println(s"latest index fount at ${uri}.")
+          println(s"latest index fount at ${resource.uri}.")
         }
         case None => {
           // 存在しない場合はインデックスを作成して登録
-          println(s"no index fount at ${uri}. index will be generated.")
+          println(s"no index fount at ${resource.uri}. index will be generated.")
           persistIndex(session, indexer.generateIndex(resource))
         }
       }

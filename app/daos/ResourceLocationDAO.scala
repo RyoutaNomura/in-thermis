@@ -34,7 +34,7 @@ object ResourceLocationDAO {
   }
 
   def insert(session: Session, dto: ResourceLocationDTO) {
-    CassandraHelper.execCql(session, s"INSERT INTO resource_location(id, uri, display_location, name, size, created, modified, indexer_class_name, index_generated) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+    CassandraHelper.execCql(session, s"INSERT INTO resource_location(id, uri, display_location, name, size, created, modified, indexer_class_name, index_generated) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
       dto.id,
       dto.uri,
       dto.displayLocation,
