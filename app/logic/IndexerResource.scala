@@ -1,4 +1,4 @@
-package logic.indexer.entity
+package logic
 
 import java.io.InputStream
 import java.net.URI

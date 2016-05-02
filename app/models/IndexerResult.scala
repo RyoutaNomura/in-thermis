@@ -5,7 +5,7 @@ import java.util.{ Date, UUID }
 import scala.collection.mutable.{ HashMap, HashSet }
 import org.apache.commons.lang3.StringUtils
 import dtos.{ ResourceContentDTO, ResourceLocationDTO, WordIndicesDTO }
-import logic.indexer.entity.IndexerResource
+import logic.IndexerResource
 
 case class IndexerResult(
     uri: URI,

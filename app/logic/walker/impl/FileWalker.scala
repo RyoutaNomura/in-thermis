@@ -1,18 +1,22 @@
 package logic.walker.impl
 
+import java.io.{ BufferedInputStream, InputStream }
 import java.net.URI
 import java.nio.file.{ Files, Paths }
 import java.util.Date
+
 import scala.collection.JavaConversions._
+
 import org.apache.commons.io.FilenameUtils
-import logic.indexer.entity.IndexerResource
-import logic.walker.ResourceWalker
+
+import logic.IndexerResource
+import logic.walker.{ ResourceWalker, ResourceWalkerConfig }
 import utils.FileTimeUtils
-import java.io.BufferedInputStream
 
 object FileWalker extends ResourceWalker {
-  def walk(uri: URI, generateIndex: IndexerResource => Unit): Unit = {
-    Files.walk(Paths.get(uri))
+
+  override def walk(config: ResourceWalkerConfig, generateIndex: IndexerResource => Unit): Unit = {
+    Files.walk(Paths.get(config.uri))
       .iterator
       .filter(p => !Files.isDirectory(p))
       .map { p =>
@@ -23,21 +27,20 @@ object FileWalker extends ResourceWalker {
           Files.size(p),
           FileTimeUtils.getCreated(p.toUri),
           FileTimeUtils.getCreated(p.toUri))
-      }.foreach { r =>
-        println(r)
-        generateIndex(r)
-      }
+      }.foreach { generateIndex }
   }
 }
 
 case class LocalFileResource(
-  val uri: URI,
-  val displayLocation: String,
-  val name: String,
-  val size: Long,
-  val created: Date,
-  val lastModified: Date)
+  override val uri: URI,
+  override val displayLocation: String,
+  override val name: String,
+  override val size: Long,
+  override val created: Date,
+  override val lastModified: Date)
     extends IndexerResource {
 
-  override def getInputStream = new BufferedInputStream(Files.newInputStream(Paths.get(uri)))
+  override def getInputStream: InputStream = {
+    new BufferedInputStream(Files.newInputStream(Paths.get(uri)))
+  }
 }

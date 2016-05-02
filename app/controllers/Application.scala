@@ -9,15 +9,21 @@ import play.api.libs.json.Json
 import play.api.mvc.{ Action, Controller }
 import utils.CassandraHelper
 import org.apache.commons.lang3.StringUtils
+import play.api.mvc.AnyContent
+import play.Logger
+import logic.IndexerResource
+import logic.walker.ResourceWalkerConfig
 
 class Application extends Controller {
 
-  def index = Action {
+  private val logger = Logger.of(this.getClass)
+
+  def index: Action[AnyContent] = Action {
     Ok(views.html.index())
   }
 
-  def doSearch(word: String) = Action {
-    val start1 = System.currentTimeMillis
+  def doSearch(word: String): Action[AnyContent] = Action {
+    val start = System.currentTimeMillis
     val session = CassandraHelper.getSession
 
     try {
@@ -73,7 +79,7 @@ class Application extends Controller {
         }
       }.toSeq
 
-      println(s"ellapsed ${System.currentTimeMillis() - start1}ms for ${results.size} results.")
+      logger.debug(s"ellapsed ${System.currentTimeMillis() - start}ms for ${results.size} results.")
       Ok(Json.toJson(results))
 
     } finally {
@@ -81,11 +87,15 @@ class Application extends Controller {
     }
   }
 
-  def runIndexer = Action {
+  def runIndexer: Action[AnyContent] = Action {
     request =>
       val session = CassandraHelper.getSession
       try {
-        ResourceIndexer.generateIndex(session, Paths.get("/Users/RyoutaNomura/Desktop/odssample").toUri)
+        val config = ResourceWalkerConfig("name",
+          Paths.get("/Users/RyoutaNomura/Desktop/odssample").toUri,
+          null,
+          null)
+        ResourceIndexer.generateIndex(session, config)
       } finally {
         session.closeAsync()
       }

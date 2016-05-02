@@ -15,20 +15,4 @@ case class WordIndicesDTO(
     StringUtils.EMPTY,
     -1,
     Map.empty)
-
-  //  def findTargetContentId(): Option[UUID] = {
-  //    indices.size match {
-  //      case 0 => None
-  //      case _ => Some(indices.maxBy(_._2.size)._1)
-  //    }
-  //  }
-
-  //  def genereateIndices(meta: Metadata): java.util.Map[String, java.util.Set[TupleValue]] = {
-  //    val tupleType = meta.newTupleType(DataType.cint, DataType.cint);
-  //    indices.map{f => 
-  //      val key = f._1
-  //      val value:java.util.Set[TupleValue] = f._2.map{t => tupleType.newValue(Int.box(t._1), Int.box(t._2))}
-  //      (key, value)
-  //    }
-  //  }
 }

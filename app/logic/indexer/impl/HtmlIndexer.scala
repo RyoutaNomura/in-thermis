@@ -4,14 +4,12 @@ import java.net.URI
 import java.nio.file.Paths
 import java.util.Date
 
-import scala.collection.JavaConversions._
-
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.Jsoup
 
+import logic.IndexerResource
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
-import logic.indexer.entity.IndexerResource
 import models.{ Content, IndexerResult }
 import utils.CharsetUtils
 

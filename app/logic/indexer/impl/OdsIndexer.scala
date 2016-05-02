@@ -8,9 +8,9 @@ import org.odftoolkit.odfdom.dom.element.table.{ TableTableCellElementBase, Tabl
 import org.odftoolkit.simple.SpreadsheetDocument
 import org.odftoolkit.simple.table.{ Cell, Row, Table }
 
+import logic.IndexerResource
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
-import logic.indexer.entity.IndexerResource
 import models.{ Content, IndexerResult }
 
 object OdsIndexer extends FileIndexer {

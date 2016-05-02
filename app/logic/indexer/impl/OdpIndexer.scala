@@ -8,9 +8,9 @@ import scala.collection.JavaConversions._
 import org.apache.commons.lang3.StringUtils
 import org.odftoolkit.simple.PresentationDocument
 
+import logic.IndexerResource
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
-import logic.indexer.entity.IndexerResource
 import models.{ Content, IndexerResult }
 
 object OdpIndexer extends FileIndexer {

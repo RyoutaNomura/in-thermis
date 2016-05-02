@@ -42,7 +42,7 @@ case class SearchResult(
 }
 
 object SearchResult {
-  def apply() = {
+  def apply(): SearchResult = {
     new SearchResult()
   }
 

@@ -9,5 +9,4 @@ object FileTimeUtils {
   def getLastModified(uri: URI): Date = {
     new Date(Files.getLastModifiedTime(Paths.get(uri)).toMillis)
   }
-
 }

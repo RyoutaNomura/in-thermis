@@ -7,9 +7,9 @@ import scala.io.Source
 
 import org.apache.commons.lang3.StringUtils
 
+import logic.IndexerResource
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
-import logic.indexer.entity.IndexerResource
 import models.{ Content, IndexerResult }
 import utils.CharsetUtils
 

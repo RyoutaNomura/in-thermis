@@ -1,14 +1,13 @@
 package logic
 
-import collection.JavaConversions._
-import java.net.URI
 import com.datastax.driver.core.Session
-import logic.walker.ResourceWalkerFactory
+
+import logic.walker.{ ResourceWalkerConfig, ResourceWalkerFactory }
 
 object ResourceIndexer {
 
-  def generateIndex(session: Session, uri: URI) {
-    var walker = ResourceWalkerFactory.create(uri)
-    walker.walk(session, uri)
+  def generateIndex(session: Session, config: ResourceWalkerConfig) {
+    var walker = ResourceWalkerFactory.create(config)
+    walker.walk(session, config)
   }
 }

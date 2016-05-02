@@ -12,9 +12,9 @@ import org.apache.pdfbox.text.PDFTextStripper
 
 import com.google.common.base.Splitter
 
+import logic.IndexerResource
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
-import logic.indexer.entity.IndexerResource
 import models.{ Content, IndexerResult }
 
 object PdfIndexer extends FileIndexer {

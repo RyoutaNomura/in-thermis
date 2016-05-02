@@ -12,8 +12,6 @@ import utils.CassandraHelper
 
 object ResourceContentDAO {
 
-  //  private var helper = new CassandraHelper(DBSettings.host, DBSettings.port, DBSettings.keyspace)
-
   def select(session: Session, ids: Set[UUID]): Map[UUID, ResourceContentDTO] = {
     if (ids.isEmpty) {
       Map.empty
@@ -26,7 +24,10 @@ object ResourceContentDAO {
   }
 
   def insert(session: Session, dto: ResourceContentDTO) {
-    CassandraHelper.execCql(session, "INSERT INTO resource_content(id, key1, key2, key3, content, prev_content, next_content, resource_location_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+    val cql = "INSERT INTO resource_content(id, key1, key2, key3, content, prev_content, next_content, resource_location_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?)"
+
+    CassandraHelper.execCql(session,
+      cql,
       dto.id,
       dto.key1,
       dto.key2,

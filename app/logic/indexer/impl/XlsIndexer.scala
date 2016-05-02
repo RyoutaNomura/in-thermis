@@ -12,9 +12,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
 import com.google.common.base.Joiner
 
+import logic.IndexerResource
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
-import logic.indexer.entity.IndexerResource
 import models.{ Content, IndexerResult }
 
 object XlsIndexer extends FileIndexer {
@@ -41,7 +41,7 @@ object XlsIndexer extends FileIndexer {
         .flatMap { sheet =>
           (0 to sheet.getPhysicalNumberOfRows)
             .map(sheet.getRow)
-            .filter(_ != null)
+            .filter(Option(_).isDefined)
             .filter(_.getPhysicalNumberOfCells > 0)
             .map { row =>
               val rowStr = Joiner.on("\t").join(row.cellIterator.map(cell => cell.getCellType match {

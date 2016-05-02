@@ -5,13 +5,15 @@ import scala.reflect.ClassTag
 import scala.reflect.runtime.{ universe => ru }
 import ru._
 import scala.util.{ Failure, Success }
-
 import com.datastax.driver.core.{ BoundStatement, Cluster, DataType, Metadata, Row, Session }
 import com.google.common.base.CaseFormat
-
+import play.Logger
 import settings.DBSettings
+import com.datastax.driver.core.ResultSet
 
 object CassandraHelper {
+
+  private val logger = Logger.of(this.getClass)
 
   private val runtimeMirror = ru.runtimeMirror(Thread.currentThread.getContextClassLoader)
 
@@ -23,18 +25,18 @@ object CassandraHelper {
     cluster = Cluster.builder.addContactPoint(node).withPort(port).build
 
     metadata = cluster.getMetadata
-    println(s"Connected to cluster: ${metadata.getClusterName}");
-    metadata.getAllHosts.foreach { host => println(s"Datatacenter: ${host.getDatacenter}; Host: ${host.getAddress}; Rack: ${host.getRack}") }
+    logger.info(s"Connected to cluster: ${metadata.getClusterName}");
+    metadata.getAllHosts.foreach { host => logger.info(s"Datatacenter: ${host.getDatacenter}; Host: ${host.getAddress}; Rack: ${host.getRack}") }
   }
 
   def close() {
     cluster.close()
-    println(s"CassandraHelper.cluster closed.")
+    logger.info(s"CassandraHelper.cluster closed.")
   }
 
   def getSession: Session = cluster.connect(DBSettings.keyspace)
 
-  def execCql(session: Session, cql: String, params: AnyRef*) = {
+  def execCql(session: Session, cql: String, params: AnyRef*): ResultSet = {
     try {
       val stmt = session.prepare(cql)
       session.execute(new BoundStatement(stmt).bind(params: _*))

@@ -2,18 +2,35 @@ package logic.walker.impl
 
 import java.net.URI
 import java.util.Date
-
 import jcifs.smb.SmbFile
-import logic.indexer.entity.IndexerResource
+import logic.IndexerResource
 import logic.walker.ResourceWalker
+import logic.walker.ResourceWalkerConfig
+import jcifs.smb.NtlmPasswordAuthentication
+import java.io.InputStream
 
 object CIFSWalker extends ResourceWalker {
-  private val uri: URI = URI.create("")
-  private val user: String = ""
-  private val pass: String = ""
 
-  override def walk(uri: URI, generateIndex: IndexerResource => Unit): Unit = {
-    walkTree(new SmbFile(uri.toString), generateIndex)
+  val cifsAuthDomain = "CIFS_AUTH_DOMAIN"
+  val cifsAuthUser = "CIFS_AUTH_USER"
+  val cifsAuthPass = "CIFS_AUTH_PASS"
+
+  override def walk(config: ResourceWalkerConfig, generateIndex: IndexerResource => Unit): Unit = {
+
+    val auth = new NtlmPasswordAuthentication(
+      config.props.get(cifsAuthDomain) match {
+        case Some(s) => s
+        case None    => throw new IllegalArgumentException(s"$cifsAuthDomain not found in props")
+      },
+      config.props.get(cifsAuthUser) match {
+        case Some(s) => s
+        case None    => throw new IllegalArgumentException(s"$cifsAuthUser not found in props")
+      },
+      config.props.get(cifsAuthPass) match {
+        case Some(s) => s
+        case None    => throw new IllegalArgumentException(s"$cifsAuthPass not found in props")
+      });
+    this.walkTree(new SmbFile(config.uri.toString, auth), generateIndex)
   }
 
   private def walkTree(parent: SmbFile, generateIndex: IndexerResource => Unit): Unit = {
@@ -34,15 +51,15 @@ object CIFSWalker extends ResourceWalker {
 }
 
 case class CIFSResource(
-  val uri: URI,
-  val displayLocation: String,
-  val name: String,
-  val size: Long,
-  val created: Date,
-  val lastModified: Date)
+  override val uri: URI,
+  override val displayLocation: String,
+  override val name: String,
+  override val size: Long,
+  override val created: Date,
+  override val lastModified: Date)
     extends IndexerResource {
 
-  override def getInputStream = {
+  override def getInputStream: InputStream = {
     new SmbFile(uri.toString).getInputStream
   }
 }

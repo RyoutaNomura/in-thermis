@@ -9,9 +9,9 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.poi.hslf.usermodel.{ HSLFSlideShow, HSLFTextParagraph }
 import org.apache.poi.xslf.usermodel.XMLSlideShow
 
+import logic.IndexerResource
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
-import logic.indexer.entity.IndexerResource
 import models.{ Content, IndexerResult }
 
 object PptIndexer extends FileIndexer {

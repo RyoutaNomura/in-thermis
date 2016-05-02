@@ -1,19 +1,18 @@
 package logic.indexer.impl
 
 import java.net.URI
-import java.nio.file.{ Files, Paths }
 import java.util.Date
-import org.apache.commons.io.FilenameUtils
+
 import org.apache.commons.lang3.StringUtils
 import org.apache.poi.hwpf.HWPFDocument
 import org.apache.poi.hwpf.extractor.WordExtractor
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor
 import org.apache.poi.xwpf.usermodel.XWPFDocument
+
+import logic.IndexerResource
 import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexer
 import models.{ Content, IndexerResult }
-import utils.FileTimeUtils
-import logic.indexer.entity.IndexerResource
 
 object DocIndexer extends FileIndexer {
 

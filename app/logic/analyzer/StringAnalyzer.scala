@@ -20,18 +20,17 @@ object StringAnalyzer {
 
   def analyze(text: String): Seq[AnalyzeResult] = {
     if (text.isEmpty) {
-      return Seq.empty
+      Seq.empty
+    } else {
+      val tagger = SenFactory.getStringTagger(dictDir)
+      tagger.analyze(text, reuseList)
+        .filter(x => StringUtils.startsWithAny(x.getMorpheme.getPartOfSpeech, "名詞", "動詞"))
+        .map { x =>
+          x.getMorpheme.getBasicForm match {
+            case "*" => AnalyzeResult(x.toString, x.getStart, x.getLength)
+            case _   => AnalyzeResult(x.getMorpheme.getBasicForm, x.getStart, x.getLength)
+          }
+        }.toSeq
     }
-
-    val tagger = SenFactory.getStringTagger(dictDir)
-
-    tagger.analyze(text, reuseList)
-      .filter(x => StringUtils.startsWithAny(x.getMorpheme.getPartOfSpeech, "名詞", "動詞"))
-      .map { x =>
-        x.getMorpheme.getBasicForm match {
-          case "*" => AnalyzeResult(x.toString, x.getStart, x.getLength)
-          case _   => AnalyzeResult(x.getMorpheme.getBasicForm, x.getStart, x.getLength)
-        }
-      }.toSeq
   }
 }

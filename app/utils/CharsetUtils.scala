@@ -24,5 +24,4 @@ object CharsetUtils {
     Codec(CharsetUtils.detectEncoding(is))
       .onUnmappableCharacter(CodingErrorAction.IGNORE)
       .onMalformedInput(CodingErrorAction.IGNORE)
-
 }
