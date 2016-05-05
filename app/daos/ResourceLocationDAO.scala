@@ -24,7 +24,7 @@ object ResourceLocationDAO {
   }
 
   def delete(session: Session, id: UUID) {
-    CassandraHelper.execCql(session, s"DELETE FROM resource_location WHERE id = ?", id)
+    CassandraHelper.execCqlAsync(session, s"DELETE FROM resource_location WHERE id = ?", id)
   }
 
   def find(session: Session, uri: String): Option[ResourceLocationDTO] = {
@@ -38,7 +38,7 @@ object ResourceLocationDAO {
       "?, ?, ?, ?, ?, ?, ?, ?, ?" +
       ")"
 
-    CassandraHelper.execCql(session,
+    CassandraHelper.execCqlAsync(session,
       cql,
       dto.id,
       dto.uri,

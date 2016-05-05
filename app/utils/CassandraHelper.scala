@@ -1,15 +1,17 @@
 package utils
 
+import scala.annotation.migration
 import scala.collection.JavaConversions._
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{ universe => ru }
 import ru._
 import scala.util.{ Failure, Success }
-import com.datastax.driver.core.{ BoundStatement, Cluster, DataType, Metadata, Row, Session }
+import com.datastax.driver.core.{ BoundStatement, Cluster, DataType, Metadata, PreparedStatement, ResultSet, Row, Session }
 import com.google.common.base.CaseFormat
 import play.Logger
 import settings.DBSettings
-import com.datastax.driver.core.ResultSet
+import java.lang.Boolean
+import com.datastax.driver.core.ResultSetFuture
 
 object CassandraHelper {
 
@@ -20,6 +22,8 @@ object CassandraHelper {
   private var cluster: Cluster = _
 
   var metadata: Metadata = _
+
+  private val stmtCache: scala.collection.mutable.Map[String, PreparedStatement] = scala.collection.mutable.Map.empty
 
   def open(node: String, port: Int, keyspace: String) {
     cluster = Cluster.builder.addContactPoint(node).withPort(port).build
@@ -38,8 +42,20 @@ object CassandraHelper {
 
   def execCql(session: Session, cql: String, params: AnyRef*): ResultSet = {
     try {
-      val stmt = session.prepare(cql)
-      session.execute(new BoundStatement(stmt).bind(params: _*))
+      val stmt = this.stmtCache.getOrElseUpdate(cql, session.prepare(cql))
+      val bs = new BoundStatement(stmt).bind(params: _*)
+      session.execute(bs)
+    } catch {
+      case t: Throwable => throw t
+    }
+  }
+
+  def execCqlAsync(session: Session, cql: String, params: AnyRef*): ResultSetFuture = {
+    try {
+      val stmt = this.stmtCache.getOrElseUpdate(cql, session.prepare(cql))
+      val bs = new BoundStatement(stmt).bind(params: _*)
+      session.executeAsync(bs)
+
     } catch {
       case t: Throwable => throw t
     }

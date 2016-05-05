@@ -22,7 +22,7 @@ class Application extends Controller {
     Ok(views.html.index())
   }
 
-  def doSearch(word: String): Action[AnyContent] = Action {
+  def doSearch(word: String): Action[AnyContent] = Action { request =>
     val start = System.currentTimeMillis
     val session = CassandraHelper.getSession
 
@@ -93,8 +93,8 @@ class Application extends Controller {
       try {
         val config = ResourceWalkerConfig("name",
           Paths.get("/Users/RyoutaNomura/Desktop/odssample").toUri,
-          null,
-          null)
+          "logic.walker.impl.FileWalker",
+          Map.empty)
         ResourceIndexer.generateIndex(session, config)
       } finally {
         session.closeAsync()

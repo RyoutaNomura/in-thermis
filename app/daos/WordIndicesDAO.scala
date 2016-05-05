@@ -21,7 +21,7 @@ object WordIndicesDAO {
   }
 
   def delete(session: Session, resourceLocationId: UUID) {
-    CassandraHelper.execCql(session, "DELETE FROM word_indices WHERE resource_location_id = ?", resourceLocationId)
+    CassandraHelper.execCqlAsync(session, "DELETE FROM word_indices WHERE resource_location_id = ?", resourceLocationId)
   }
 
   def insert(session: Session, dto: WordIndicesDTO) {
@@ -36,7 +36,7 @@ object WordIndicesDAO {
       }
     }
 
-    CassandraHelper.execCql(session, "INSERT INTO word_indices(word, resource_location_id, count, indices) VALUES(?,?,?,?)",
+    CassandraHelper.execCqlAsync(session, "INSERT INTO word_indices(word, resource_location_id, count, indices) VALUES(?,?,?,?)",
       dto.word,
       dto.resourceLocationId,
       Long.box(dto.count),

@@ -26,7 +26,7 @@ object ResourceContentDAO {
   def insert(session: Session, dto: ResourceContentDTO) {
     val cql = "INSERT INTO resource_content(id, key1, key2, key3, content, prev_content, next_content, resource_location_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?)"
 
-    CassandraHelper.execCql(session,
+    CassandraHelper.execCqlAsync(session,
       cql,
       dto.id,
       dto.key1,
@@ -39,7 +39,7 @@ object ResourceContentDAO {
   }
 
   def delete(session: Session, id: UUID) {
-    CassandraHelper.execCql(session, "DELETE FROM resource_content WHERE recource_location_id = ? ",
+    CassandraHelper.execCqlAsync(session, "DELETE FROM resource_content WHERE recource_location_id = ? ",
       id)
   }
 }

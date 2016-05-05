@@ -16,7 +16,6 @@ object FileIndexerFactory {
 
   private val implPackage = "logic.indexer.impl"
   private val cache: Seq[FileIndexer] = {
-
     ClassPath
       .from(this.getClass.getClassLoader)
       .getTopLevelClasses(implPackage)
