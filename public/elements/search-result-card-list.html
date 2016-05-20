@@ -5,21 +5,21 @@
 
 <dom-module id="search-result-card-list"> 
 <template> 
-  <template is="dom-repeat" items="{{results}}"> 
+  <template is="dom-repeat" items="[[items]]"> 
     <search-result-card
-      uri={{item.uri}}
-      resource-name={{item.resourceName}}
-      resource-size={{item.resourceSize}}
-      resource-type-name={{item.resourceTypeName}}
-      resource-created={{item.resourceCreated}}
-      resource-modified={{item.resourceModified}}
-      keys={{item.keys}}
-      content={{item.content}}
-      prev-content={{item.prevContent}}
-      next-content={{item.nextContent}}
-      positions={{item.positions}}
-      indexer-class-name={{item.indexerClassName}}
-      index-generated={{item.indexGenerated}}>
+      uri=[[item.uri]]
+      resource-name=[[item.resourceName]]
+      resource-size=[[item.resourceSize]]
+      resource-type-name=[[item.resourceTypeName]]
+      resource-created=[[item.resourceCreated]]
+      resource-modified=[[item.resourceModified]]
+      keys=[[item.keys]]
+      content=[[item.content]]
+      prev-content=[[item.prevContent]]
+      next-content=[[item.nextContent]]
+      positions=[[item.positions]]
+      indexer-class-name=[[item.indexerClassName]]
+      index-generated=[[item.indexGenerated]]>
     </search-result-card>
   </template>
 </template>
@@ -29,22 +29,18 @@
   display: block;
 }
 
-search-box {
-  margin: 10px 10% 10px 10%;
-}
-
 search-result-card {
-  margin: 14px;
-  width: 80%;
+  margin: 0 0 14px 0;
   margin-left: auto;
   margin-right: auto;
 }
+
 </style>
 <script>
 	Polymer({
 		is : 'search-result-card-list',
 		properties: {
-			results: Array
+			items: Array
 		},
 		created : function() {
 			console.log("search-result-card-list created.")

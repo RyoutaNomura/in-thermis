@@ -4,10 +4,19 @@
 <link rel="import" href="../bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="./search-box.html">
 <link rel="import" href="./search-result-card-list.html">
+<link rel="import" href="./search-result-header.html">
+<link rel="import" href="./side-bar.html">
 
 <dom-module id="inthermis-app"> 
 <template>
-  <search-service id="service" params={{params}} results={{searchResult}}></search-service>
+  <search-service 
+    id="service"
+    query-string=[[queryString]]
+    search-order-type=[[searchOrderOption]]
+    results={{searchResult}}
+    result-count={{searchResultCount}}
+    ellapsed-time={{ellapsedTime}}">
+  </search-service>
   
   <paper-toolbar>
     <span class="title">
@@ -15,12 +24,27 @@
     </span>
     <search-box value={{queryString}}></search-box>
   </paper-toolbar>
-  <search-result-card-list results={{searchResult}}></search-result-card-list>
+  
+  <div class="flex-container" >
+    <div class="side-bar-area">
+      <side-bar></side-bar>
+    </div>
+    <div class="result-area">
+      <search-result-header search-order-option={{searchOrderOption}} result-count=[[searchResultCount]] ellapsed-time=[[ellapsedTime]]></search-result-header>
+      <search-result-card-list items=[[searchResult]]></search-result-card-list>
+    </div>
+  </div>
+
 </template>
 
 <style>
 :host {
   display: block;
+}
+
+.flex-container {
+  padding: 0 20px;
+  @apply(--layout-horizontal);
 }
 
 search-box {
@@ -29,24 +53,16 @@ search-box {
   --search-box-background-color: white;
   --serch-box-icon-color: black;
 }
+
+.side-bar-area {
+  width: 20%;
+}
+
+.result-area {
+  width: 80%;
+}
 </style>
 
 <script>
-	Polymer({
-		is : "inthermis-app",
-		properties:{
-			queryString:{
-				type: String,
-				observer: 'onQueryStringChanged'
-			},
-			params: {
-				type: Object,
-				value: {},
-				notify: true
-			}
-		},
-		onQueryStringChanged: function(newValue, oldValue) {
-			this.params = {"text": newValue};
-		}
-	});
+	Polymer({is : "inthermis-app"});
 </script> </dom-module>

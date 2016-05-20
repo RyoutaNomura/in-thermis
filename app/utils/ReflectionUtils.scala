@@ -62,4 +62,11 @@ object ReflectionUtils {
   def toType(clazz: Class[_]): Type = {
     runtimeMirror.classSymbol(clazz).toType
   }
+
+  def getNestedObjects[A: TypeTag](typeSymbol: TypeSymbol): Seq[A] = {
+    typeSymbol.toType.decls.collect {
+      case s if s.isModule =>
+        runtimeMirror.reflectModule(s.asModule).instance.asInstanceOf[A]
+    }.toSeq
+  }
 }

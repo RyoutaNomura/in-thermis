@@ -55,8 +55,8 @@ object PptIndexer extends FileIndexer {
             case (line, lineNo) =>
               val indices = StringAnalyzer.analyze(line).map { x => (x.word, x.start, x.length) }
               Content(
-                slideNo + 1.toString,
-                lineNo.toString,
+                (slideNo + 1).toString,
+                StringUtils.EMPTY,
                 StringUtils.EMPTY,
                 line,
                 StringUtils.EMPTY,

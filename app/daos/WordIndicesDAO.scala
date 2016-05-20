@@ -1,14 +1,14 @@
 package daos
 
 import java.util.UUID
-
 import scala.collection.JavaConversions._
 import scala.reflect.runtime.universe
-
 import com.datastax.driver.core.{ Session, TupleValue, DataType }
-
 import dtos.WordIndicesDTO
 import utils.CassandraHelper
+import com.datastax.driver.core.querybuilder.QueryBuilder
+import settings.DBSettings
+import com.datastax.driver.core.PreparedStatement
 
 object WordIndicesDAO {
 
@@ -36,10 +36,23 @@ object WordIndicesDAO {
       }
     }
 
-    CassandraHelper.execCqlAsync(session, "INSERT INTO word_indices(word, resource_location_id, count, indices) VALUES(?,?,?,?)",
+    val cql = "INSERT INTO word_indices(" +
+      " word" +
+      ",resource_location_id" +
+      ",count" +
+      ",resource_updated" +
+      ",resource_uri" +
+      ",resource_name" +
+      ",indices" +
+      ") VALUES(?,?,?,?,?,?,?)"
+
+    CassandraHelper.execCqlAsync(session, cql,
       dto.word,
       dto.resourceLocationId,
       Long.box(dto.count),
+      dto.resourceUpdated,
+      dto.resourceUri,
+      dto.resourceName,
       indices)
   }
 }

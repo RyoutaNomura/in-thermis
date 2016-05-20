@@ -4,7 +4,7 @@
 
 <dom-module id="search-box">
 <template>
-  <iron-a11y-keys id="a11y" target="{{target}}" keys="enter" on-keys-pressed="onEnterInput"></iron-a11y-keys>
+  <iron-a11y-keys id="a11y" target="[[target]]" keys="enter" on-keys-pressed="onEnterInput"></iron-a11y-keys>
   <paper-input
     id="input-search-word"
     placeholder="検索ワードを入力してください。"

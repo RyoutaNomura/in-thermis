@@ -52,9 +52,12 @@ case class IndexerResult(
       val count = i._2.values.foldLeft(0)((acc, i) => acc + i.size)
       val indices = i._2.map { idx => (idx._1, idx._2.toSet) }.toMap
       WordIndicesDTO(
-        locationId,
         word,
+        locationId,
         count,
+        resourceModified,
+        uri.toString,
+        name,
         indices)
     }.toSeq
   }

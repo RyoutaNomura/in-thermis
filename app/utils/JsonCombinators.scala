@@ -1,6 +1,6 @@
 package utils
 
-import scala.language.higherKinds
+import scala.annotation.implicitNotFound
 
 import play.api.libs.json.{ JsArray, Writes }
 

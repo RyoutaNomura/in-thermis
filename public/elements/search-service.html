@@ -8,7 +8,7 @@
     id="search-service"
     auto=true
     url="/search"
-    params={{params}}
+    params=[[params]]
     handle-as="json"
     on-response="responseHandler"
     debounce-duration="300">
@@ -25,20 +25,38 @@
 	Polymer({
 		is : 'search-service',
 		properties: {
+			queryString: String,
+			searchOrderType: String,
 			params: {
 				type: Object,
-				value:{}
+				notify: true,
+				computed: "createParam(queryString, searchOrderType)"
 			},
 			results: {
 				type: Array,
 				notify: true
+			},
+			resultCount: {
+				type: Number,
+				value: 0,
+				notify: true
+			},
+			ellapsedTime: {
+				type: String,
+				value: "0.01",
+				notify: true,
 			}
+		},
+		createParam: function(queryString, searchOrderType) {
+			return {"text": queryString, "order": searchOrderType};
 		},
 		responseHandler : function(e, detail) {
 			if (this.$['search-service'].lastResponse) {
 				this.results = this.$['search-service'].lastResponse.slice(0);
+				this.resultCount = this.results.length;
 			} else {
 				this.results = [];
+				this.resultCount = 0;
 			}
 		}
 	});

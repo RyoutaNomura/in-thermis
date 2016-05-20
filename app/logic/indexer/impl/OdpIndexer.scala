@@ -40,7 +40,7 @@ object OdpIndexer extends FileIndexer {
         }.map {
           case (no, c) =>
             val indices = StringAnalyzer.analyze(c).map { x => (x.word, x.start, x.length) }
-            Content(no + 1.toString, StringUtils.EMPTY, StringUtils.EMPTY, c, StringUtils.EMPTY, StringUtils.EMPTY, indices)
+            Content((no + 1).toString, StringUtils.EMPTY, StringUtils.EMPTY, c, StringUtils.EMPTY, StringUtils.EMPTY, indices)
         }.toList
 
       IndexerResult(

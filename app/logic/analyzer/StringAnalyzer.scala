@@ -15,7 +15,7 @@ case class AnalyzeResult(
   length: Int)
 
 object StringAnalyzer {
-  val reuseList = new ArrayList[Token]
+  private val reuseList = new ArrayList[Token]
   val dictDir = StringUtils.EMPTY
 
   def analyze(text: String): Seq[AnalyzeResult] = {

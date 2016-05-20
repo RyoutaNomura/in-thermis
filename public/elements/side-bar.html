@@ -1,0 +1,58 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+
+<dom-module id="side-bar">
+<template>
+  <p>Resource Source</p>
+  <ul style="list-style:none;">
+    <li><paper-checkbox>Redmine</paper-checkbox></li>
+    <li><paper-checkbox>CIFS</paper-checkbox></li>
+    <li><paper-checkbox>MediaWiki</paper-checkbox></li>
+  </ul>
+  <p>Last Modified</p>
+  <ul style="list-style:none;">
+    <li><paper-checkbox>Today</paper-checkbox></li>
+    <li><paper-checkbox>This week</paper-checkbox></li>
+    <li><paper-checkbox>This month</paper-checkbox></li>
+    <li><paper-checkbox>This year</paper-checkbox></li>
+  </ul>
+  <p>File Type</p>
+  <ul style="list-style:none;">
+    <li><paper-checkbox>Microsoft Word</paper-checkbox></li>
+    <li><paper-checkbox>Microsoft Excel</paper-checkbox></li>
+    <li><paper-checkbox>OpenOffice Document</paper-checkbox></li>
+    <li><paper-checkbox>OpenOffice SpreadSheet</paper-checkbox></li>
+    <li><paper-checkbox>PDF Document</paper-checkbox></li>
+    <li><paper-checkbox>Plain Text</paper-checkbox></li>
+  </ul>
+</template>
+
+<style>
+:host {
+  display: block;
+  padding-top: 45px;
+}
+
+ul {
+  padding-left:15px;
+  margin: 0;
+}
+
+paper-checkbox {
+  --paper-checkbox-size:14px;
+  font-size:small;
+}
+
+p {
+  margin: 15px 0 0 0;
+}
+</style>
+<script>
+	Polymer({
+		is : 'side-bar',
+		properties: {
+			
+		},
+	});
+</script></dom-module>

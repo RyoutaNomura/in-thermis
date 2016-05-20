@@ -5,25 +5,25 @@
 <dom-module id="search-result-card"> <template>
 <div class="header container flex-horizontal">
   <div class="resource-name">
-    <span>{{resourceName}}</span> <span class="resource-key">{{keys}}</span>
+    <span>[[resourceName]]</span> <span class="resource-key">[[keys]]</span>
   </div>
   <div class="flexchild"></div>
-  <div class="date">{{resourceModified}}</div>
+  <div class="date">[[resourceModified]]</div>
 </div>
 
 <div class="content font-mincho">
-  <div>{{prevContent}}</div>
+  <div>[[prevContent]]</div>
   <div id='content'></div>
-  <div>{{nextContent}}</div>
+  <div>[[nextContent]]</div>
 </div>
 
 <div class="footer">
   <resource-location
-    uri={{uri}}
-    resource-size={{resourceSize}}
-    resource-type-name={{resourceTypeName}}
-    resource-icon={{resourceIcon}}
-    indexer-class-name={{indexerClassName}}></resource-location>
+    uri=[[uri]]
+    resource-size=[[resourceSize]]
+    resource-type-name=[[resourceTypeName]]
+    resource-icon=[[resourceIcon]]
+    indexer-class-name=[[indexerClassName]]></resource-location>
 </div>
 
 </template>
@@ -37,8 +37,13 @@
     rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
 }
 
-.flex-horizontal { @apply (--layout-horizontal);}
-.flexchild { @apply (--layout-flex);}
+.flex-horizontal { 
+  @apply (--layout-horizontal);
+  @apply(--layout-center);
+}
+.flexchild {
+  @apply (--layout-flex);
+}
 
 .header {
   border-bottom: solid 1px;

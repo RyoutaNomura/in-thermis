@@ -17,7 +17,7 @@ object HtmlIndexer extends FileIndexer {
 
   override def getResourceTypeName: String = "HTML"
 
-  override def getKeyTitles: Tuple3[String, String, String] = ("Line: ", StringUtils.EMPTY, StringUtils.EMPTY)
+  override def getKeyTitles: Tuple3[String, String, String] = ("Line", StringUtils.EMPTY, StringUtils.EMPTY)
 
   override def getPriority: Int = 0
 
