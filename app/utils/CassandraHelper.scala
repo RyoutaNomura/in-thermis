@@ -9,9 +9,9 @@ import scala.util.{ Failure, Success }
 import com.datastax.driver.core.{ BoundStatement, Cluster, DataType, Metadata, PreparedStatement, ResultSet, Row, Session }
 import com.google.common.base.CaseFormat
 import play.Logger
-import settings.DBSettings
 import java.lang.Boolean
 import com.datastax.driver.core.ResultSetFuture
+import settings.ApplicationConfig
 
 object CassandraHelper {
 
@@ -38,7 +38,7 @@ object CassandraHelper {
     logger.info(s"CassandraHelper.cluster closed.")
   }
 
-  def getSession: Session = cluster.connect(DBSettings.keyspace)
+  def getSession: Session = cluster.connect(ApplicationConfig.keyspace)
 
   def execCql(session: Session, cql: String, params: AnyRef*): ResultSet = {
     try {
@@ -46,7 +46,10 @@ object CassandraHelper {
       val bs = new BoundStatement(stmt).bind(params: _*)
       session.execute(bs)
     } catch {
-      case t: Throwable => throw t
+      case t: Throwable => {
+        logger.error(s"cql: $cql, params: $params", t)
+        throw t
+      }
     }
   }
 
@@ -57,7 +60,10 @@ object CassandraHelper {
       session.executeAsync(bs)
 
     } catch {
-      case t: Throwable => throw t
+      case t: Throwable => {
+        logger.error(s"cql: $cql, params: $params", t)
+        throw t
+      }
     }
   }
 

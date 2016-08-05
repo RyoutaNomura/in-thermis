@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils
 import dtos.{ ResourceContentDTO, ResourceLocationDTO, WordIndicesDTO }
 import logic.IndexerResource
 
+// TODO コンストラクタでやるのはわかりづらいので、utilityっぽくする
 case class IndexerResult(
     uri: URI,
     displayLocation: String,
@@ -15,6 +16,7 @@ case class IndexerResult(
     resourceCreated: Date,
     resourceModified: Date,
     contents: Seq[Content],
+    //    walkerClassName: String,
     indexerClassName: String,
     indexerGenerated: Date) {
 
@@ -53,11 +55,14 @@ case class IndexerResult(
       val indices = i._2.map { idx => (idx._1, idx._2.toSet) }.toMap
       WordIndicesDTO(
         word,
-        locationId,
-        count,
         resourceModified,
-        uri.toString,
+        StringUtils.EMPTY,
+        //        walkerClassName,
+        indexerClassName,
+        locationId,
         name,
+        uri.toString(),
+        count,
         indices)
     }.toSeq
   }
@@ -102,11 +107,13 @@ object IndexerResult {
     new Date,
     new Date,
     Seq.empty,
+    //    StringUtils.EMPTY,
     StringUtils.EMPTY,
     new Date)
 
   def apply(resource: IndexerResource,
             contents: Seq[Content],
+            //            walkerClassName: String,
             indexerClassName: String,
             indexerGenerated: Date): IndexerResult = IndexerResult(
     resource.uri,
@@ -116,6 +123,7 @@ object IndexerResult {
     resource.created,
     resource.lastModified,
     contents,
+    //    walkerClassName,
     indexerClassName,
     indexerGenerated)
 }

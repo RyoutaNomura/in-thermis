@@ -1,13 +1,12 @@
 package application
 
 import scala.concurrent.Future
-
 import javax.inject.{ Inject, Singleton }
 import play.Logger
 import play.api.{ Configuration, Environment }
 import play.api.inject.{ ApplicationLifecycle, Binding, Module }
-import settings.DBSettings
 import utils.CassandraHelper
+import settings.ApplicationConfig
 
 class CassandraModule extends Module {
 
@@ -27,6 +26,6 @@ class CassandraTask @Inject() (lifecycle: ApplicationLifecycle) {
     logger.info("Application disconnected from Cassandra cluster.")
   })
 
-  CassandraHelper.open(DBSettings.host, DBSettings.port, DBSettings.keyspace)
+  CassandraHelper.open(ApplicationConfig.host, ApplicationConfig.port, ApplicationConfig.keyspace)
   logger.info("Application connected to Cassandra cluster.")
 }

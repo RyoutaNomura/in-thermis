@@ -6,12 +6,12 @@
 <template>
   <iron-ajax
     id="search-service"
-    auto=true
     url="/search"
-    params=[[params]]
+    params="[[_params]]"
     handle-as="json"
-    on-response="responseHandler"
-    debounce-duration="300">
+    on-response="_responseHandler"
+    debounce-duration="300"
+    auto=false>
   </iron-ajax>
 </template>
 
@@ -22,41 +22,131 @@
 </style>
 
 <script>
+
 	Polymer({
 		is : 'search-service',
-		properties: {
-			queryString: String,
-			searchOrderType: String,
-			params: {
-				type: Object,
-				notify: true,
-				computed: "createParam(queryString, searchOrderType)"
+		properties : {
+			// 検索文字列
+			queryString : {
+				type : String,
+				value : "",
+				observer : "_onChangeCriteria",
 			},
-			results: {
-				type: Array,
-				notify: true
+			// 検索結果のソート順
+			searchOrderType : {
+				type : String,
+				value : "COUNT_DESC",
+				observer : "_onChangeCriteria",
 			},
-			resultCount: {
-				type: Number,
-				value: 0,
-				notify: true
+			// フェッチサイズ
+			fetchSize : {
+				type : Number,
+				value : 5,
+				observer : "_onChangeCriteria",
 			},
-			ellapsedTime: {
-				type: String,
-				value: "0.01",
-				notify: true,
+			// 現在ページ
+			currentPage : {
+				type : Number,
+				value : 0,
+				notify : true,
+			},
+			// 検索結果(fetchSize分だけ帰ってくる)
+			results : {
+				type : Array,
+				value : [],
+				notify : true,
+			},
+			// 結果の総数
+			resultCount : {
+				type : Number,
+				value : 0,
+				notify : true,
+			},
+			// 結果時間
+			ellapsedTime : {
+				type : Number,
+				value : 0,
+				notify : true,
+			},
+			isLastResponse : {
+				type : Boolean,
+				value : false,
+				notify : true,
+			},
+			dateRangeCriteria : {
+				type : Array,
+				value : [],
+			},
+			resourceWalkers : {
+				type : Array,
+				value : [],
+			},
+			resourceIndices : {
+				type : Array,
+				value : [],
+			},
+			// サーバーに送信するパラメータ
+			_params : {
+				type : Object,
+				computed : "_createParams(queryString, searchOrderType, fetchSize, currentPage, dateRangeCriteria.*, resourceWalkers.*, resourceIndices.*)",
+			},
+		},
+		setAutoRequest : function() {
+			this.$['search-service'].auto = true;
+			console.log("Auto request start");
+		},
+		_reset : function() {
+			console.log("search reset");
+			this.currentPage = 0;
+		},
+		_onChangeCriteria : function(newValue, oldValue) {
+			this._reset();
+		},
+		_createParams : function(queryString, searchOrderType, fetchSize,
+				currentPage, dateRangeCriteria, resourceWalkers, resourceIndices) {
+			var param = {
+
+				"text" : queryString,
+				"order" : searchOrderType,
+				"fetchSize" : fetchSize,
+				"currentPage" : currentPage,
+				"dateRangeCriteria" : dateRangeCriteria.base.filter(function(val) {
+					return val.selected;
+				}).map(function(element, index, array) {
+					return element.key;
+				}),
+				"resourceWalkers" : resourceWalkers.base.filter(function(val) {
+					return val.selected;
+				}).map(function(element, index, array) {
+					return element.key;
+				}),
+				"resourceIndices" : resourceIndices.base.filter(function(val) {
+					return val.selected;
+				}).map(function(element, index, array) {
+					return element.key;
+				}),
+			};
+			return param;
+		},
+		_responseHandler : function(e, detail) {
+			var paramStr = "";
+			for ( var key in this._params) {
+				paramStr = paramStr + key + ':' + this._params[key] + ", "; // プロパティhogeとfugaが出力される
 			}
-		},
-		createParam: function(queryString, searchOrderType) {
-			return {"text": queryString, "order": searchOrderType};
-		},
-		responseHandler : function(e, detail) {
+			console.log("Param: " + paramStr);
+
 			if (this.$['search-service'].lastResponse) {
-				this.results = this.$['search-service'].lastResponse.slice(0);
-				this.resultCount = this.results.length;
+				var service = this.$['search-service'];
+				this.results = service.lastResponse.searchResults.slice(0);
+				this.resultCount = service.lastResponse.resultCount;
+				this.ellapsedTime = service.lastResponse.ellapsedTime;
+				this.isLastResponse = service.lastResponse.isLastResponse;
 			} else {
 				this.results = [];
 				this.resultCount = 0;
+				this.ellapsedTime = 0;
+				this.isLastResponse = true;
+				this.currentPage = 0;
 			}
 		}
 	});

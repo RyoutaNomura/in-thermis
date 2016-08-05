@@ -4,6 +4,7 @@
 	url(//fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700);
 
 body {
+/*     overflow: hidden; */
 	background-color: #efefef;
 	margin:0;
 }

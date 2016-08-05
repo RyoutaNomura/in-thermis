@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animation.html">
 <link rel="import" href="./resource-location.html">
 
 <dom-module id="search-result-card"> <template>
@@ -37,24 +38,25 @@
     rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
 }
 
-.flex-horizontal { 
+div.flex-horizontal { 
   @apply (--layout-horizontal);
   @apply(--layout-center);
 }
-.flexchild {
+
+div.flexchild {
   @apply (--layout-flex);
 }
 
-.header {
+div.header {
   border-bottom: solid 1px;
   padding: 7px 0;
 }
 
-.resource-name {
+div.resource-name {
   font-weight: bold;
 }
 
-.resource-key {
+span.resource-key {
   margin-left: 20px;
   font-size: small;
 }
@@ -83,6 +85,7 @@ div.footer {
 <script>
 	Polymer({
 		is : "search-result-card",
+		behaviors : [ Polymer.NeonAnimationRunnerBehavior ],
 		properties : {
 			uri : String,
 			resourceName : String,
@@ -92,35 +95,47 @@ div.footer {
 			resourceModified : Date,
 			keys : String,
 			content : {
-				type: String,
-				observer: 'contentChanged',
+				type : String,
+				observer : 'contentChanged',
 			},
-			prevContent: String,
-			nextContent: String,
+			prevContent : String,
+			nextContent : String,
 			positions : Array,
-			indexerClassName: String,
+			indexerClassName : String,
 			indexGenerated : Date,
+			animationConfig : {
+				value : function() {
+					return {
+						name : 'fade-in-animation',
+						node : this
+					}
+				}
+			},
 		},
-		contentChanged: function() {
-			if (typeof this.content === 'undefined') return;
-			if (typeof this.positions ==='undefined') return;
+		contentChanged : function() {
+			if (typeof this.content === 'undefined')
+				return;
+			if (typeof this.positions === 'undefined')
+				return;
 
 			// 検索結果の該当箇所をspan要素を利用して色付けする。
 			var html = this.content;
-			this.positions.sort(function(a,b) {
-				return  b[0] - a[0];
+			this.positions.sort(function(a, b) {
+				return b[0] - a[0];
 			})
-			this.positions.forEach(function(val, index, ar){
+			this.positions.forEach(function(val, index, ar) {
 				var start = val[0];
 				var length = val[1];
-				html = html.substr(0, start) + 
-					"<span class='highlightend-text'>" + 
-					html.substr(start, length) + "</span>" + 
-					html.substr(start+length, html.length);
+				html = html.substr(0, start)
+						+ "<span class='highlightend-text'>"
+						+ html.substr(start, length) + "</span>"
+						+ html.substr(start + length, html.length);
 			});
-			html = html.replace(/[\n\r]/g,"</br>")
+			html = html.replace(/[\n\r]/g, "</br>")
 			// エスケープされるのを防ぐために、DOMを直接操作する(※サーバーサイドでやるべきか)
 			Polymer.dom(this.$.content).innerHTML = html;
-		}
+			
+			this.playAnimation();
+		},
 	});
 </script> </dom-module>

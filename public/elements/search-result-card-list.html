@@ -5,7 +5,7 @@
 
 <dom-module id="search-result-card-list"> 
 <template> 
-  <template is="dom-repeat" items="[[items]]"> 
+  <template is="dom-repeat" items="[[items]]">
     <search-result-card
       uri=[[item.uri]]
       resource-name=[[item.resourceName]]
@@ -28,7 +28,6 @@
 :host {
   display: block;
 }
-
 search-result-card {
   margin: 0 0 14px 0;
   margin-left: auto;
@@ -40,10 +39,7 @@ search-result-card {
 	Polymer({
 		is : 'search-result-card-list',
 		properties: {
-			items: Array
+			items: Array,
 		},
-		created : function() {
-			console.log("search-result-card-list created.")
-		}
 	});
 </script></dom-module>

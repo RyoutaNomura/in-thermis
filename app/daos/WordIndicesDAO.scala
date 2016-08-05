@@ -2,22 +2,22 @@ package daos
 
 import java.util.UUID
 import scala.collection.JavaConversions._
+import scala.collection.mutable.ArrayBuffer
 import scala.reflect.runtime.universe
-import com.datastax.driver.core.{ Session, TupleValue, DataType }
+import org.apache.commons.lang3.StringUtils
+import com.datastax.driver.core.{ DataType, Session, TupleValue }
 import dtos.WordIndicesDTO
+import enums.DateRangeCriteria
 import utils.CassandraHelper
-import com.datastax.driver.core.querybuilder.QueryBuilder
-import settings.DBSettings
-import com.datastax.driver.core.PreparedStatement
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import dtos.WordIndicesDTO
 
-object WordIndicesDAO {
+class WordIndicesDAO {
 
-  def select(session: Session, word: String): Seq[WordIndicesDTO] = {
-    if (word.isEmpty) {
-      Seq.empty
-    } else {
-      CassandraHelper.getRows(session, classOf[WordIndicesDTO], "SELECT * FROM word_indices WHERE word = ?", word)
-    }
+  def select(session: Session, word: String, resourceLocationId: UUID): Seq[WordIndicesDTO] = {
+    val cql = "SELECT * FROM word_indices WHERE resource_location_id = ? AND word = ?"
+    CassandraHelper.getRows(session, classOf[WordIndicesDTO], cql, word, resourceLocationId)
   }
 
   def delete(session: Session, resourceLocationId: UUID) {
@@ -25,34 +25,49 @@ object WordIndicesDAO {
   }
 
   def insert(session: Session, dto: WordIndicesDTO) {
-    val indices: java.util.Map[UUID, java.util.Set[TupleValue]] = {
-      dto.indices.map { f =>
-        val contentId = f._1
-        val tupleSet: java.util.Set[TupleValue] = f._2.map { t =>
-          val tupleType = CassandraHelper.metadata.newTupleType(DataType.cint, DataType.cint)
-          tupleType.newValue(Int.box(t._1), Int.box(t._2))
-        }
-        (contentId, tupleSet)
-      }
-    }
 
     val cql = "INSERT INTO word_indices(" +
       " word" +
       ",resource_location_id" +
-      ",count" +
-      ",resource_updated" +
-      ",resource_uri" +
-      ",resource_name" +
+      ",content" +
+      ",content_id" +
+      ",content_key1" +
+      ",content_key2" +
+      ",content_key3" +
       ",indices" +
-      ") VALUES(?,?,?,?,?,?,?)"
+      ",indices_in_resource" +
+      ",next_content" +
+      ",prev_content" +
+      ",resource_display_location" +
+      ",resource_indexer_name" +
+      ",resource_last_modified" +
+      ",resource_name" +
+      ",resource_size" +
+      ",resource_uri" +
+      ",resource_walker_name" +
+      ") VALUES(" +
+      "?,?,?,?,?,?,?,?,?,?," +
+      "?,?,?,?,?,?,?,?" +
+      ")"
 
     CassandraHelper.execCqlAsync(session, cql,
       dto.word,
       dto.resourceLocationId,
-      Long.box(dto.count),
-      dto.resourceUpdated,
-      dto.resourceUri,
+      dto.content,
+      dto.contentId,
+      dto.contentKey1,
+      dto.contentKey2,
+      dto.contentKey3,
+      dto.indices,
+      Double.box(dto.indicesInResource),
+      dto.nextContent,
+      dto.prevContent,
+      dto.resourceDisplayLocation,
+      dto.resourceIndexerName,
+      dto.resourceLastModified,
       dto.resourceName,
-      indices)
+      dto.resourceSize,
+      dto.resourceUri,
+      dto.resourceWalkerName)
   }
 }

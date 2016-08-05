@@ -1,12 +1,14 @@
 package daos
 
 import java.util.UUID
+
 import scala.collection.JavaConversions._
 import scala.reflect.runtime.universe
+
 import com.datastax.driver.core.Session
+
 import dtos.ResourceContentDTO
 import utils.CassandraHelper
-import com.datastax.driver.core.querybuilder.QueryBuilder
 
 object ResourceContentDAO {
 

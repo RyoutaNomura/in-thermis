@@ -1,14 +1,18 @@
 package controllers
 
 import java.nio.file.Paths
-
-import controllers.action.{ SearchAction, SearchResultOrder }
+import controllers.action.search.SearchAction
+import enums.SearchResultOrder
 import logic.ResourceIndexer
 import logic.walker.ResourceWalkerConfig
 import play.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{ Action, AnyContent, Controller }
 import utils.CassandraHelper
+import controllers.action.loadInitData.LoadInitDataAction
+import settings.ApplicationConfig
+import org.apache.commons.lang3.StringUtils
+import controllers.action.search.SearchCriteria
 
 class Application extends Controller {
 
@@ -19,13 +23,18 @@ class Application extends Controller {
   }
 
   def loadInitData: Action[AnyContent] = Action { request =>
-    Ok(Json.toJson(SearchResultOrder.values))
+    Ok(Json.toJson(LoadInitDataAction.execute))
   }
 
-  def doSearch(text: String, order: String): Action[AnyContent] = Action { request =>
+  def doSearch: Action[AnyContent] = Action { request =>
+
     val start = System.currentTimeMillis()
-    val result = SearchAction.execute(text, SearchResultOrder.valueOf(order))
-    logger.info(s"${result.size} result(s) in ${System.currentTimeMillis() - start} ms.");
+
+    val criteria = SearchCriteria(request)
+    val result = SearchAction.execute(criteria)
+
+    logger.info(s"${result.searchResults.size} result(s) in ${System.currentTimeMillis() - start} ms. criteria: ${criteria}");
+
     Ok(Json.toJson(result))
   }
 
@@ -33,11 +42,7 @@ class Application extends Controller {
     request =>
       val session = CassandraHelper.getSession
       try {
-        val config = ResourceWalkerConfig("name",
-          Paths.get("/Users/RyoutaNomura/Desktop/odssample").toUri,
-          "logic.walker.impl.FileWalker",
-          Map.empty)
-        ResourceIndexer.generateIndex(session, config)
+        ApplicationConfig.resourceWalkerConfigs.foreach { x => ResourceIndexer.generateIndex(session, x) }
       } finally {
         session.closeAsync()
       }

@@ -1,8 +1,9 @@
-package controllers.action
+package enums
 
 import utils.{ EnumClass, EnumObject }
 import play.api.libs.json.{ Writes, __ }
 import play.api.libs.functional.syntax.{ toFunctionalBuilderOps, unlift }
+import scala.reflect.runtime.universe
 
 sealed abstract case class SearchResultOrder(key: String, displayName: String) extends EnumClass {
   override def getKey: String = key

@@ -6,14 +6,6 @@
 
 <dom-module id="search-result-header"> 
 <template> 
-  <iron-ajax
-    id="load-init-data"
-    url="/loadInitData/SearchResultOption"
-    handle-as="json"
-    on-response="responseHandler"
-    debounce-duration="300">
-  </iron-ajax>
-  
   <div class="flex-container" hidden=[[isHidden]]>
     <paper-dropdown-menu no-label-float class="search-order-dropdown">
       <paper-listbox class="dropdown-content" selected={{indexOfSearchOrderOption}}>
@@ -23,7 +15,7 @@
       </paper-listbox>
     </paper-dropdown-menu>
     <div class="flexchild"></div>
-    <span>[[resultCount]] results ([[ellapsedTime]] seconds)</span>
+    <span>[[resultCount]] results ([[ellapsedTime]] milliseconds)</span>
   </div>
 </template>
 
@@ -61,6 +53,7 @@
 }
 
 </style>
+
 <script>
 	Polymer({
 		is : 'search-result-header',
@@ -75,40 +68,29 @@
 			},
 			indexOfSearchOrderOption: {
 				type: Number,
-				value: -1,
+				value: 0,
 			},
 			searchOrderOption: {
 				type: String,
 				notify: true,
-				computed: "getSearhOrderOption(indexOfSearchOrderOption)",
+				computed: "_getSearhOrderOption(searchOrderOptions, indexOfSearchOrderOption)",
 			},
 			resultCount: {
 				type: Number,
 				value: 0,
-				observer: "toggleDisplay",
+				observer: "_toggleDisplay",
 			},
 			ellapsedTime: {
 				type: Number,
 				value: 0,
 			},
-		},
-		ready: function() {
-			this.$['load-init-data'].generateRequest();
-		},
-		responseHandler : function(e, detail) {
-			if (this.$['load-init-data'].lastResponse) {
-				this.searchOrderOptions = this.$['load-init-data'].lastResponse.slice(0);
-			} else {
-				this.searchOrderOptions = [];
-			}
-			this.indexOfSearchOrderOption = 0;
-		},
-		getSearhOrderOption : function(index) {
-			obj = this.searchOrderOptions[index]
+		},		
+		_getSearhOrderOption : function(options,index) {
+			obj = options[index]
 			return obj ? obj.key : "";
 		},
-		toggleDisplay: function(newValue, oldValue) {
+		_toggleDisplay: function(newValue, oldValue) {
 			this.isHidden = (newValue == 0)
-		}
+		},
 	});
 </script></dom-module>

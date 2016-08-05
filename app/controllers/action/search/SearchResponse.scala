@@ -1,12 +1,20 @@
-package models
+package controllers.action.search
 
 import java.util.Date
-
 import org.apache.commons.lang3.StringUtils
-
 import play.api.libs.functional.syntax.{ toFunctionalBuilderOps, unlift }
-import play.api.libs.json.{ Writes, __ }
+import play.api.libs.json.{ Json, Writes, __ }
 import utils.JsonCombinators
+
+case class SearchResponse(
+  searchResults: Seq[SearchResult],
+  resultCount: Int,
+  ellapsedTime: Long,
+  isLastResponse: Boolean)
+
+object SearchResponse {
+  implicit val searchResponseWrites = Json.writes[SearchResponse]
+}
 
 case class SearchResult(
     word: String,
@@ -42,10 +50,6 @@ case class SearchResult(
 }
 
 object SearchResult {
-  def apply(): SearchResult = {
-    new SearchResult()
-  }
-
   implicit val searchResultWrites: Writes[SearchResult] = (
     (__ \ "word").write[String] and
     (__ \ "uri").write[String] and

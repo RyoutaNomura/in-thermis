@@ -1,37 +1,35 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
 
 <dom-module id="side-bar">
 <template>
   <p>Resource Source</p>
   <ul style="list-style:none;">
-    <li><paper-checkbox>Redmine</paper-checkbox></li>
-    <li><paper-checkbox>CIFS</paper-checkbox></li>
-    <li><paper-checkbox>MediaWiki</paper-checkbox></li>
+    <template is="dom-repeat" items="{{resourceWalkers}}">
+      <li><paper-checkbox checked={{item.selected}}>[[item.displayName]]</paper-checkbox></li>
+    </template>
   </ul>
+  
   <p>Last Modified</p>
-  <ul style="list-style:none;">
-    <li><paper-checkbox>Today</paper-checkbox></li>
-    <li><paper-checkbox>This week</paper-checkbox></li>
-    <li><paper-checkbox>This month</paper-checkbox></li>
-    <li><paper-checkbox>This year</paper-checkbox></li>
-  </ul>
+  <paper-radio-group>
+    <template is="dom-repeat" items="{{dateRangeCriteria}}">
+      <paper-radio-button checked={{item.selected}} name=[[item.key]]>[[item.displayName]]</paper-radio-button>
+    </template>
+  </paper-radio-group>
+
   <p>File Type</p>
   <ul style="list-style:none;">
-    <li><paper-checkbox>Microsoft Word</paper-checkbox></li>
-    <li><paper-checkbox>Microsoft Excel</paper-checkbox></li>
-    <li><paper-checkbox>OpenOffice Document</paper-checkbox></li>
-    <li><paper-checkbox>OpenOffice SpreadSheet</paper-checkbox></li>
-    <li><paper-checkbox>PDF Document</paper-checkbox></li>
-    <li><paper-checkbox>Plain Text</paper-checkbox></li>
+    <template is="dom-repeat" items="{{resourceIndices}}">
+      <li><paper-checkbox checked={{item.selected}}>[[item.displayName]]</paper-checkbox></li>
+    </template>
   </ul>
 </template>
 
 <style>
 :host {
-  display: block;
-  padding-top: 45px;
+  width: 250px;
 }
 
 ul {
@@ -44,15 +42,53 @@ paper-checkbox {
   font-size:small;
 }
 
+paper-radio-group {
+  padding-left:15px;
+  margin: 0;
+  --paper-radio-group-item-padding: 2px 0;
+}
+
+paper-radio-button {
+  display: block;
+  --paper-radio-button-size:14px;
+  font-size:small;
+}
+
 p {
-  margin: 15px 0 0 0;
+  margin: 10px 5px 0 0;
 }
 </style>
 <script>
 	Polymer({
 		is : 'side-bar',
 		properties: {
-			
+			resourceIndices: {
+				type: Array,
+				value: [],
+				notify: true,
+			},
+/* 			resourceIndexer : {
+				type: String,
+				notify: true,
+			}, */
+			resourceWalkers: {
+				type: Array,
+				value: [],
+				notify: true,
+			},
+/* 			resourceWalker: {
+				type: String,
+				notify: true,
+			}, */
+ 			dateRangeCriteria: {
+				type: Array,
+				value: [],
+				notify: true,
+			},
+/* 			dateRangeCriterion : {
+				type: String,
+				notify: true,
+			}, */
 		},
 	});
 </script></dom-module>

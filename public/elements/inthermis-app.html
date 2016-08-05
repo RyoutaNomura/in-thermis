@@ -2,23 +2,40 @@
 
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
+<link rel="import" href="../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="./search-box.html">
 <link rel="import" href="./search-result-card-list.html">
 <link rel="import" href="./search-result-header.html">
 <link rel="import" href="./side-bar.html">
+<link rel="import" href="./search-service.html">
+<link rel="import" href="./init-data-service.html">
 
 <dom-module id="inthermis-app"> 
 <template>
+  <init-data-service
+    id="init-data-service"
+    search-order-options={{searchOrderOptions}}
+    date-range-criteria={{dateRangeCriteria}}
+    resource-walkers={{resourceWalkers}}
+    resource-indices={{resourceIndices}}></init-data-service>
+    
   <search-service 
-    id="service"
+    id="search-service"
     query-string=[[queryString]]
     search-order-type=[[searchOrderOption]]
-    results={{searchResult}}
+    date-range-criteria=[[dateRangeCriteria]]
+    resource-walkers=[[resourceWalkers]]
+    resource-indices=[[resourceIndices]]
+    fetch-size=5
+    current-page={{currentPage}}
+    results={{serviceResult}}
     result-count={{searchResultCount}}
-    ellapsed-time={{ellapsedTime}}">
+    ellapsed-time={{ellapsedTime}}
+    is-last-response={{isLastResponse}}>
   </search-service>
   
-  <paper-toolbar>
+  <paper-toolbar id="toolbar">
     <span class="title">
       <h3>IN-THERMIS</h3>
     </span>
@@ -26,15 +43,21 @@
   </paper-toolbar>
   
   <div class="flex-container" >
-    <div class="side-bar-area">
-      <side-bar></side-bar>
+    <div id="side-bar-area">
+      <side-bar
+        date-range-criteria={{dateRangeCriteria}}
+        resource-walkers={{resourceWalkers}}
+        resource-indices={{resourceIndices}}></side-bar>
     </div>
-    <div class="result-area">
-      <search-result-header search-order-option={{searchOrderOption}} result-count=[[searchResultCount]] ellapsed-time=[[ellapsedTime]]></search-result-header>
+    <iron-scroll-threshold id="result-area" on-lower-threshold="_onScrollLast">
+      <search-result-header 
+        search-order-options="[[searchOrderOptions]]"
+        result-count=[[searchResultCount]]
+        ellapsed-time=[[ellapsedTime]]>
+      </search-result-header>
       <search-result-card-list items=[[searchResult]]></search-result-card-list>
-    </div>
+    </iron-scroll-threshold>
   </div>
-
 </template>
 
 <style>
@@ -49,20 +72,69 @@
 
 search-box {
   width: 60%;
-  margin-right: 10%; 
+  margin-right: 10%;
   --search-box-background-color: white;
   --serch-box-icon-color: black;
 }
 
-.side-bar-area {
-  width: 20%;
+#side-bar-area {
+  width: 250px;
 }
 
-.result-area {
-  width: 80%;
+#result-area {
+  width: 100%;
 }
 </style>
 
 <script>
-	Polymer({is : "inthermis-app"});
+
+	Polymer({
+		is : "inthermis-app",
+		properties : {
+			serviceResult: {
+				type: Array,
+				value: [],
+				observer: "_onChangeServiceResult",
+			},
+			searchResult : {
+				type : Array,
+				value : [],
+			},
+			queryString : {
+				type : String,
+				/* observer : "_onChangeQueryString", */
+			},
+			currentPage: Number,
+		},
+		behaviors : [ Polymer.IronResizableBehavior ],
+		listeners : {
+			'iron-resize' : '_onResize'
+		},
+
+		ready: function() {
+			this.$['init-data-service'].load();
+			this.$['search-service'].setAutoRequest();
+		},
+		_onResize : function() {
+			var height = window.innerHeight - this.$['toolbar'].offsetHeight;
+			this.$["result-area"].style.height = height + "px";
+		},
+		_onChangeServiceResult : function(newValue, oldValue) {
+			if (this.currentPage > 0) {
+				this.searchResult = this.searchResult.concat(this.serviceResult);
+				
+			} else {
+				this.searchResult = this.serviceResult.slice(0);
+			}
+			if ((this.serviceResult.length > 0) && (!this.isLastResponse)) {
+				this.$$("iron-scroll-threshold").clearTriggers();
+			}
+		},
+		_onScrollLast : function() {
+			if (this.searchResult.length > 0) {
+				console.log("_onScrollLast start");
+				this.currentPage++;
+			}
+		}
+	});
 </script> </dom-module>

@@ -2,14 +2,14 @@ package logic.walker
 
 import java.net.URI
 import java.util.UUID
-
 import com.datastax.driver.core.Session
-
-import daos.{ ResourceContentDAO, ResourceLocationDAO, WordIndicesDAO }
 import logic.IndexerResource
 import logic.indexer.FileIndexerFactory
 import models.IndexerResult
 import play.Logger
+import daos.ResourceLocationDAO
+import daos.ResourceContentDAO
+import daos.WordIndicesDAO
 
 trait ResourceWalker {
 
@@ -57,6 +57,9 @@ trait ResourceWalker {
   private def persistIndex(session: Session, indexerResult: IndexerResult) {
     ResourceLocationDAO.insert(session, indexerResult.locationDTO)
     indexerResult.contentDTOs.foreach { dto => ResourceContentDAO.insert(session, dto) }
-    indexerResult.wordIndicesDTOs.foreach { dto => WordIndicesDAO.insert(session, dto) }
+    indexerResult.wordIndicesDTOs.foreach { dto =>
+      dto.resourceWalkerName = this.getClass.getName
+      WordIndicesDAO.insert(session, dto)
+    }
   }
 }

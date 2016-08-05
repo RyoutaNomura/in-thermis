@@ -1,35 +1,33 @@
-package controllers.action
+package controllers.action.search
 
-import models.SearchResult
-import utils.CassandraHelper
-import daos.WordIndicesDAO
-import daos.ResourceLocationDAO
-import daos.ResourceContentDAO
 import org.apache.commons.lang3.StringUtils
+import com.datastax.driver.core.Session
+import daos.{ ResourceContentDAO, ResourceLocationDAO, WordIndicesDAO }
+import dtos.WordIndicesDTO
+import enums.SearchResultOrder
+import logic.analyzer.StringAnalyzer
 import logic.indexer.FileIndexerFactory
 import play.Logger
-import dtos.WordIndicesDTO
-import com.datastax.driver.core.Session
-import logic.analyzer.StringAnalyzer
-import dtos.WordIndicesDTO
-import java.util.UUID
-import dtos.WordIndicesDTO
-import scala.collection.mutable
-import dtos.WordIndicesDTO
-import scala.collection.mutable.MapBuilder
-import dtos.WordIndicesDTO
+import utils.CassandraHelper
+import daos.WordIndicesByKeyDAO
+import daos.WordIndicesByKeyDAO
+import daos.WordIndicesByKeyDAO
 
 object SearchAction {
 
   val logger = Logger.of(this.getClass)
 
-  def execute(word: String, order: SearchResultOrder): Seq[SearchResult] = {
+  //  def execute(word: String, order: SearchResultOrder, fetchSize: Int, currentPage: Int): SearchResponse = {
+  def execute(criteria: SearchCriteria) = {
+
+    val starttime = System.currentTimeMillis()
 
     val session = CassandraHelper.getSession
 
     try {
       // 単語リストを取得して、指定オーダー順に並べる
-      val wordIndices = loadAndSortIndices(session, word, order);
+      val wordIndicesAll = sortIndices(loadIndices(session, criteria), criteria.order)
+      val wordIndices = wordIndicesAll.slice(criteria.currentPage * criteria.fetchSize, (criteria.currentPage + 1) * criteria.fetchSize)
 
       // 取得した単語リストに含まれる場所の一覧を取得
       val locationIds = wordIndices.map { x => x.resourceLocationId }.toSet
@@ -40,7 +38,7 @@ object SearchAction {
       val contents = ResourceContentDAO.select(session, contentIds)
 
       // 結果の組み立て
-      wordIndices.map { x =>
+      val searchResults = wordIndices.map { x =>
         // 場所情報
         val location = locations.getOrElse(x.resourceLocationId, throw new RuntimeException(s"no location: ${x.resourceLocationId}"))
         // 内容(出現回数が一番多い内容)
@@ -62,7 +60,7 @@ object SearchAction {
 
         // 結果オブジェクトを生成
         SearchResult(
-          word,
+          criteria.text,
           location.uri,
           location.name,
           location.size,
@@ -78,17 +76,31 @@ object SearchAction {
           location.indexGenerated)
       }.toSeq
 
+      SearchResponse(
+        searchResults,
+        wordIndicesAll.size,
+        System.currentTimeMillis - starttime,
+        wordIndicesAll.size < (criteria.currentPage + 1) * criteria.fetchSize)
+
     } finally {
       session.closeAsync()
     }
   }
 
-  private def loadAndSortIndices(session: Session, text: String, order: SearchResultOrder): Seq[WordIndicesDTO] = {
+  private def loadIndices(session: Session, criteria: SearchCriteria): Seq[WordIndicesDTO] = {
 
     // 形態素解析の結果単語でインデックスを取得する
+    val words = StringAnalyzer.analyze(criteria.text)
+    words.map(x => WordIndicesByKeyDAO.)
+
     val dtos = StringAnalyzer
-      .analyze(text)
-      .map(x => WordIndicesDAO.select(session, x.word))
+      .analyze(criteria.text)
+      .map(x => WordIndicesByKeyDAO.select(
+        session,
+        x.word,
+        criteria.dateRangeCriteria,
+        criteria.resourceWalkers,
+        criteria.resourceIndices))
       .toSet
 
     // すべての単語に含まれる場所IDの一覧を取得
@@ -104,31 +116,36 @@ object SearchAction {
       .groupBy(_.resourceLocationId)
 
     // 結果リストに畳み込む
-    val mergedDtos = groupedDtos.values.foldLeft(Seq.newBuilder[WordIndicesDTO]) { (builder, seq) =>
+    groupedDtos.values.foldLeft(Seq.newBuilder[WordIndicesDTO]) { (builder, seq) =>
       val indices = seq.flatMap(_.indices).groupBy(_._1).mapValues(f => f.flatMap(_._2))
       val mergedDto = seq.find { x => true } match {
         case Some(s) => WordIndicesDTO(
           s.word,
-          s.resourceLocationId,
-          indices.values.flatten.size,
           s.resourceUpdated,
-          s.resourceUri,
+          s.resourceWalkerName,
+          s.resourceIndexerName,
+          s.resourceLocationId,
           s.resourceName,
+          s.resourceUri,
+          indices.values.flatten.size,
           indices)
         case None => WordIndicesDTO()
       }
       builder += mergedDto
     }.result
+  }
+
+  private def sortIndices(dtos: Seq[WordIndicesDTO], order: SearchResultOrder): Seq[WordIndicesDTO] = {
 
     order match {
-      case SearchResultOrder.COUNT_ASC             => mergedDtos.sortBy { x => x.count }
-      case SearchResultOrder.COUNT_DESC            => mergedDtos.sortBy { x => x.count }.reverse
-      case SearchResultOrder.RESOURCE_UPDATED_ASC  => mergedDtos.sortBy { x => x.resourceUpdated }.reverse
-      case SearchResultOrder.RESOURCE_UPDATED_DESC => mergedDtos.sortBy { x => x.resourceUpdated }.reverse
-      case SearchResultOrder.RESOURCE_URI_ASC      => mergedDtos.sortBy { x => x.resourceUri }
-      case SearchResultOrder.RESOURCE_URI_DESC     => mergedDtos.sortBy { x => x.resourceUri }.reverse
-      case SearchResultOrder.RESOURCE_NAME_ASC     => mergedDtos.sortBy { x => x.resourceName }
-      case SearchResultOrder.RESOURCE_NAME_DESC    => mergedDtos.sortBy { x => x.resourceName }.reverse
+      case SearchResultOrder.COUNT_ASC             => dtos.sortBy { x => x.count }
+      case SearchResultOrder.COUNT_DESC            => dtos.sortBy { x => x.count }.reverse
+      case SearchResultOrder.RESOURCE_UPDATED_ASC  => dtos.sortBy { x => x.resourceUpdated }.reverse
+      case SearchResultOrder.RESOURCE_UPDATED_DESC => dtos.sortBy { x => x.resourceUpdated }.reverse
+      case SearchResultOrder.RESOURCE_URI_ASC      => dtos.sortBy { x => x.resourceUri }
+      case SearchResultOrder.RESOURCE_URI_DESC     => dtos.sortBy { x => x.resourceUri }.reverse
+      case SearchResultOrder.RESOURCE_NAME_ASC     => dtos.sortBy { x => x.resourceName }
+      case SearchResultOrder.RESOURCE_NAME_DESC    => dtos.sortBy { x => x.resourceName }.reverse
     }
   }
 
