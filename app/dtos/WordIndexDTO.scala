@@ -1,50 +1,50 @@
 package dtos
 
-import java.util.UUID
-import java.util.Date
+import java.util.{ Date, UUID }
+
 import org.apache.commons.lang3.StringUtils
 
-class WordIndicesDTO(
-    var resourceLocationId: UUID,
+case class WordIndexDTO(
     var word: String,
+    var resourceContentId: UUID,
+    var indices: Map[Int, Int],
+    var indicesCount: Int,
     var content: String,
-    var contentId: UUID,
+    var prevContent: String,
+    var nextContent: String,
     var contentKey1: String,
     var contentKey2: String,
     var contentKey3: String,
-    var indices: Map[Int, Int],
-    var indicesInResource: Double,
-    var nextContent: String,
-    var prevContent: String,
+    var resourceUri: String,
     var resourceDisplayLocation: String,
+    var resourceName: String,
+    var resourceSize: Long,
+    var resourceWalkerName: String,
     var resourceIndexerName: String,
     var resourceLastModified: Date,
-    var resourceName: String,
-    var resourceSize: String,
-    var resourceUri: String,
-    var resourceWalkerName: String) {
+    var resourceLocationId: UUID) {
 }
 
-object WordIndicesDTO {
-  def apply: WordIndicesDTO =
-    new WordIndicesDTO(
-      UUID.randomUUID(),
-      StringUtils.EMPTY,
+object WordIndexDTO {
+  def apply(): WordIndexDTO =
+    new WordIndexDTO(
       StringUtils.EMPTY,
       UUID.randomUUID(),
-      StringUtils.EMPTY,
-      StringUtils.EMPTY,
-      StringUtils.EMPTY,
       Map.empty,
       0,
       StringUtils.EMPTY,
       StringUtils.EMPTY,
       StringUtils.EMPTY,
       StringUtils.EMPTY,
-      new Date,
       StringUtils.EMPTY,
       StringUtils.EMPTY,
       StringUtils.EMPTY,
-      StringUtils.EMPTY)
+      StringUtils.EMPTY,
+      StringUtils.EMPTY,
+      0,
+      StringUtils.EMPTY,
+      StringUtils.EMPTY,
+      new Date(),
+      UUID.randomUUID())
 
 }

@@ -7,45 +7,89 @@ import scala.util.Try
 
 object ReflectionUtils {
 
-  private val runtimeMirror = ru.runtimeMirror(Thread.currentThread.getContextClassLoader)
+  private val rm = ru.runtimeMirror(Thread.currentThread.getContextClassLoader)
+
+  def getObjectModuleMirror[A: TypeTag](t: Type): ModuleMirror = {
+    val typeName = t.typeSymbol.fullName
+    val moduleSymbol = rm.staticModule(typeName)
+    rm.reflectModule(moduleSymbol)
+  }
 
   def getObjectInstance[A: TypeTag](t: Type): A = {
-    val typeName = t.typeSymbol.fullName
-    val moduleSymbol = runtimeMirror.staticModule(typeName)
-    val module = runtimeMirror.reflectModule(moduleSymbol)
+    val module = getObjectModuleMirror(t)
     val instance = module.instance
     instance.asInstanceOf[A]
   }
 
   def createInstance[A: TypeTag](t: Type): Try[A] = Try {
-    val constructor = t.member(ru.termNames.CONSTRUCTOR).filter {
-      _.asMethod.paramLists match {
+    // もう少し書きようが有る気がする
+    t.member(ru.termNames.CONSTRUCTOR).alternatives
+      .find(_.asMethod.paramLists match {
         case List(Nil) => true
         case _         => false
+      }) match {
+        case Some(s) =>
+          val classMirror = rm.reflectClass(t.typeSymbol.asClass)
+          val constructorMirror = classMirror.reflectConstructor(s.asMethod)
+          constructorMirror().asInstanceOf[A]
+        case None =>
+          val mm = getObjectModuleMirror(t)
+          mm.symbol.info.decl(ru.TermName("apply")).alternatives
+            .find(_.asMethod.paramLists match {
+              case List(Nil) => true
+              case _         => false
+            }) match {
+              case Some(s) =>
+                val c = rm.reflect(mm.instance)
+                val m = c.reflectMethod(s.asMethod)
+                m.apply().asInstanceOf[A]
+              case None => throw new RuntimeException("no simple constructor or apply method: " + t.member(ru.termNames.CONSTRUCTOR))
+            }
       }
-    }.asMethod
-    val classMirror = runtimeMirror.reflectClass(t.typeSymbol.asClass)
-    val constructorMirror = classMirror.reflectConstructor(constructor)
-    constructorMirror().asInstanceOf[A]
   }
 
   def createInstance[A: TypeTag](t: Type, args: Any*): Try[A] = Try {
-    val classMirror = runtimeMirror.reflectClass(t.typeSymbol.asClass)
-    val constructor = t.member(ru.termNames.CONSTRUCTOR).filter {
-      _.asMethod.paramLists match {
-        case List(Nil) => false
-        case _         => true
+    //    val classMirror = rm.reflectClass(t.typeSymbol.asClass)
+    //    val constructor = t.member(ru.termNames.CONSTRUCTOR).filter {
+    //      _.asMethod.paramLists match {
+    //        case List(Nil) => false
+    //        case _         => true
+    //      }
+    //    }.asMethod
+    //    def wrapper(args: Any*) = classMirror.reflectConstructor(constructor)(args: _*)
+    //    wrapper(args: _*).asInstanceOf[A]
+
+    // もう少し書きようが有る気がする
+    t.member(ru.termNames.CONSTRUCTOR).alternatives
+      .find(_.asMethod.paramLists match {
+        case List(Nil) => true
+        case _         => false
+      }) match {
+        case Some(s) =>
+          val classMirror = rm.reflectClass(t.typeSymbol.asClass)
+          def wrapper(args: Any*) = classMirror.reflectConstructor(s.asMethod)(args: _*)
+          wrapper(args: _*).asInstanceOf[A]
+        case None =>
+          val mm = getObjectModuleMirror(t)
+          mm.symbol.info.decl(ru.TermName("apply")).alternatives
+            .find(_.asMethod.paramLists match {
+              case List(Nil) => true
+              case _         => false
+            }) match {
+              case Some(s) =>
+                val c = rm.reflect(mm.instance)
+                val m = c.reflectMethod(s.asMethod)
+                m.apply(args: _*).asInstanceOf[A]
+              case None => throw new RuntimeException("no simple constructor or apply method: " + t.member(ru.termNames.CONSTRUCTOR))
+            }
       }
-    }.asMethod
-    def wrapper(args: Any*) = classMirror.reflectConstructor(constructor)(args: _*)
-    wrapper(args: _*).asInstanceOf[A]
   }
 
   def setValueToInstance[A: TypeTag: ClassTag](instance: A, name: String, value: Option[Any]) {
     value match {
       case Some(v) =>
         val t = ru.typeOf[A]
-        val instanceMirror = runtimeMirror.reflect(instance)
+        val instanceMirror = rm.reflect(instance)
 
         val symbol = t.decl(ru.TermName(name))
         if (symbol.isTerm) {
@@ -60,13 +104,13 @@ object ReflectionUtils {
   }
 
   def toType(clazz: Class[_]): Type = {
-    runtimeMirror.classSymbol(clazz).toType
+    rm.classSymbol(clazz).toType
   }
 
   def getNestedObjects[A: TypeTag](typeSymbol: TypeSymbol): Seq[A] = {
     typeSymbol.toType.decls.collect {
       case s if s.isModule =>
-        runtimeMirror.reflectModule(s.asModule).instance.asInstanceOf[A]
+        rm.reflectModule(s.asModule).instance.asInstanceOf[A]
     }.toSeq
   }
 }

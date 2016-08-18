@@ -19,7 +19,7 @@ import models.{ Content, IndexerResult }
 
 object XlsIndexer extends FileIndexer {
 
-  override def getResourceTypeName: String = "Microsoft Excel Document"
+  override def getResourceTypeName: String = "Microsoft Excel"
 
   override def getKeyTitles: Tuple3[String, String, String] = ("Sheet", "Row", StringUtils.EMPTY)
 

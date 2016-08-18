@@ -5,7 +5,7 @@ import java.util.UUID
 import org.apache.commons.lang3.StringUtils
 
 case class ResourceContentDTO(
-    var id: UUID,
+    var resourceContentId: UUID,
     var key1: String,
     var key2: String,
     var key3: String,

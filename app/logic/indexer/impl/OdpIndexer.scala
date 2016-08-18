@@ -15,7 +15,7 @@ import models.{ Content, IndexerResult }
 
 object OdpIndexer extends FileIndexer {
 
-  override def getResourceTypeName: String = "OpenDocument Presentation Document"
+  override def getResourceTypeName: String = "OpenDocument Presentation"
 
   override def getKeyTitles: Tuple3[String, String, String] = ("Slide", StringUtils.EMPTY, StringUtils.EMPTY)
 

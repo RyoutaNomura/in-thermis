@@ -15,7 +15,7 @@ import utils.CharsetUtils
 
 object TextIndexer extends FileIndexer {
 
-  override def getResourceTypeName: String = "Plain Text File"
+  override def getResourceTypeName: String = "Plain Text"
 
   override def getKeyTitles: Tuple3[String, String, String] = ("Line", StringUtils.EMPTY, StringUtils.EMPTY)
 

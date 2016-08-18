@@ -16,7 +16,7 @@ import models.{ Content, IndexerResult }
 
 object PptIndexer extends FileIndexer {
 
-  override def getResourceTypeName: String = "Microsoft PowerPoint Document"
+  override def getResourceTypeName: String = "Microsoft PowerPoint"
 
   override def getKeyTitles: Tuple3[String, String, String] = ("Slide", StringUtils.EMPTY, StringUtils.EMPTY)
 

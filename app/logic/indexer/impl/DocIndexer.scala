@@ -16,7 +16,7 @@ import models.{ Content, IndexerResult }
 
 object DocIndexer extends FileIndexer {
 
-  override def getResourceTypeName: String = "Microsoft Word Document"
+  override def getResourceTypeName: String = "Microsoft Word"
 
   override def getKeyTitles: Tuple3[String, String, String] = ("Sheet", "Row", StringUtils.EMPTY)
 

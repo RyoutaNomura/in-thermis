@@ -2,7 +2,6 @@ package daos
 
 import java.util.UUID
 
-import scala.collection.JavaConversions._
 import scala.reflect.runtime.universe
 
 import com.datastax.driver.core.Session
@@ -12,42 +11,43 @@ import utils.CassandraHelper
 
 object ResourceLocationDAO {
 
-  def select(session: Session, ids: Set[UUID]): Map[UUID, ResourceLocationDTO] = {
-    if (ids.isEmpty) {
-      Map.empty
-    } else {
-      val idList: java.util.List[UUID] = ids.toSeq
-      CassandraHelper.getRows(session, classOf[ResourceLocationDTO], s"SELECT * FROM resource_location WHERE id IN ?", idList)
-        .map(r => (r.id, r))
-        .toMap
-    }
+  def selectById(session: Session, id: UUID): Option[ResourceLocationDTO] = {
+    CassandraHelper.getRows(session, classOf[ResourceLocationDTO], s"SELECT * FROM resource_location WHERE id = ?", id).headOption
+  }
+
+  def selectByUri(session: Session, uri: String): Option[ResourceLocationDTO] = {
+    CassandraHelper.getRows(session, classOf[ResourceLocationDTO], "SELECT * FROM resource_location WHERE resource_uri = ? ", uri).headOption
   }
 
   def delete(session: Session, id: UUID) {
-    CassandraHelper.execCqlAsync(session, s"DELETE FROM resource_location WHERE id = ?", id)
-  }
-
-  def find(session: Session, uri: String): Option[ResourceLocationDTO] = {
-    CassandraHelper.getRows(session, classOf[ResourceLocationDTO], "SELECT * FROM resource_location WHERE uri = ? ", uri).headOption
+    CassandraHelper.execCqlAsync(session, s"DELETE FROM resource_location WHERE resource_location_id = ?", id)
   }
 
   def insert(session: Session, dto: ResourceLocationDTO) {
     val cql = "INSERT INTO resource_location(" +
-      "id, uri, display_location, name, size, created, modified, indexer_class_name, index_generated" +
+      "resource_location_id, " +
+      "resource_uri," +
+      "resource_display_location," +
+      "resource_name," +
+      "resource_size," +
+      "resource_walker_name," +
+      "resource_indexer_name," +
+      "resource_last_modified," +
+      "index_generated" +
       ") VALUES(" +
-      "?, ?, ?, ?, ?, ?, ?, ?, ?" +
+      "?, ?, ?, ?, ?, ?, ?, ?,?" +
       ")"
 
     CassandraHelper.execCqlAsync(session,
       cql,
-      dto.id,
-      dto.uri,
-      dto.displayLocation,
-      dto.name,
-      Long.box(dto.size),
-      dto.created,
-      dto.modified,
-      dto.indexerClassName,
+      dto.resourceLocationId,
+      dto.resourceUri,
+      dto.resourceDisplayLocation,
+      dto.resourceName,
+      Long.box(dto.resourceSize),
+      dto.resourceWalkerName,
+      dto.resourceIndexerName,
+      dto.resourceLastModified,
       dto.indexGenerated)
   }
 }

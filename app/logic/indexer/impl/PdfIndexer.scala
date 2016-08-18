@@ -19,7 +19,7 @@ import models.{ Content, IndexerResult }
 
 object PdfIndexer extends FileIndexer {
 
-  override def getResourceTypeName: String = "Adobe PDF Document"
+  override def getResourceTypeName: String = "Adobe PDF"
 
   override def getKeyTitles: Tuple3[String, String, String] = ("Page", "Line", StringUtils.EMPTY)
 

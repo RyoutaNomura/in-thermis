@@ -15,7 +15,7 @@ import models.{ Content, IndexerResult }
 
 object OdtIndexer extends FileIndexer {
 
-  override def getResourceTypeName: String = "OpenDocument Word Processor Document"
+  override def getResourceTypeName: String = "OpenDocument Text"
 
   override def getKeyTitles: Tuple3[String, String, String] = ("Paragraph", StringUtils.EMPTY, StringUtils.EMPTY)
 

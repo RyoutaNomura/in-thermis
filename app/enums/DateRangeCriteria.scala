@@ -16,6 +16,7 @@ sealed abstract case class DateRangeCriteria(key: String, displayName: String) e
       case DateRangeCriteria.THIS_WEEK  => LocalDate.now.minusWeeks(1)
       case DateRangeCriteria.THIS_MONTH => LocalDate.now.minusMonths(1)
       case DateRangeCriteria.THIS_YEAR  => LocalDate.now.minusYears(1)
+      case DateRangeCriteria.ALL        => LocalDate.MIN
       case _                            => throw new IllegalStateException()
     }
   }
@@ -26,6 +27,7 @@ object DateRangeCriteria extends EnumObject[DateRangeCriteria] {
   object THIS_WEEK extends DateRangeCriteria("THIS_WEEK", "This week")
   object THIS_MONTH extends DateRangeCriteria("THIS_MONTH", "This month")
   object THIS_YEAR extends DateRangeCriteria("THIS_YEAR", "This year")
+  object ALL extends DateRangeCriteria("ALL", "All")
 
   implicit val searchResultWrites: Writes[SearchResultOrder] = (
     (__ \ "key").write[String] and

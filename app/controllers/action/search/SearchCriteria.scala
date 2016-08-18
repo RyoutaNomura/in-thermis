@@ -1,7 +1,5 @@
 package controllers.action.search
 
-import scala.annotation.implicitNotFound
-
 import org.apache.commons.lang3.StringUtils
 
 import enums.{ DateRangeCriteria, SearchResultOrder }
@@ -18,12 +16,12 @@ case class SearchCriteria(
 
 case object SearchCriteria {
 
-  val DEFAULT_FETCH_SIZE = 5
+  val defaultFetchSize = 5
 
   def apply(request: RequestHeader): SearchCriteria = {
     var text = StringUtils.EMPTY
     var order: SearchResultOrder = SearchResultOrder.COUNT_DESC
-    var fetchSize = DEFAULT_FETCH_SIZE
+    var fetchSize = defaultFetchSize
     var currentPage = 0
     var dateRangeCriteria: DateRangeCriteria = DateRangeCriteria.THIS_YEAR
     var resourceWalkers: Set[String] = Set.empty
@@ -36,8 +34,8 @@ case object SearchCriteria {
         case "fetchSize"         => fetchSize = f._2.head.toInt
         case "currentPage"       => currentPage = f._2.head.toInt
         case "dateRangeCriteria" => dateRangeCriteria = DateRangeCriteria.valueOf(f._2.head)
-        case "resourceWalkers" => resourceWalkers = f._2.toSet
-        case "resourceIndices"         => resourceIndices = f._2.toSet
+        case "resourceWalkers"   => resourceWalkers = f._2.toSet
+        case "resourceIndices"   => resourceIndices = f._2.toSet
       }
     })
     SearchCriteria(text, order, fetchSize, currentPage, dateRangeCriteria, resourceWalkers, resourceIndices)

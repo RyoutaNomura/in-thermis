@@ -5,24 +5,26 @@ import java.util.{ Date, UUID }
 import org.apache.commons.lang3.StringUtils
 
 case class ResourceLocationDTO(
-    var id: UUID,
-    var uri: String,
-    var displayLocation: String,
-    var name: String,
-    var size: Long,
-    var created: Date,
-    var modified: Date,
-    var indexerClassName: String,
+    var resourceLocationId: UUID,
+    var resourceUri: String,
+    var resourceDisplayLocation: String,
+    var resourceName: String,
+    var resourceSize: Long,
+    var resourceWalkerName: String,
+    var resourceIndexerName: String,
+    var resourceLastModified: Date,
     var indexGenerated: Date) {
+}
 
-  def this() = this(
-    UUID.randomUUID,
+object ResourceLocationDTO {
+  def apply(): ResourceLocationDTO = new ResourceLocationDTO(
+    UUID.randomUUID(),
     StringUtils.EMPTY,
     StringUtils.EMPTY,
     StringUtils.EMPTY,
     -1,
-    new Date,
-    new Date,
     StringUtils.EMPTY,
-    new Date)
+    StringUtils.EMPTY,
+    new Date(),
+    new Date())
 }

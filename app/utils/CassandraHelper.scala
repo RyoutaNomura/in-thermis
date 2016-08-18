@@ -85,7 +85,9 @@ object CassandraHelper {
         })
         instance
       }
-      case Failure(f) => throw new RuntimeException("Illegal Type: " + f)
+      case Failure(f) =>
+        logger.error("Could not create instance: " + t)
+        throw f
     }
   }
 
