@@ -51,9 +51,10 @@
     </div>
     <iron-scroll-threshold id="result-area" on-lower-threshold="_onScrollLast">
       <search-result-header 
-        search-order-options="[[searchOrderOptions]]"
+        search-order-options=[[searchOrderOptions]]
         result-count=[[searchResultCount]]
-        ellapsed-time=[[ellapsedTime]]>
+        ellapsed-time=[[ellapsedTime]]
+        search-order-option={{searchOrderOption}}>
       </search-result-header>
       <search-result-card-list items=[[searchResult]]></search-result-card-list>
     </iron-scroll-threshold>

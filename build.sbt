@@ -34,7 +34,11 @@ libraryDependencies += "org.apache.poi" % "poi-scratchpad" % "3.14"
 libraryDependencies += "com.ibm.icu" % "icu4j" % "57.1"
 libraryDependencies += "org.jsoup" % "jsoup" % "1.9.1"
 libraryDependencies += "jcifs" % "jcifs" % "1.3.17"
+libraryDependencies += "net.databinder.dispatch" % "dispatch-core_2.11" % "0.11.3"
 
+// https://mvnrepository.com/artifact/org.sweble.wikitext/swc-engine
+libraryDependencies += "org.sweble.wikitext" % "swc-engine" % "2.1.0"
+libraryDependencies += "org.sweble.wikitext" % "swc-example-basic" % "2.1.0"
 
 
 

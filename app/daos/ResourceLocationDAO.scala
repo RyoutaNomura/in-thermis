@@ -19,6 +19,10 @@ object ResourceLocationDAO {
     CassandraHelper.getRows(session, classOf[ResourceLocationDTO], "SELECT * FROM resource_location WHERE resource_uri = ? ", uri).headOption
   }
 
+  def selectByWalkerName(session: Session, walkerName: String): Seq[ResourceLocationDTO] = {
+    CassandraHelper.getRows(session, classOf[ResourceLocationDTO], "SELECT * FROM resource_location WHERE resource_walker_name = ? ", walkerName)
+  }
+
   def delete(session: Session, id: UUID) {
     CassandraHelper.execCqlAsync(session, s"DELETE FROM resource_location WHERE resource_location_id = ?", id)
   }

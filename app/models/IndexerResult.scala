@@ -9,6 +9,10 @@ import dtos.ResourceContentDTO
 import logic.IndexerResource
 import dtos.ResourceContentDTO
 import scala.collection._
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 // TODO コンストラクタでやるのはわかりづらいので、utilityっぽくする
 case class IndexerResult(
@@ -16,26 +20,26 @@ case class IndexerResult(
     val displayLocation: String,
     val name: String,
     val size: Long,
-    val resourceCreated: Date,
-    val resourceModified: Date,
+    val resourceCreated: LocalDateTime,
+    val resourceModified: LocalDateTime,
     val contents: Seq[Content],
     val indexerClassName: String,
-    val indexGenerated: Date) {
+    val indexGenerated: LocalDateTime) {
 
   private val locationId = UUID.randomUUID
   private val contentIds = contents.map { c => (c, UUID.randomUUID) }.toMap
 
-  def generateResourceLocationDTO: ResourceLocationDTO = {
+  def generateResourceLocationDTO(walkerClassName: String): ResourceLocationDTO = {
     ResourceLocationDTO(
       locationId,
       uri.toString,
       displayLocation,
       name,
       size,
-      StringUtils.EMPTY,
+      walkerClassName,
       indexerClassName,
-      resourceModified,
-      indexGenerated)
+      Date.from(resourceModified.toInstant(ZoneOffset.UTC)),
+      Date.from(indexGenerated.toInstant(ZoneOffset.UTC)))
   }
 
   def generateResourceContentDTOs: Seq[ResourceContentDTO] = {
@@ -82,7 +86,7 @@ case class IndexerResult(
           size,
           walkerName,
           indexerClassName,
-          resourceModified,
+          Date.from(resourceModified.toInstant(ZoneOffset.UTC)),
           locationId)
       }
     }.flatten.toSeq
@@ -125,16 +129,15 @@ object IndexerResult {
     StringUtils.EMPTY,
     StringUtils.EMPTY,
     -1,
-    new Date,
-    new Date,
+    LocalDateTime.now,
+    LocalDateTime.now,
     Seq.empty,
     StringUtils.EMPTY,
-    new Date)
+    LocalDateTime.now)
 
   def apply(resource: IndexerResource,
             contents: Seq[Content],
-            indexerClassName: String,
-            indexerGenerated: Date): IndexerResult = IndexerResult(
+            indexerClassName: String): IndexerResult = IndexerResult(
     resource.uri,
     resource.displayLocation,
     resource.name,
@@ -143,7 +146,7 @@ object IndexerResult {
     resource.lastModified,
     contents,
     indexerClassName,
-    indexerGenerated)
+    LocalDateTime.now)
 }
 
 case class Content(

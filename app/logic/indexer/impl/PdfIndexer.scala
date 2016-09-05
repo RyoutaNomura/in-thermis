@@ -35,35 +35,38 @@ object PdfIndexer extends FileIndexer {
     try {
       val parser = new PDFParser(rabfis)
       parser.parse
+
       val pd = parser.getPDDocument
+      try {
+        val stripper = new PDFTextStripper
+        val contents =
+          (0 until pd.getNumberOfPages)
+            .flatMap { pageIndex =>
+              stripper.setStartPage(pageIndex)
+              stripper.setEndPage(pageIndex)
 
-      val stripper = new PDFTextStripper
-      var contents =
-        (0 until pd.getNumberOfPages)
-          .flatMap { pageIndex =>
-            stripper.setStartPage(pageIndex)
-            stripper.setEndPage(pageIndex)
+              val pageContents = Splitter
+                .on(System.lineSeparator())
+                .split(stripper.getText(pd))
+                .zipWithIndex
+                .map {
+                  case (line, lineNo) =>
+                    val indices = StringAnalyzer.analyze(line).map { x => (x.word, x.start, x.length) }
+                    Content(pageIndex + 1.toString, lineNo.toString, StringUtils.EMPTY, line, StringUtils.EMPTY, StringUtils.EMPTY, indices)
+                }.toList
 
-            val pageContents = Splitter
-              .on(System.lineSeparator())
-              .split(stripper.getText(pd))
-              .zipWithIndex
-              .map {
-                case (line, lineNo) =>
-                  val indices = StringAnalyzer.analyze(line).map { x => (x.word, x.start, x.length) }
-                  Content(pageIndex + 1.toString, lineNo.toString, StringUtils.EMPTY, line, StringUtils.EMPTY, StringUtils.EMPTY, indices)
-              }.toList
+              fillSibilingContent(pageContents)
+              pageContents
+            }
 
-            fillSibilingContent(pageContents)
-            pageContents
-          }
+        IndexerResult(
+          resource,
+          contents,
+          this.getClassName)
 
-      IndexerResult(
-        resource,
-        contents,
-        this.getClassName,
-        new Date)
-
+      } finally {
+        pd.close
+      }
     } finally {
       rabfis.close()
       is.close()

@@ -39,8 +39,7 @@ object OdsIndexer extends FileIndexer {
       IndexerResult(
         resource,
         contents,
-        this.getClassName,
-        new Date)
+        this.getClassName)
 
     } finally {
       is.close()

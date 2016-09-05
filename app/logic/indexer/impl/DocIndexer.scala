@@ -48,8 +48,7 @@ object DocIndexer extends FileIndexer {
       IndexerResult(
         resource,
         contents,
-        this.getClassName,
-        new Date)
+        this.getClassName)
 
     } finally {
       extractor.close()

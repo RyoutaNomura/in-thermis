@@ -9,7 +9,10 @@ object ResourceIndexer {
   private val logger = Logger.of(this.getClass)
 
   def generateIndex(session: Session, config: ResourceWalkerConfig) {
-    var walker = ResourceWalkerFactory.create(config)
-    walker.walk(session, config)
+    ResourceWalkerFactory.create(config).walk(session, config)
+  }
+
+  def deleteAllIndex(session: Session, config: ResourceWalkerConfig) {
+    ResourceWalkerFactory.create(config).deleteAll(session, config)
   }
 }

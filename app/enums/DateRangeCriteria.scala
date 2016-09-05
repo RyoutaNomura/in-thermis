@@ -7,6 +7,7 @@ import utils.{ EnumClass, EnumObject }
 import java.util.Date
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 sealed abstract case class DateRangeCriteria(key: String, displayName: String) extends EnumClass {
   override def getKey: String = key
@@ -16,10 +17,11 @@ sealed abstract case class DateRangeCriteria(key: String, displayName: String) e
       case DateRangeCriteria.THIS_WEEK  => LocalDate.now.minusWeeks(1)
       case DateRangeCriteria.THIS_MONTH => LocalDate.now.minusMonths(1)
       case DateRangeCriteria.THIS_YEAR  => LocalDate.now.minusYears(1)
-      case DateRangeCriteria.ALL        => LocalDate.MIN
+      case DateRangeCriteria.ALL        => LocalDate.of(1900, 1, 1)
       case _                            => throw new IllegalStateException()
     }
   }
+  def resolveAsDate: Date = Date.from(resolve.atStartOfDay(ZoneId.systemDefault).toInstant)
 }
 
 object DateRangeCriteria extends EnumObject[DateRangeCriteria] {

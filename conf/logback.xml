@@ -3,7 +3,8 @@
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		utEncoder -->
 		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} -
+				%msg%n</pattern>
 		</encoder>
 	</appender>
 
@@ -11,7 +12,8 @@
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>logs/app.log</file>
 		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} -
+				%msg%n</pattern>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>INFO</level>
@@ -25,10 +27,16 @@
 		</rollingPolicy>
 	</appender>
 
-	<logger name="play" level="INFO" />
-	<logger name="application" level="DEBUG" />
+	<logger name="play" level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</logger>
+	<logger name="application" level="DEBUG">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</logger>
 
-	<root level="INFO">
+	<root level="ERROR">
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="FILE" />
 	</root>

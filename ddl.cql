@@ -43,6 +43,9 @@ CREATE TABLE mykeyspace.word_index(
   PRIMARY KEY(word, resource_content_id)
 );
 
+create INDEX resource_content_by_location_id on mykeyspace.resource_content(resource_location_id);
+create INDEX resource_location_by_walker on mykeyspace.resource_location(resource_walker_name);
+create INDEX word_index_by_location_id on mykeyspace.word_index(resource_location_id);
 CREATE INDEX resource_location_by_uri ON mykeyspace.resource_location(resource_uri);
 CREATE INDEX word_index_by_walker ON mykeyspace.word_index(resource_walker_name);
 CREATE INDEX word_index_by_indexer ON mykeyspace.word_index(resource_indexer_name);

@@ -12,12 +12,14 @@ import logic.indexer.FileIndexerFactory
 import play.Logger
 import utils.CassandraHelper
 import scala.collection.mutable.ArrayBuffer
+import java.util.Date
+import java.time.ZoneId
+import java.util.UUID
 
 object SearchAction {
 
   val logger = Logger.of(this.getClass)
 
-  //  def execute(word: String, order: SearchResultOrder, fetchSize: Int, currentPage: Int): SearchResponse = {
   def execute(criteria: SearchCriteria) = {
     val starttime = System.currentTimeMillis()
     val session = CassandraHelper.getSession
@@ -73,16 +75,25 @@ object SearchAction {
     // 形態素解析の結果単語でインデックスを取得する
     val resourceIndexMap = words.flatMap { ar =>
 
-      var wordIndices = WordIndexDAO.select(session, ar.word)
-
-      // 条件がある場合は、単語+条件で条件数分検索して和集合をとる
+      val contentIdsBuilder = Set.newBuilder[UUID]
+      // 条件がある場合は、単語+条件で条件数分検索してIDの和集合をとる
       criteria.resourceIndices.map { x =>
-        wordIndices = wordIndices.intersect(WordIndexDAO.selectByResourceIndexerName(session, ar.word, x))
+        contentIdsBuilder ++= WordIndexDAO.selectContentIdByIndexerName(session, ar.word, x)
       }
       criteria.resourceWalkers.map { x =>
-        wordIndices = wordIndices.intersect(WordIndexDAO.selectByResourceWalkerName(session, ar.word, x))
+        contentIdsBuilder ++= WordIndexDAO.selectContentIdByWalkerName(session, ar.word, x)
       }
-      wordIndices
+      val contentIds = contentIdsBuilder.result
+
+      // 単語と日付で絞込
+      if ((criteria.resourceIndices.size > 0) || (criteria.resourceWalkers.size) > 0) {
+        WordIndexDAO.selectByResourceLastModified(session, ar.word, criteria.dateRangeCriteria.resolveAsDate)
+          .filter { x =>
+            contentIds.contains(x.resourceContentId)
+          }
+      } else {
+        WordIndexDAO.selectByResourceLastModified(session, ar.word, criteria.dateRangeCriteria.resolveAsDate)
+      }
     }.groupBy { x => x.resourceLocationId }
 
     // リソースごとに、代表コンテンツを取得
@@ -127,8 +138,8 @@ object SearchAction {
 
   private def createSortFunction(order: SearchResultOrder): ((WordIndexDTO, WordIndexDTO) => Boolean) = {
     order match {
-      case SearchResultOrder.COUNT_ASC             => ((a, b) => a.indicesCount - b.indicesCount > 0)
-      case SearchResultOrder.COUNT_DESC            => ((a, b) => a.indicesCount - b.indicesCount < 0)
+      case SearchResultOrder.COUNT_ASC             => ((a, b) => a.indicesCount - b.indicesCount < 0)
+      case SearchResultOrder.COUNT_DESC            => ((a, b) => a.indicesCount - b.indicesCount > 0)
       case SearchResultOrder.RESOURCE_UPDATED_ASC  => ((a, b) => a.resourceLastModified.before(b.resourceLastModified))
       case SearchResultOrder.RESOURCE_UPDATED_DESC => ((a, b) => a.resourceLastModified.after(b.resourceLastModified))
       case SearchResultOrder.RESOURCE_URI_ASC      => ((a, b) => a.resourceUri.compareTo(b.resourceUri) > 0)

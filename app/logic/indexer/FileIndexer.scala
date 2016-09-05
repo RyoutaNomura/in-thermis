@@ -15,7 +15,7 @@ trait FileIndexer {
 
   def getClassName: String = ReflectionUtils.toType(this.getClass).typeSymbol.fullName
 
-  private val maxLengthOfResult = 100;
+  private val maxLengthOfResult = 60;
 
   protected def fillSibilingContent(contents: Seq[Content]) = {
     contents.sliding(2).foreach {

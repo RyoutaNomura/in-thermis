@@ -15,6 +15,7 @@ object FileIndexerFactory {
   private val logger = Logger.of(this.getClass)
 
   private val implPackage = "logic.indexer.impl"
+
   val cache: Seq[FileIndexer] = {
     ClassPath
       .from(this.getClass.getClassLoader)

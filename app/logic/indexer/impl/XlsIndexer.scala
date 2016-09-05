@@ -60,8 +60,7 @@ object XlsIndexer extends FileIndexer {
       IndexerResult(
         resource,
         contents,
-        this.getClassName,
-        new Date)
+        this.getClassName)
 
     } finally {
       workbook.close()

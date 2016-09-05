@@ -1,6 +1,5 @@
 package utils
 
-import scala.annotation.migration
 import scala.collection.JavaConversions._
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{ universe => ru }
@@ -68,7 +67,6 @@ object CassandraHelper {
   }
 
   def getRows[T: TypeTag: ClassTag](session: Session, clazz: Class[T], cql: String, params: AnyRef*): Seq[T] = {
-    val seq = Seq.empty
     val cqlResult = execCql(session, cql, params: _*)
     val types = cqlResult.getColumnDefinitions.map { definition => (definition.getName, definition.getType) }.toMap
     cqlResult.map { cqlrow => convert(cqlrow, clazz, types) }.toSeq

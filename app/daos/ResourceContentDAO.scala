@@ -24,8 +24,12 @@ object ResourceContentDAO {
       dto.resourceLocationId)
   }
 
-  def deleteByResourceLocationId(session: Session, resourceLocationId: UUID) {
-    CassandraHelper.execCqlAsync(session, "DELETE FROM resource_content WHERE recource_location_id = ? ",
-      resourceLocationId)
+  def selectByResourceLocationId(session: Session, resourceLocationId: UUID): Seq[ResourceContentDTO] = {
+    CassandraHelper.getRows(session, classOf[ResourceContentDTO], "SELECT * FROM resource_content WHERE resource_location_id = ?", resourceLocationId)
+  }
+
+  def delete(session: Session, resourceContentId: UUID) {
+    CassandraHelper.execCqlAsync(session, "DELETE FROM resource_content WHERE resource_content_id = ? ",
+      resourceContentId)
   }
 }

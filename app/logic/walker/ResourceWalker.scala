@@ -9,23 +9,31 @@ import logic.indexer.FileIndexerFactory
 import models.IndexerResult
 import play.Logger
 import utils.ReflectionUtils
+import java.time.ZoneOffset
+import java.util.Date
+import logic.indexer.FileIndexer
 
 trait ResourceWalker {
 
   private val logger = Logger.of(this.getClass)
 
-  def getWalkerName: String = ReflectionUtils.toType(this.getClass).typeSymbol.fullName
+  val walkerName: String = ReflectionUtils.toType(this.getClass).typeSymbol.fullName
+
+  val specificFileIndexer: Option[FileIndexer] = Option.empty
 
   def walk(config: ResourceWalkerConfig, generateIndex: IndexerResource => Unit): Unit
 
   def walk(session: Session, config: ResourceWalkerConfig): Unit = {
 
-    def function = (resource: IndexerResource) => {
+    def generateIndex = (resource: IndexerResource) => {
+      logger.debug(s"target: ${resource.name}")
       // インデクサ取得
-      val indexer = FileIndexerFactory.create(resource.uri)
-
+      val indexer = specificFileIndexer match {
+        case Some(s) => s
+        case _       => FileIndexerFactory.create(resource.uri)
+      }
       // リソースの最終更新日時を取得
-      val lastModified = resource.lastModified
+      val lastModified = Date.from(resource.lastModified.toInstant(ZoneOffset.UTC))
 
       // DBのインデックスを取得
       ResourceLocationDAO.selectByUri(session, resource.uri.toString) match {
@@ -47,19 +55,36 @@ trait ResourceWalker {
       }
     }
 
-    this.walk(config, function)
+    this.walk(config, generateIndex)
+  }
+
+  def deleteAll(session: Session, config: ResourceWalkerConfig): Unit = {
+    val locations = ResourceLocationDAO.selectByWalkerName(session, config.implClassName)
+    locations.foreach { x => deleteLocationById(session, x.resourceLocationId) }
   }
 
   private def deleteLocationById(session: Session, id: UUID) {
-    WordIndexDAO.deleteByResourceLocationId(session, id)
-    ResourceContentDAO.deleteByResourceLocationId(session, id)
+    logger.debug(s"$id deleting...")
+
+    WordIndexDAO.selectByResourceLocationId(session, id)
+      .foreach { wordIndex =>
+        WordIndexDAO.delete(session, wordIndex.word, wordIndex.resourceContentId)
+      }
+
+    ResourceContentDAO.selectByResourceLocationId(session, id)
+      .map(_.resourceContentId)
+      .distinct
+      .foreach { contentId =>
+        ResourceContentDAO.delete(session, contentId)
+      }
+
     ResourceLocationDAO.delete(session, id)
   }
 
   private def persistIndex(session: Session, indexerResult: IndexerResult) {
-    ResourceLocationDAO.insert(session, indexerResult.generateResourceLocationDTO)
+    ResourceLocationDAO.insert(session, indexerResult.generateResourceLocationDTO(walkerName))
     indexerResult.generateResourceContentDTOs.foreach { dto => ResourceContentDAO.insert(session, dto) }
-    indexerResult.generateWordIndexDTOs(this.getWalkerName).foreach { dto =>
+    indexerResult.generateWordIndexDTOs(walkerName).foreach { dto =>
       WordIndexDAO.insert(session, dto)
     }
   }

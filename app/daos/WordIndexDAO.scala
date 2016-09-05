@@ -6,6 +6,7 @@ import com.datastax.driver.core.Session
 import dtos.WordIndexDTO
 import utils.CassandraHelper
 import scala.collection.JavaConverters._
+import scala.collection.JavaConversions._
 
 object WordIndexDAO {
 
@@ -13,20 +14,34 @@ object WordIndexDAO {
     CassandraHelper.getRows(session, classOf[WordIndexDTO], "SELECT * FROM word_index WHERE word = ? ", word)
   }
 
-  def selectByResourceIndexerName(session: Session, word: String, resourceIndexerName: String): Seq[WordIndexDTO] = {
-    CassandraHelper.getRows(session, classOf[WordIndexDTO], "SELECT * FROM word_index WHERE word = ? AND resource_indexer_name = ? ", word, resourceIndexerName)
+  def selectContentIdByIndexerName(session: Session, word: String, resourceIndexerName: String): Set[UUID] = {
+    val rs = CassandraHelper.execCql(session, "SELECT resource_content_id FROM word_index WHERE word = ? AND resource_indexer_name = ? ", word, resourceIndexerName)
+    rs.all.map(_.getUUID(0)).toSet
   }
 
-  def selectByResourceWalkerName(session: Session, word: String, resourceWalkerName: String): Seq[WordIndexDTO] = {
-    CassandraHelper.getRows(session, classOf[WordIndexDTO], "SELECT * FROM word_index WHERE word = ? AND resource_walker_name = ? ", word, resourceWalkerName)
+  //  def selectByResourceIndexerName(session: Session, word: String, resourceIndexerName: String): Seq[WordIndexDTO] = {
+  //    CassandraHelper.getRows(session, classOf[WordIndexDTO], "SELECT * FROM word_index WHERE word = ? AND resource_indexer_name = ? ", word, resourceIndexerName)
+  //  }
+
+  def selectContentIdByWalkerName(session: Session, word: String, resourceWalkerName: String): Set[UUID] = {
+    val rs = CassandraHelper.execCql(session, "SELECT * FROM word_index WHERE word = ? AND resource_walker_name = ? ", word, resourceWalkerName)
+    rs.all.map(_.getUUID(0)).toSet
   }
+
+  //  def selectByResourceWalkerName(session: Session, word: String, resourceWalkerName: String): Seq[WordIndexDTO] = {
+  //    CassandraHelper.getRows(session, classOf[WordIndexDTO], "SELECT * FROM word_index WHERE word = ? AND resource_walker_name = ? ", word, resourceWalkerName)
+  //  }
 
   def selectByResourceLastModified(session: Session, word: String, resourceLastModified: Date): Seq[WordIndexDTO] = {
-    CassandraHelper.getRows(session, classOf[WordIndexDTO], "SELECT * FROM word_index WHERE word = ? AND resource_last_modified >= ? ", word, resourceLastModified)
+    CassandraHelper.getRows(session, classOf[WordIndexDTO], "SELECT * FROM word_index WHERE word = ? AND resource_last_modified >= ? ALLOW FILTERING", word, resourceLastModified)
   }
 
-  def deleteByResourceLocationId(session: Session, resourceLocationId: UUID) {
-    CassandraHelper.execCqlAsync(session, "DELETE FROM word_index WHERE resource_location_id = ?", resourceLocationId)
+  def selectByResourceLocationId(session: Session, resourceLocationId: UUID): Seq[WordIndexDTO] = {
+    CassandraHelper.getRows(session, classOf[WordIndexDTO], "SELECT * FROM word_index WHERE resource_location_id = ?", resourceLocationId)
+  }
+
+  def delete(session: Session, word: String, contentId: UUID) {
+    CassandraHelper.execCqlAsync(session, "DELETE FROM word_index WHERE word = ? AND resource_content_id = ?", word, contentId)
   }
 
   def insert(session: Session, dto: WordIndexDTO) {

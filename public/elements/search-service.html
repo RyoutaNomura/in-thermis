@@ -23,6 +23,7 @@
 
 <script>
 
+
 	Polymer({
 		is : 'search-service',
 		properties : {
@@ -91,6 +92,9 @@
 				computed : "_createParams(queryString, searchOrderType, fetchSize, currentPage, dateRangeCriteria.*, resourceWalkers.*, resourceIndices.*)",
 			},
 		},
+		observers : [ '_onChangeCriteria(dateRangeCriteria.*)',
+				'_onChangeCriteria(resourceWalkers.*)',
+				'_onChangeCriteria(resourceIndices.*)', ],
 		setAutoRequest : function() {
 			this.$['search-service'].auto = true;
 			console.log("Auto request start");
@@ -103,16 +107,17 @@
 			this._reset();
 		},
 		_createParams : function(queryString, searchOrderType, fetchSize,
-				currentPage, dateRangeCriteria, resourceWalkers, resourceIndices) {
+				currentPage, dateRangeCriteria, resourceWalkers,
+				resourceIndices) {
 			var param = {
-
 				"text" : queryString,
 				"order" : searchOrderType,
 				"fetchSize" : fetchSize,
 				"currentPage" : currentPage,
-				"dateRangeCriteria" : dateRangeCriteria.base.filter(function(val) {
-					return val.selected;
-				}).map(function(element, index, array) {
+				"dateRangeCriteria" : dateRangeCriteria.base.filter(
+						function(val) {
+							return val.selected;
+						}).map(function(element, index, array) {
 					return element.key;
 				}),
 				"resourceWalkers" : resourceWalkers.base.filter(function(val) {

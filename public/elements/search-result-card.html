@@ -13,9 +13,9 @@
 </div>
 
 <div class="content font-mincho">
-  <div>[[prevContent]]</div>
+  <div id='prev-content'>[[prevContent]]</div>
   <div id='content'></div>
-  <div>[[nextContent]]</div>
+  <div id='next-content'>[[nextContent]]</div>
 </div>
 
 <div class="footer">
@@ -65,6 +65,18 @@ div.content {
   font-size: smaller;
   color: gray;
   padding: 10px 0;
+}
+
+div#prev-content {
+  background: -webkit-linear-gradient(#ccc, #000);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+div#next-content {
+  background: -webkit-linear-gradient(#000, #ccc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 div#content {

@@ -8,6 +8,10 @@ import logic.walker.ResourceWalker
 import logic.walker.ResourceWalkerConfig
 import jcifs.smb.NtlmPasswordAuthentication
 import java.io.InputStream
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.Instant
 
 object CIFSWalker extends ResourceWalker {
 
@@ -43,8 +47,8 @@ object CIFSWalker extends ResourceWalker {
             child.getUncPath,
             child.getName,
             child.getContentLength,
-            new Date(child.getLastModified),
-            new Date(child.getLastModified)))
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(child.getLastModified), ZoneOffset.UTC),
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(child.getLastModified), ZoneOffset.UTC)))
       }
     }
   }
@@ -55,8 +59,8 @@ case class CIFSResource(
   override val displayLocation: String,
   override val name: String,
   override val size: Long,
-  override val created: Date,
-  override val lastModified: Date)
+  override val created: LocalDateTime,
+  override val lastModified: LocalDateTime)
     extends IndexerResource {
 
   override def getInputStream: InputStream = {

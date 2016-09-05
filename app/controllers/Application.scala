@@ -42,7 +42,22 @@ class Application extends Controller {
     request =>
       val session = CassandraHelper.getSession
       try {
-        ApplicationConfig.resourceWalkerConfigs.foreach { x => ResourceIndexer.generateIndex(session, x) }
+        ApplicationConfig.resourceWalkerConfigs.foreach { x =>
+          ResourceIndexer.generateIndex(session, x)
+        }
+      } finally {
+        session.closeAsync()
+      }
+      Ok
+  }
+
+  def deleteAllIndex: Action[AnyContent] = Action {
+    request =>
+      val session = CassandraHelper.getSession
+      try {
+        ApplicationConfig.resourceWalkerConfigs.foreach { x =>
+          ResourceIndexer.deleteAllIndex(session, x)
+        }
       } finally {
         session.closeAsync()
       }
