@@ -2,27 +2,29 @@
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
 
 <dom-module id="side-bar">
 <template>
-  <p>Resource Source</p>
+
+  <p><iron-icon icon="maps:place"></iron-icon><span>Resource Source</span></p>
   <ul style="list-style:none;">
     <template is="dom-repeat" items="{{resourceWalkers}}">
       <li><paper-checkbox checked={{item.selected}}>[[item.displayName]]</paper-checkbox></li>
     </template>
   </ul>
   
-  <p>Last Modified</p>
+  <p><iron-icon icon="icons:date-range"></iron-icon><span>Last Modified</span></p>
   <paper-radio-group>
     <template is="dom-repeat" items="{{dateRangeCriteria}}">
       <paper-radio-button checked={{item.selected}} name=[[item.key]]>[[item.displayName]]</paper-radio-button>
     </template>
   </paper-radio-group>
 
-  <p>File Type</p>
+  <p><iron-icon icon="icons:filter-list"></iron-icon>File Type</p>
   <ul style="list-style:none;">
-    <template is="dom-repeat" items="{{resourceIndices}}">
-      <li><paper-checkbox checked={{item.selected}}>[[item.displayName]]</paper-checkbox></li>
+    <template is="dom-repeat" items="{{resourceIndexers}}">
+      <li><paper-checkbox checked={{item.selected}}><i class$="fa [[item.iconCssClassName]]"></i>[[item.displayName]]</paper-checkbox></li>
     </template>
   </ul>
 </template>
@@ -30,17 +32,18 @@
 <style>
 
 :host {
-  padding: 14px;
-/*   width: 200px; */
+  display: block;
+  height: 110%;
+  margin-right: 5px;
 }
 
 ul {
-  padding-left:10px;
+  padding-left:20px;
   margin: 0;
 }
 
 ul li {
-  margin: 3px 0;
+  margin: 5px 0;
 }
 
 paper-checkbox {
@@ -49,9 +52,8 @@ paper-checkbox {
 }
 
 paper-radio-group {
-  padding-left:10px;
-  margin: 3px 0;
-  --paper-radio-group-item-padding: 3px 0;
+  padding-left:20px;
+  --paper-radio-group-item-padding: 5px 0;
 }
 
 paper-radio-button {
@@ -60,15 +62,30 @@ paper-radio-button {
   font-size:small;
 }
 
+iron-icon {
+  margin-right: 10px;
+  margin-top: -0.5rem;
+}
+
+i.fa {
+  margin-right: 10px;
+}
+
 p {
-  margin: 14px 0 0 0;
+  margin: 24px 0 14px 0;
+}
+
+.big {
+  --iron-icon-height: 32px;
+  --iron-icon-width: 32px;
 }
 </style>
+
 <script>
 	Polymer({
 		is : 'side-bar',
 		properties: {
-			resourceIndices: {
+			resourceIndexers: {
 				type: Array,
 				value: [],
 				notify: true,

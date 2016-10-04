@@ -82,19 +82,19 @@
 				type : Array,
 				value : [],
 			},
-			resourceIndices : {
+			resourceIndexers : {
 				type : Array,
 				value : [],
 			},
 			// サーバーに送信するパラメータ
 			_params : {
 				type : Object,
-				computed : "_createParams(queryString, searchOrderType, fetchSize, currentPage, dateRangeCriteria.*, resourceWalkers.*, resourceIndices.*)",
+				computed : "_createParams(queryString, searchOrderType, fetchSize, currentPage, dateRangeCriteria.*, resourceWalkers.*, resourceIndexers.*)",
 			},
 		},
 		observers : [ '_onChangeCriteria(dateRangeCriteria.*)',
 				'_onChangeCriteria(resourceWalkers.*)',
-				'_onChangeCriteria(resourceIndices.*)', ],
+				'_onChangeCriteria(resourceIndexers.*)', ],
 		setAutoRequest : function() {
 			this.$['search-service'].auto = true;
 			console.log("Auto request start");
@@ -108,7 +108,7 @@
 		},
 		_createParams : function(queryString, searchOrderType, fetchSize,
 				currentPage, dateRangeCriteria, resourceWalkers,
-				resourceIndices) {
+				resourceIndexers) {
 			var param = {
 				"text" : queryString,
 				"order" : searchOrderType,
@@ -125,7 +125,7 @@
 				}).map(function(element, index, array) {
 					return element.key;
 				}),
-				"resourceIndices" : resourceIndices.base.filter(function(val) {
+				"resourceIndexers" : resourceIndexers.base.filter(function(val) {
 					return val.selected;
 				}).map(function(element, index, array) {
 					return element.key;

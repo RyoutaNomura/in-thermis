@@ -7,19 +7,26 @@ body {
 /*     overflow: hidden; */
 	background-color: #efefef;
 	margin:0;
+	overflow: hidden;
 }
 
 .font-gothic {
 	font-family: Avenir, "Open Sans", "Helvetica Neue", Helvetica, Arial,
 		Verdana, Roboto, "游ゴシック", "Yu Gothic", "游ゴシック体", "YuGothic",
 		"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "Meiryo UI", "メイリオ",
-		Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+		Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif !important;
 }
 
 .font-mincho {
 	font-family: "Roboto Slab", Garamond, "Times New Roman", "游明朝",
 		"Yu Mincho", "游明朝体", "YuMincho", "ヒラギノ明朝 Pro W3",
 		"Hiragino Mincho Pro", "HiraMinProN-W3", "HGS明朝E", "ＭＳ Ｐ明朝",
-		"MS PMincho", serif;
+		"MS PMincho", serif !important;
+}
+
+paper-icon-button.fa {
+    padding: .5em;
+    height: 2em;
+    width: 2em;
 }
 

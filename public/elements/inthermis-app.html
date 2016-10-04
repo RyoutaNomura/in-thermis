@@ -18,7 +18,7 @@
     search-order-options={{searchOrderOptions}}
     date-range-criteria={{dateRangeCriteria}}
     resource-walkers={{resourceWalkers}}
-    resource-indices={{resourceIndices}}></init-data-service>
+    resource-indexers={{resourceIndexers}}></init-data-service>
     
   <search-service 
     id="search-service"
@@ -26,7 +26,7 @@
     search-order-type=[[searchOrderOption]]
     date-range-criteria=[[dateRangeCriteria]]
     resource-walkers=[[resourceWalkers]]
-    resource-indices=[[resourceIndices]]
+    resource-indexers=[[resourceIndexers]]
     fetch-size=5
     current-page={{currentPage}}
     results={{serviceResult}}
@@ -43,12 +43,12 @@
   </paper-toolbar>
   
   <div class="flex-container" >
-    <div id="side-bar-area">
+    <iron-scroll-threshold id="side-bar-area">
       <side-bar
-        date-range-criteria={{dateRangeCriteria}}
-        resource-walkers={{resourceWalkers}}
-        resource-indices={{resourceIndices}}></side-bar>
-    </div>
+       date-range-criteria={{dateRangeCriteria}}
+       resource-walkers={{resourceWalkers}}
+       resource-indexers={{resourceIndexers}}></side-bar>
+    </iron-scroll-threshold>
     <iron-scroll-threshold id="result-area" on-lower-threshold="_onScrollLast">
       <search-result-header 
         search-order-options=[[searchOrderOptions]]
@@ -67,7 +67,7 @@
 }
 
 .flex-container {
-  padding: 0 14px;
+  padding: 0 20px;
   @apply(--layout-horizontal);
 }
 
@@ -79,12 +79,12 @@ search-box {
 }
 
 #side-bar-area {
-  width: 250px;
+  width: 300px;
 }
 
 #result-area {
   width: 100%;
-  margin-left: 14px;
+  margin-left: 40px;
 }
 </style>
 

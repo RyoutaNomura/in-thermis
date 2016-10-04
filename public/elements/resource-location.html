@@ -9,30 +9,20 @@
 <template>
 <div class="container flex-horizontal">
   <div class="resource-icon">
-    <i class$="fa [[resourceIcon]]"></i>
+    <i class$="fa [[iconCssClassName]]"></i>
   </div>
   <div class="resource-type-name">[[resourceTypeName]]</div>
   <div class="resource-size">[[resourceSizeFormatted]]</div>
   <div class="flexchild"></div>
-  <div id="buttons">
-    <paper-icon-button
-      id="show-link-button"
-      icon="link"
-      title="Show link"
-      on-tap="onShowLinkButtonTap"></paper-icon-button>
-    <paper-icon-button 
-      id="download-button"
-      icon="file-download"
-      title="Download" 
-      on-tap="onDownloadButtonTap"></paper-icon-button>
-  </div>
 </div>
-<div id="path-box" class="container flex-horizontal" hidden="true">
+<!-- <div id="path-box" class="container flex-horizontal">
   <div class="flexchild">
-    <paper-input id="uri-input" value$="[[uri]]" readonly="true" no-label-float="true"></paper-input>
+    <paper-input id="uri-input" value$="[[uri]]" readonly="true" no-label-float="true">
+    </paper-input>
   </div>
-  <paper-button on-tap="onCopyButtonTap">COPY</paper-button>
-</div>
+    <paper-icon-button class="fa fa-clipboard" on-tap="onCopyButtonTap">Copy</paper-icon-button>
+    <paper-icon-button class="fa fa-download" on-tap="onDownloadButtonTap"></paper-icon-button>
+</div> -->
 </template>
 
 <style>
@@ -47,13 +37,12 @@
 .flexchild {
   @apply (--layout-flex);
 }
-
-.resource-icon{
+.resource-icon {
+  margin-right: 5px;
 }
 
 .resource-type-name{
   font-size: small;
-  margin-left: 5px;
 }
 
 .resource-size{
@@ -61,25 +50,20 @@
   margin-left: 10px;
 }
 
-#buttons {
-  margin-left: 5px;
-}
-
-#buttons paper-icon-button {
-  margin-left: 5px;
-  --paper-icon-button: {
-    padding: 0;
-    height: 24px;
-    width: 24px;
-  }
-}
-
-#path-box paper-input {
-  --paper-input-container-focus-color: none;
+/* #path-box paper-input {
+  margin-right: 14px;
   --paper-input-container: {
+    padding: 0px;
+  }
+  --paper-input-container-underline: {
+     border-bottom: none;
+  }
+  --paper-input-container-input:{
     font-size:small;
   }
-}
+  --paper-input-container-focus-color: none;
+  --paper-input-container-color: none;
+} */
 
 </style>
 
@@ -87,32 +71,22 @@
 	Polymer({
 		is : "resource-location",
 		properties : {
-			uri :　String,
+			uri : String,
 			resourceSize : Number,
 			resourceSizeFormatted: {
 				type: String,
 				computed: 'formatNumber(resourceSize)'
 			},
 			resourceTypeName : String,
-			resourceIcon : {
-				type: String,
-				computed: 'resolveResourceIcon(indexerClassName)',
-			},
-			indexerClassName: String
-		},
-		
-		resolveResourceIcon: function(indexerClassName) {
-			if (indexerClassName === "logic.indexer.impl.OdsIndexer") {
-				return "fa-file-excel-o";
-			}
-			return "";
+			indexerClassName: String,
+			iconCssClassName: String
 		},
 		
 		formatNumber: function(resourceSize) {
 			return Number(Math.floor(resourceSize/1000)).toLocaleString() + " KB";
 		},
 		
-		onShowLinkButtonTap: function() {
+/* 		onShowLinkButtonTap: function() {
 			this.$['path-box'].hidden = false;
 			this.$['show-link-button'].hidden = true;
 		},
@@ -136,6 +110,6 @@
 				console.log('Oops, unable to copy');
 			}
 			Polymer.dom(document.body).removeChild(textArea);
-		}
+		} */
 	});
 </script> </dom-module>

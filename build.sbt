@@ -40,5 +40,8 @@ libraryDependencies += "net.databinder.dispatch" % "dispatch-core_2.11" % "0.11.
 libraryDependencies += "org.sweble.wikitext" % "swc-engine" % "2.1.0"
 libraryDependencies += "org.sweble.wikitext" % "swc-example-basic" % "2.1.0"
 
+// https://mvnrepository.com/artifact/org.apache.tika/tika-parsers
+libraryDependencies += "org.apache.tika" % "tika-parsers" % "1.13"
+
 
 

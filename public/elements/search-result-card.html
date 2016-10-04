@@ -4,12 +4,21 @@
 <link rel="import" href="./resource-location.html">
 
 <dom-module id="search-result-card"> <template>
-<div class="header container flex-horizontal">
-  <div class="resource-name">
-    <span>[[resourceName]]</span> <span class="resource-key">[[keys]]</span>
+<div class="header">
+  <div class="container flex-horizontal">
+    <div class="resource-name">
+      <span>[[resourceName]]</span> <span class="resource-key">[[keys]]</span>
+    </div>
+    <div class="flexchild"></div>
+    <div class="date">[[resourceModified]]</div>
   </div>
-  <div class="flexchild"></div>
-  <div class="date">[[resourceModified]]</div>
+  <div id="path-box" class="container flex-horizontal">
+    <div class="flexchild">
+      <paper-input id="uri-input" value$="[[uri]]" readonly="true" no-label-float="true"> </paper-input>
+    </div>
+    <paper-icon-button class="fa fa-clipboard" on-tap="onCopyButtonTap">Copy</paper-icon-button>
+    <paper-icon-button class="fa fa-download" on-tap="onDownloadButtonTap"></paper-icon-button>
+  </div>
 </div>
 
 <div class="content font-mincho">
@@ -24,7 +33,8 @@
     resource-size=[[resourceSize]]
     resource-type-name=[[resourceTypeName]]
     resource-icon=[[resourceIcon]]
-    indexer-class-name=[[indexerClassName]]></resource-location>
+    indexer-class-name=[[indexerClassName]]
+    icon-css-class-name=[[iconCssClassName]]></resource-location>
 </div>
 
 </template>
@@ -33,7 +43,7 @@
 :host {
   display: block;
   background-color: white;
-  padding: 10px 14px 10px 14px;
+  padding: 20px 40px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0
     rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
 }
@@ -49,7 +59,7 @@ div.flexchild {
 
 div.header {
   border-bottom: solid 1px;
-  padding: 7px 0;
+  padding-top: 14px;
 }
 
 div.resource-name {
@@ -64,7 +74,7 @@ span.resource-key {
 div.content {
   font-size: smaller;
   color: gray;
-  padding: 10px 0;
+  padding: 14px 0;
 }
 
 div#prev-content {
@@ -89,7 +99,23 @@ span.highlightend-text {
 
 div.footer {
   border-top: dashed 1px gray;
-  padding-top: 10px;
+  padding-top: 14px;
+}
+
+div#path-box paper-input {
+  margin-right: 14px;
+  --paper-input-container: {
+    padding: 0px;
+  }
+  --paper-input-container-underline: {
+     border-bottom: none;
+  }
+  --paper-input-container-input:{
+    font-size:x-small;
+    color: darkgreen;
+  }
+  --paper-input-container-focus-color: none;
+  --paper-input-container-color: none;
 }
 
 </style>
@@ -115,6 +141,7 @@ div.footer {
 			positions : Array,
 			indexerClassName : String,
 			indexGenerated : Date,
+			iconCssClassName: String,
 			animationConfig : {
 				value : function() {
 					return {
@@ -149,5 +176,25 @@ div.footer {
 			
 			this.playAnimation();
 		},
+		onDownloadButtonTap: function() {
+			var ref = window.location.href = this.uri;
+			if (ref == null) {
+				// TODO ダイアログ化
+				alert('ファイルのダウンロードに失敗しました。')
+			}
+		},
+		
+		onCopyButtonTap: function() {
+			var textArea = document.createElement("textarea");
+			textArea.value = this.uri;
+			Polymer.dom(document.body).appendChild(textArea);
+			textArea.select();
+			try {
+				document.execCommand('copy');
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+			Polymer.dom(document.body).removeChild(textArea);
+		}
 	});
 </script> </dom-module>
