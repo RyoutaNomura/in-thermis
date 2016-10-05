@@ -10,6 +10,7 @@ import jp.co.rn.inthermis.logic.analyzer.StringAnalyzer
 import jp.co.rn.inthermis.logic.indexer.FileIndexer
 import jp.co.rn.inthermis.models.{ Content, IndexerResource, IndexerResult }
 import jp.co.rn.inthermis.utils.CharsetUtils
+import scala.io.Codec
 
 object TextIndexer extends FileIndexer {
 

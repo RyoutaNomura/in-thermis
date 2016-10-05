@@ -7,6 +7,9 @@ import java.time.{ Instant, LocalDateTime, ZoneOffset }
 import jcifs.smb.{ NtlmPasswordAuthentication, SmbFile }
 import jp.co.rn.inthermis.logic.walker.{ ResourceWalker, ResourceWalkerConfig }
 import jp.co.rn.inthermis.models.IndexerResource
+import org.apache.http.client.utils.URIUtils
+import java.net.URLEncoder
+import javax.ws.rs.core.UriBuilder
 
 object CIFSWalker extends ResourceWalker {
 
@@ -38,12 +41,13 @@ object CIFSWalker extends ResourceWalker {
         case true => walkTree(child, generateIndex)
         case false => generateIndex(
           CIFSResource(
-            child.getURL.toURI,
+            URI.create(child.getURL.toString().replaceAll(" ", "%20")),
             child.getUncPath,
             child.getName,
             child.getContentLength,
             LocalDateTime.ofInstant(Instant.ofEpochMilli(child.getLastModified), ZoneOffset.UTC),
-            LocalDateTime.ofInstant(Instant.ofEpochMilli(child.getLastModified), ZoneOffset.UTC)))
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(child.getLastModified), ZoneOffset.UTC),
+            child))
       }
     }
   }
@@ -55,10 +59,11 @@ case class CIFSResource(
   override val name: String,
   override val size: Long,
   override val created: LocalDateTime,
-  override val lastModified: LocalDateTime)
+  override val lastModified: LocalDateTime,
+  val smbFile: SmbFile)
     extends IndexerResource {
 
   override def getInputStream: InputStream = {
-    new SmbFile(uri.toString).getInputStream
+    smbFile.getInputStream
   }
 }

@@ -17,11 +17,12 @@ import jp.co.rn.inthermis.logic.indexer.impl.WikiTextIndexer
 import jp.co.rn.inthermis.logic.walker.{ ResourceWalker, ResourceWalkerConfig }
 import jp.co.rn.inthermis.models.IndexerResource
 import play.libs.Json
+import com.fasterxml.jackson.databind.JsonNode
 
 object MediaWikiWalker extends ResourceWalker {
   val props = "PROPS"
 
-  val maxContinue = 10
+  val maxContinue = 50
   val gaplimit = 50
   val requestInterval = 1000
   val defaultProps = Map(
@@ -72,11 +73,15 @@ object MediaWikiWalker extends ResourceWalker {
     }
 
     // 繰り返し書利用のパラメータを取得
-    val newProps = Json.parse(res).get("continue").fields
-      .foldLeft(Map.newBuilder[String, String]) { (builder, elm) =>
-        builder += (elm.getKey -> elm.getValue.asText)
-      }
-      .result
+    val newProps = Option[JsonNode](Json.parse(res).get("continue")) match {
+      case Some(s) => s.fields
+        .foldLeft(Map.newBuilder[String, String]) { (builder, elm) =>
+          builder += (elm.getKey -> elm.getValue.asText)
+        }
+        .result
+      case None =>
+        Map.empty[String, String]
+    }
     // 繰り返し処理が必要な場合は、処理する
     newProps.get("gapcontinue") match {
       case Some(s) if StringUtils.isNoneEmpty(s) => query(uri, newProps, limit, count + 1, generateIndex)

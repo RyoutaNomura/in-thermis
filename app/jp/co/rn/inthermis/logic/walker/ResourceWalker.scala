@@ -10,6 +10,8 @@ import jp.co.rn.inthermis.logic.indexer.{ FileIndexer, FileIndexerFactory }
 import jp.co.rn.inthermis.models.{ IndexerResource, IndexerResult }
 import jp.co.rn.inthermis.utils.ReflectionUtils
 import play.Logger
+import scala.util.Try
+import java.nio.charset.MalformedInputException
 
 trait ResourceWalker {
 
@@ -33,22 +35,26 @@ trait ResourceWalker {
       val lastModified = Date.from(resource.lastModified.toInstant(ZoneOffset.UTC))
 
       // DBのインデックスを取得
-      ResourceLocationDAO.selectByUri(session, resource.uri.toString) match {
-        case Some(s) if (s.indexGenerated.before(lastModified)) => {
-          // インデクサ作成日時 < リソース更新日時の場合は既存データ削除後に登録
-          logger.debug(s"Index will be regenerated: ${resource.uri}")
-          deleteLocationById(session, s.resourceLocationId)
-          persistIndex(session, indexer.generateIndex(resource))
+      try {
+        ResourceLocationDAO.selectByUri(session, resource.uri.toString) match {
+          case Some(s) if (s.indexGenerated.before(lastModified)) => {
+            // インデクサ作成日時 < リソース更新日時の場合は既存データ削除後に登録
+            logger.debug(s"Index will be regenerated: ${resource.uri}")
+            deleteLocationById(session, s.resourceLocationId)
+            persistIndex(session, indexer.generateIndex(resource))
+          }
+          case Some(s) => {
+            // 何もしない
+            logger.debug(s"Index is latest: ${resource.uri}.")
+          }
+          case None => {
+            // 存在しない場合はインデックスを作成して登録
+            logger.debug(s"Index not found. Index will be generated: ${resource.uri}")
+            persistIndex(session, indexer.generateIndex(resource))
+          }
         }
-        case Some(s) => {
-          // 何もしない
-          logger.debug(s"Index is latest: ${resource.uri}.")
-        }
-        case None => {
-          // 存在しない場合はインデックスを作成して登録
-          logger.debug(s"Index not found. Index will be generated: ${resource.uri}")
-          persistIndex(session, indexer.generateIndex(resource))
-        }
+      } catch {
+        case e: Exception => logger.error(e.getLocalizedMessage)
       }
     }
 
