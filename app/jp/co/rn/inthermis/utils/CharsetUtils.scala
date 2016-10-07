@@ -8,6 +8,7 @@ import scala.io.Codec
 import com.ibm.icu.text.CharsetDetector
 
 object CharsetUtils {
+
   def detectEncoding(is: InputStream): String = {
 
     var ret = Some(new CharsetDetector().setText(is).detect)

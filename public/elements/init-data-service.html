@@ -47,7 +47,11 @@
 			var service = this.$['init-data-service'];
 			if (service.lastResponse) {
 				this.searchOrderOptions = service.lastResponse.searchOrderOptions.slice(0);
+				this.searchOrderOptions[0].selected = true;
+				
 				this.dateRangeCriteria = service.lastResponse.dateRangeCriteria.slice(0);
+				this.dateRangeCriteria[0].selected = true;
+				
 				this.resourceWalkers = service.lastResponse.resourceWalkers.slice(0);
 				this.resourceIndexers = service.lastResponse.resourceIndexers.slice(0);
 			}

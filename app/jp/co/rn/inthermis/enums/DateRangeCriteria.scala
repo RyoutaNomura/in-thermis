@@ -25,11 +25,11 @@ sealed abstract case class DateRangeCriteria(key: String, displayName: String) e
 }
 
 object DateRangeCriteria extends EnumObject[DateRangeCriteria] {
-  object TODAY extends DateRangeCriteria("TODAY", "Today")
-  object THIS_WEEK extends DateRangeCriteria("THIS_WEEK", "This week")
-  object THIS_MONTH extends DateRangeCriteria("THIS_MONTH", "This month")
-  object THIS_YEAR extends DateRangeCriteria("THIS_YEAR", "This year")
   object ALL extends DateRangeCriteria("ALL", "All")
+  object THIS_YEAR extends DateRangeCriteria("THIS_YEAR", "This year")
+  object THIS_MONTH extends DateRangeCriteria("THIS_MONTH", "This month")
+  object THIS_WEEK extends DateRangeCriteria("THIS_WEEK", "This week")
+  object TODAY extends DateRangeCriteria("TODAY", "Today")
 
   implicit val searchResultWrites: Writes[SearchResultOrder] = (
     (__ \ "key").write[String] and

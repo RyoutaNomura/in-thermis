@@ -1,9 +1,12 @@
 package jp.co.rn.inthermis.logic.walker.impl
 
 import com.taskadapter.redmineapi.RedmineManagerFactory
-
 import jp.co.rn.inthermis.models.IndexerResource
 import jp.co.rn.inthermis.logic.walker.{ ResourceWalker, ResourceWalkerConfig }
+import java.net.URI
+import java.time.LocalDateTime
+import java.io.InputStream
+import java.io.ByteArrayInputStream
 
 object RedmineWalker extends ResourceWalker {
 
@@ -19,3 +22,19 @@ object RedmineWalker extends ResourceWalker {
     val issues = issueManager.getIssues(projectKey, null)
   }
 }
+
+case class RedmineResource(
+  override val uri: URI,
+  override val displayLocation: String,
+  override val name: String,
+  override val size: Long,
+  override val created: LocalDateTime,
+  override val lastModified: LocalDateTime,
+  val content: String)
+    extends IndexerResource {
+
+  override def getInputStream: InputStream = {
+    new ByteArrayInputStream(content.getBytes("utf-8"))
+  }
+}
+
