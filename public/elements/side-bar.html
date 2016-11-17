@@ -1,117 +1,132 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
-<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
-<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
+<link rel="import"
+  href="../bower_components/polymer/polymer.html">
+<link rel="import"
+  href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import"
+  href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import"
+  href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import"
+  href="../bower_components/iron-icons/maps-icons.html">
 
 <dom-module id="side-bar">
-<template>
+  <template>
 
-  <p><iron-icon icon="maps:place"></iron-icon><span>Resource Source</span></p>
-  <ul style="list-style:none;">
-    <template is="dom-repeat" items="{{resourceWalkers}}">
-      <li><paper-checkbox checked={{item.selected}}>[[item.displayName]]</paper-checkbox></li>
-    </template>
-  </ul>
-  
-  <p><iron-icon icon="icons:date-range"></iron-icon><span>Last Modified</span></p>
-  <paper-radio-group>
-    <template is="dom-repeat" items="{{dateRangeCriteria}}">
-      <paper-radio-button checked={{item.selected}} name=[[item.key]]>[[item.displayName]]</paper-radio-button>
-    </template>
-  </paper-radio-group>
+    <p>
+      <iron-icon icon="maps:place"></iron-icon>
+      <span>Resource Source</span>
+    </p>
+    <ul style="list-style:none;">
+      <template is="dom-repeat"
+        items="{{resourceWalkers}}">
+        <li>
+          <paper-checkbox checked={{item.selected}}>[[item.displayName]]</paper-checkbox>
+        </li>
+      </template>
+    </ul>
 
-  <p><iron-icon icon="icons:filter-list"></iron-icon>File Type</p>
-  <ul style="list-style:none;">
-    <template is="dom-repeat" items="{{resourceIndexers}}">
-      <li><paper-checkbox checked={{item.selected}}><i class$="fa [[item.iconCssClassName]]"></i>[[item.displayName]]</paper-checkbox></li>
-    </template>
-  </ul>
-</template>
+    <p>
+      <iron-icon icon="icons:date-range"></iron-icon>
+      <span>Last Modified</span>
+    </p>
+    <paper-radio-group id="date-range-criteria">
+      <template is="dom-repeat"
+        items="{{dateRangeCriteria}}">
+        <paper-radio-button checked={{item.selected}}
+          name=[[item.key]]>[[item.displayName]]</paper-radio-button>
+      </template>
+    </paper-radio-group>
 
-<style>
+    <p>
+      <iron-icon icon="icons:filter-list"></iron-icon>File Type</p>
+    <ul style="list-style:none;">
+      <template is="dom-repeat"
+        items="{{resourceIndexers}}">
+        <li>
+          <paper-checkbox checked={{item.selected}}>
+            <i class$="fa [[item.iconCssClassName]]"></i>[[item.displayName]]</paper-checkbox>
+        </li>
+      </template>
+    </ul>
+  </template>
 
-:host {
-  display: block;
-  height: 110%;
-  margin-right: 5px;
-}
+  <style>
+     :host {
+      display: block;
+      height: 110%;
+      margin-right: 5px;
+    }
+    
+    ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+    
+    ul li {
+      margin: 5px 0;
+    }
+    
+    paper-checkbox {
+      --paper-checkbox-size: 14px;
+      font-size: small;
+    }
+    
+    paper-radio-group {
+      padding-left: 20px;
+      --paper-radio-group-item-padding: 5px 0;
+    }
+    
+    paper-radio-button {
+      display: block;
+      --paper-radio-button-size: 14px;
+      font-size: small;
+    }
+    
+    iron-icon {
+      margin-right: 10px;
+      margin-top: -0.5rem;
+    }
+    
+    i.fa {
+      margin-right: 10px;
+    }
+    
+    p {
+      margin: 24px 0 14px 0;
+    }
+    
+    .big {
+      --iron-icon-height: 32px;
+      --iron-icon-width: 32px;
+    }
+  </style>
 
-ul {
-  padding-left:20px;
-  margin: 0;
-}
-
-ul li {
-  margin: 5px 0;
-}
-
-paper-checkbox {
-  --paper-checkbox-size:14px;
-  font-size:small;
-}
-
-paper-radio-group {
-  padding-left:20px;
-  --paper-radio-group-item-padding: 5px 0;
-}
-
-paper-radio-button {
-  display: block;
-  --paper-radio-button-size:14px;
-  font-size:small;
-}
-
-iron-icon {
-  margin-right: 10px;
-  margin-top: -0.5rem;
-}
-
-i.fa {
-  margin-right: 10px;
-}
-
-p {
-  margin: 24px 0 14px 0;
-}
-
-.big {
-  --iron-icon-height: 32px;
-  --iron-icon-width: 32px;
-}
-</style>
-
-<script>
-	Polymer({
-		is : 'side-bar',
-		properties: {
-			resourceIndexers: {
-				type: Array,
-				value: [],
-				notify: true,
-			},
-/* 			resourceIndexer : {
-				type: String,
-				notify: true,
-			}, */
-			resourceWalkers: {
-				type: Array,
-				value: [],
-				notify: true,
-			},
-/* 			resourceWalker: {
-				type: String,
-				notify: true,
-			}, */
- 			dateRangeCriteria: {
-				type: Array,
-				value: [],
-				notify: true,
-			},
-/* 			dateRangeCriterion : {
-				type: String,
-				notify: true,
-			}, */
-		},
-	});
-</script></dom-module>
+  <script>
+    Polymer({
+      is: 'side-bar',
+      ready: function() {
+        var dateRangeCriteriaGrp = this.$['date-range-criteria'];
+        dateRangeCriteriaGrp.addEventListener('iron-items-changed', function() {
+            dateRangeCriteriaGrp.selectIndex(0);
+        });
+      },
+      properties: {
+        resourceIndexers: {
+          type: Array,
+          value: [],
+          notify: true,
+        },
+        resourceWalkers: {
+          type: Array,
+          value: [],
+          notify: true,
+        },
+        dateRangeCriteria: {
+          type: Array,
+          value: [],
+          notify: true,
+        },
+      },
+    });
+  </script>
+</dom-module>

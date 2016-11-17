@@ -16,7 +16,7 @@ object FileIndexerFactory {
 
   private val implPackage = "jp.co.rn.inthermis.logic.indexer.impl"
 
-  val cache: Seq[FileIndexer] = {
+  private val cache: Seq[FileIndexer] = {
     ClassPath
       .from(this.getClass.getClassLoader)
       .getTopLevelClasses(implPackage)
@@ -43,4 +43,6 @@ object FileIndexerFactory {
       case None          => NullIndexer
     }
   }
+
+  def getCache: Seq[FileIndexer] = this.cache
 }

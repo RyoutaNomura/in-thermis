@@ -1,46 +1,52 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="./search-service.html">
-<link rel="import" href="./search-result-card.html">
+<link rel="import"
+  href="../bower_components/polymer/polymer.html">
+<link rel="import"
+  href="./search-service.html">
+<link rel="import"
+  href="./search-result-card.html">
 
 
-<dom-module id="search-result-card-list"> 
-<template> 
-  <template is="dom-repeat" items="[[items]]">
-    <search-result-card
-      uri=[[item.uri]]
-      resource-name=[[item.resourceName]]
-      resource-size=[[item.resourceSize]]
-      resource-type-name=[[item.resourceTypeName]]
-      resource-created=[[item.resourceCreated]]
-      resource-modified=[[item.resourceModified]]
-      keys=[[item.keys]]
-      content=[[item.content]]
-      prev-content=[[item.prevContent]]
-      next-content=[[item.nextContent]]
-      positions=[[item.positions]]
-      indexer-class-name=[[item.indexerClassName]]
-      index-generated=[[item.indexGenerated]]
-      icon-css-class-name=[[item.iconCssClassName]]>
-    </search-result-card>
+<dom-module id="search-result-card-list">
+  <template>
+    <template is="dom-repeat"
+      items="[[items]]">
+      <search-result-card uri=[[item.uri]]
+        display-location=[[item.resourceLocation]]
+        resource-name=[[item.resourceName]]
+        resource-size=[[item.resourceSize]]
+        resource-type-name=[[item.resourceTypeName]]
+        resource-created=[[item.resourceCreated]]
+        resource-modified=[[item.resourceModified]]
+        keys=[[item.keys]]
+        content=[[item.content]]
+        prev-content=[[item.prevContent]]
+        next-content=[[item.nextContent]]
+        positions=[[item.positions]]
+        indexer-class-name=[[item.indexerClassName]]
+        index-generated=[[item.indexGenerated]]
+        icon-css-class-name=[[item.iconCssClassName]]>
+      </search-result-card>
+    </template>
+
   </template>
-</template>
 
-<style>
-:host {
-  display: block;
-}
-search-result-card {
-  margin: 0 0 30px 0;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-</style>
-<script>
-	Polymer({
-		is : 'search-result-card-list',
-		properties: {
-			items: Array,
-		},
-	});
-</script></dom-module>
+  <style>
+     :host {
+      display: block;
+    }
+    
+    search-result-card {
+      margin: 0 0 30px 0;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+  <script>
+    Polymer({
+      is: 'search-result-card-list',
+      properties: {
+        items: Array,
+      },
+    });
+  </script>
+</dom-module>

@@ -1,62 +1,62 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import"
+  href="../bower_components/polymer/polymer.html">
+<link rel="import"
+  href="../bower_components/iron-ajax/iron-ajax.html">
 
 <dom-module id="init-data-service">
+  <template>
+    <iron-ajax id="init-data-service"
+      url="/loadInitData"
+      handle-as="json"
+      on-response="_responseHandler"
+      debounce-duration="300">
+    </iron-ajax>
+  </template>
 
-<template>
-  <iron-ajax
-    id="init-data-service"
-    url="/loadInitData"
-    handle-as="json"
-    on-response="_responseHandler"
-    debounce-duration="300">
-  </iron-ajax>
-</template>
+  <style>
+     :host {
+      display: none;
+    }
+  </style>
 
-<style>
-  :host {
-    display: none;
-  }
-</style>
+  <script>
+    Polymer({
+      is: 'init-data-service',
+      properties: {
+        searchOrderOptions: {
+          type: Array,
+          notify: true,
+        },
+        dateRangeCriteria: {
+          type: Array,
+          notify: true,
+        },
+        resourceWalkers: {
+          type: Array,
+          notify: true,
+        },
+        resourceIndexers: {
+          type: Array,
+          notify: true,
+        }
+      },
+      load: function() {
+        this.$['init-data-service'].generateRequest();
+      },
+      _responseHandler: function(e, detail) {
+        var service = this.$['init-data-service'];
+        if (service.lastResponse) {
+          this.searchOrderOptions = service.lastResponse.searchOrderOptions.slice(0);
+          /* this.searchOrderOptions[0].selected = true; */
 
-<script>
-	Polymer({
-		is : 'init-data-service',
-		properties : {
-			searchOrderOptions : {
-				type: Array,
-				notify: true,
-			},
-			dateRangeCriteria : {
-				type: Array,
-				notify: true,
-			},
-			resourceWalkers : {
-				type: Array,
-				notify: true,
-			},
-			resourceIndexers : {
-				type: Array,
-				notify: true,
-			}
-		},
-		load: function() {
-			this.$['init-data-service'].generateRequest();
-		},
-		_responseHandler : function(e, detail) {
-			var service = this.$['init-data-service'];
-			if (service.lastResponse) {
-				this.searchOrderOptions = service.lastResponse.searchOrderOptions.slice(0);
-				this.searchOrderOptions[0].selected = true;
-				
-				this.dateRangeCriteria = service.lastResponse.dateRangeCriteria.slice(0);
-				this.dateRangeCriteria[0].selected = true;
-				
-				this.resourceWalkers = service.lastResponse.resourceWalkers.slice(0);
-				this.resourceIndexers = service.lastResponse.resourceIndexers.slice(0);
-			}
-		}
-	});
-</script>
+          this.dateRangeCriteria = service.lastResponse.dateRangeCriteria.slice(0);
+          /* this.dateRangeCriteria[0].selected = true; */
+
+          this.resourceWalkers = service.lastResponse.resourceWalkers.slice(0);
+          this.resourceIndexers = service.lastResponse.resourceIndexers.slice(0);
+        }
+      }
+    });
+  </script>
 
 </dom-module>

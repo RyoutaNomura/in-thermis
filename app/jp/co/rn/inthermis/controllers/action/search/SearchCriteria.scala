@@ -28,14 +28,16 @@ case object SearchCriteria {
     var resourceIndexers: Set[String] = Set.empty
 
     request.queryString.foreach(f => {
-      f._1 match {
-        case "text"              => text = f._2.head
-        case "order"             => order = SearchResultOrder.valueOf(f._2.head)
-        case "fetchSize"         => fetchSize = f._2.head.toInt
-        case "currentPage"       => currentPage = f._2.head.toInt
-        case "dateRangeCriteria" => dateRangeCriteria = DateRangeCriteria.valueOf(f._2.head)
-        case "resourceWalkers"   => resourceWalkers = f._2.toSet
-        case "resourceIndexers"   => resourceIndexers = f._2.toSet
+      if (StringUtils.isNotEmpty(f._2.head)) {
+        f._1 match {
+          case "text"              => text = f._2.head
+          case "order"             => order = SearchResultOrder.valueOf(f._2.head)
+          case "fetchSize"         => fetchSize = f._2.head.toInt
+          case "currentPage"       => currentPage = f._2.head.toInt
+          case "dateRangeCriteria" => dateRangeCriteria = DateRangeCriteria.valueOf(f._2.head)
+          case "resourceWalkers"   => resourceWalkers = f._2.toSet
+          case "resourceIndexers"  => resourceIndexers = f._2.toSet
+        }
       }
     })
     SearchCriteria(text, order, fetchSize, currentPage, dateRangeCriteria, resourceWalkers, resourceIndexers)

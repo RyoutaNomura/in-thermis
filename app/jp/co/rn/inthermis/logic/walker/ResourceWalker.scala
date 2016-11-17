@@ -2,9 +2,7 @@ package jp.co.rn.inthermis.logic.walker
 
 import java.time.ZoneOffset
 import java.util.{ Date, UUID }
-
 import com.datastax.driver.core.Session
-
 import jp.co.rn.inthermis.daos.{ ResourceContentDAO, ResourceLocationDAO, WordIndexDAO }
 import jp.co.rn.inthermis.logic.indexer.{ FileIndexer, FileIndexerFactory }
 import jp.co.rn.inthermis.models.{ IndexerResource, IndexerResult }
@@ -12,6 +10,8 @@ import jp.co.rn.inthermis.utils.ReflectionUtils
 import play.Logger
 import scala.util.Try
 import java.nio.charset.MalformedInputException
+import java.net.URI
+import java.io.InputStream
 
 trait ResourceWalker {
 
@@ -91,4 +91,5 @@ trait ResourceWalker {
       WordIndexDAO.insert(session, dto)
     }
   }
+
 }

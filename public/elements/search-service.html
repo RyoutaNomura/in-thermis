@@ -1,160 +1,161 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import"
+  href="../bower_components/polymer/polymer.html">
+<link rel="import"
+  href="../bower_components/iron-ajax/iron-ajax.html">
 
 <dom-module id="search-service">
 
-<template>
-  <iron-ajax
-    id="search-service"
-    url="/search"
-    params="[[_params]]"
-    handle-as="json"
-    on-response="_responseHandler"
-    debounce-duration="300"
-    auto=false>
-  </iron-ajax>
-</template>
+  <template>
+    <iron-ajax id="search-service"
+      url="/search"
+      params="[[_params]]"
+      handle-as="json"
+      on-response="_responseHandler"
+      debounce-duration="300"
+      auto=false>
+    </iron-ajax>
+  </template>
 
-<style>
-  :host {
-    display: none;
-  }
-</style>
+  <style>
+     :host {
+      display: none;
+    }
+  </style>
 
-<script>
+  <script>
+    Polymer({
+      is: 'search-service',
+      properties: {
+        // 検索文字列
+        queryString: {
+          type: String,
+          value: "",
+          observer: "_onChangeCriteria",
+        },
+        // 検索結果のソート順
+        searchOrderType: {
+          type: String,
+          value: "COUNT_DESC",
+          observer: "_onChangeCriteria",
+        },
+        // フェッチサイズ
+        fetchSize: {
+          type: Number,
+          value: 5,
+          observer: "_onChangeCriteria",
+        },
+        // 現在ページ
+        currentPage: {
+          type: Number,
+          value: 0,
+          notify: true,
+        },
+        // 検索結果(fetchSize分だけ帰ってくる)
+        results: {
+          type: Array,
+          value: [],
+          notify: true,
+        },
+        // 結果の総数
+        resultCount: {
+          type: Number,
+          value: 0,
+          notify: true,
+        },
+        // 結果時間
+        ellapsedTime: {
+          type: Number,
+          value: 0,
+          notify: true,
+        },
+        isLastResponse: {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        dateRangeCriteria: {
+          type: Array,
+          value: [],
+        },
+        resourceWalkers: {
+          type: Array,
+          value: [],
+        },
+        resourceIndexers: {
+          type: Array,
+          value: [],
+        },
+        // サーバーに送信するパラメータ
+        _params: {
+          type: Object,
+          computed: "_createParams(queryString, searchOrderType, fetchSize, currentPage, dateRangeCriteria.*, resourceWalkers.*, resourceIndexers.*)",
+        },
+      },
+      observers: ['_onChangeCriteria(dateRangeCriteria.*)',
+        '_onChangeCriteria(resourceWalkers.*)',
+        '_onChangeCriteria(resourceIndexers.*)',
+      ],
+      setAutoRequest: function() {
+        this.$['search-service'].auto = true;
+        console.log("Auto request start");
+      },
+      _reset: function() {
+        /* console.log("search reset"); */
+        this.currentPage = 0;
+      },
+      _onChangeCriteria: function(newValue) {
+        /* console.log("Criteria changed: " + newValue); */
+        this._reset();
+      },
+      _createParams: function(queryString, searchOrderType, fetchSize,
+        currentPage, dateRangeCriteria, resourceWalkers,
+        resourceIndexers) {
+        var param = {
+          "text": queryString,
+          "order": searchOrderType,
+          "fetchSize": fetchSize,
+          "currentPage": currentPage,
+          "dateRangeCriteria": dateRangeCriteria.base.filter(
+            function(val) {
+              return val.selected;
+            }).map(function(element, index, array) {
+            return element.key;
+          }),
+          "resourceWalkers": resourceWalkers.base.filter(function(val) {
+            return val.selected;
+          }).map(function(element, index, array) {
+            return element.key;
+          }),
+          "resourceIndexers": resourceIndexers.base.filter(function(val) {
+            return val.selected;
+          }).map(function(element, index, array) {
+            return element.key;
+          }),
+        };
+        return param;
+      },
+      _responseHandler: function(e, detail) {
+        var paramStr = "";
+        for (var key in this._params) {
+          paramStr = paramStr + key + ':' + this._params[key] + ", "; // プロパティhogeとfugaが出力される
+        }
+        console.log("Param: " + paramStr);
 
-
-	Polymer({
-		is : 'search-service',
-		properties : {
-			// 検索文字列
-			queryString : {
-				type : String,
-				value : "",
-				observer : "_onChangeCriteria",
-			},
-			// 検索結果のソート順
-			searchOrderType : {
-				type : String,
-				value : "COUNT_DESC",
-				observer : "_onChangeCriteria",
-			},
-			// フェッチサイズ
-			fetchSize : {
-				type : Number,
-				value : 5,
-				observer : "_onChangeCriteria",
-			},
-			// 現在ページ
-			currentPage : {
-				type : Number,
-				value : 0,
-				notify : true,
-			},
-			// 検索結果(fetchSize分だけ帰ってくる)
-			results : {
-				type : Array,
-				value : [],
-				notify : true,
-			},
-			// 結果の総数
-			resultCount : {
-				type : Number,
-				value : 0,
-				notify : true,
-			},
-			// 結果時間
-			ellapsedTime : {
-				type : Number,
-				value : 0,
-				notify : true,
-			},
-			isLastResponse : {
-				type : Boolean,
-				value : false,
-				notify : true,
-			},
-			dateRangeCriteria : {
-				type : Array,
-				value : [],
-			},
-			resourceWalkers : {
-				type : Array,
-				value : [],
-			},
-			resourceIndexers : {
-				type : Array,
-				value : [],
-			},
-			// サーバーに送信するパラメータ
-			_params : {
-				type : Object,
-				computed : "_createParams(queryString, searchOrderType, fetchSize, currentPage, dateRangeCriteria.*, resourceWalkers.*, resourceIndexers.*)",
-			},
-		},
-		observers : [ '_onChangeCriteria(dateRangeCriteria.*)',
-				'_onChangeCriteria(resourceWalkers.*)',
-				'_onChangeCriteria(resourceIndexers.*)', ],
-		setAutoRequest : function() {
-			this.$['search-service'].auto = true;
-			console.log("Auto request start");
-		},
-		_reset : function() {
-			console.log("search reset");
-			this.currentPage = 0;
-		},
-		_onChangeCriteria : function(newValue, oldValue) {
-			this._reset();
-		},
-		_createParams : function(queryString, searchOrderType, fetchSize,
-				currentPage, dateRangeCriteria, resourceWalkers,
-				resourceIndexers) {
-			var param = {
-				"text" : queryString,
-				"order" : searchOrderType,
-				"fetchSize" : fetchSize,
-				"currentPage" : currentPage,
-				"dateRangeCriteria" : dateRangeCriteria.base.filter(
-						function(val) {
-							return val.selected;
-						}).map(function(element, index, array) {
-					return element.key;
-				}),
-				"resourceWalkers" : resourceWalkers.base.filter(function(val) {
-					return val.selected;
-				}).map(function(element, index, array) {
-					return element.key;
-				}),
-				"resourceIndexers" : resourceIndexers.base.filter(function(val) {
-					return val.selected;
-				}).map(function(element, index, array) {
-					return element.key;
-				}),
-			};
-			return param;
-		},
-		_responseHandler : function(e, detail) {
-			var paramStr = "";
-			for ( var key in this._params) {
-				paramStr = paramStr + key + ':' + this._params[key] + ", "; // プロパティhogeとfugaが出力される
-			}
-			console.log("Param: " + paramStr);
-
-			if (this.$['search-service'].lastResponse) {
-				var service = this.$['search-service'];
-				this.results = service.lastResponse.searchResults.slice(0);
-				this.resultCount = service.lastResponse.resultCount;
-				this.ellapsedTime = service.lastResponse.ellapsedTime;
-				this.isLastResponse = service.lastResponse.isLastResponse;
-			} else {
-				this.results = [];
-				this.resultCount = 0;
-				this.ellapsedTime = 0;
-				this.isLastResponse = true;
-				this.currentPage = 0;
-			}
-		}
-	});
-</script>
+        if (this.$['search-service'].lastResponse) {
+          var service = this.$['search-service'];
+          this.isLastResponse = service.lastResponse.isLastResponse;
+          this.results = service.lastResponse.searchResults.slice(0);
+          this.resultCount = service.lastResponse.resultCount;
+          this.ellapsedTime = service.lastResponse.ellapsedTime;
+        } else {
+          this.isLastResponse = true;
+          this.results = [];
+          this.resultCount = 0;
+          this.ellapsedTime = 0;
+          this.currentPage = 0;
+        }
+      }
+    });
+  </script>
 
 </dom-module>

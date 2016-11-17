@@ -24,7 +24,6 @@ class Application extends Controller {
   }
 
   def doSearch: Action[AnyContent] = Action { request =>
-
     val start = System.currentTimeMillis()
 
     val criteria = SearchCriteria(request)

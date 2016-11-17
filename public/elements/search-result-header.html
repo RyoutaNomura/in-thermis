@@ -1,96 +1,108 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import"
+  href="../bower_components/polymer/polymer.html">
+<link rel="import"
+  href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import"
+  href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import"
+  href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import"
+  href="../bower_components/paper-item/paper-item.html">
 
-<dom-module id="search-result-header"> 
-<template> 
-  <div class="flex-container" hidden=[[isHidden]]>
-    <paper-dropdown-menu no-label-float class="search-order-dropdown">
-      <paper-listbox class="dropdown-content" selected={{indexOfSearchOrderOption}}>
-        <template is="dom-repeat" items="[[searchOrderOptions]]"> 
-          <paper-item>[[item.displayName]]</paper-item>
-        </template>
-      </paper-listbox>
-    </paper-dropdown-menu>
-    <div class="flexchild"></div>
-    <span>[[resultCount]] results ([[ellapsedTime]] milliseconds)</span>
-  </div>
-</template>
+<dom-module id="search-result-header">
+  <template>
+    <div class="flex-container"
+      hidden$=[[isHidden]]>
+      <paper-dropdown-menu no-label-float
+        class="search-order-dropdown">
+        <paper-listbox id="search-order-option-list"
+          class="dropdown-content"
+          selected={{indexOfSearchOrderOption}}>
+          <template is="dom-repeat"
+            items="[[searchOrderOptions]]">
+            <paper-item>[[item.displayName]]</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
+      <div class="flexchild"></div>
+      <span>[[resultCount]] results ([[ellapsedTime]] milliseconds)</span>
+    </div>
+  </template>
 
-<style>
+  <style>
+     :host {
+      display: block;
+      padding: 14px 14px 5px;
+      font-size: small;
+    }
+    
+    .search-order-dropdown {
+      --paper-input-container-input: {
+        font-size: small;
+      }
+    }
+    
+    .search-order-dropdown paper-item {
+      --paper-item-min-height: 32px;
+      --paper-item: {
+        font-size: small;
+      }
+    }
+    
+    .flex-container {
+      @apply(--layout-horizontal);
+      @apply(--layout-justified);
+    }
+    
+    .flex-container * {
+      @apply(--layout-self-center);
+    }
+    
+    .flexchild {
+      @apply(--layout-flex);
+    }
+  </style>
 
-:host {
-  display: block;
-  padding: 14px 14px 5px;
-  font-size: small;
-}
-
-.search-order-dropdown {
-  --paper-input-container-input: {
-    font-size: small;
-  }
-}
-.search-order-dropdown paper-item {
-  --paper-item-min-height: 32px;
-  --paper-item: {
-    font-size: small;
-  }
-}
-
-.flex-container {
-  @apply(--layout-horizontal);
-  @apply(--layout-justified);
-}
-
-.flex-container * {
-  @apply(--layout-self-center);
-}
-
-.flexchild {
-  @apply(--layout-flex);
-}
-
-</style>
-
-<script>
-	Polymer({
-		is : 'search-result-header',
-		properties: {
-			isHidden: {
-				type: Boolean,
-				value: true,
-			},
-			searchOrderOptions: {
-				type: Array,
-				value: [],
-			},
-			indexOfSearchOrderOption: {
-				type: Number,
-				value: 0,
-			},
-			searchOrderOption: {
-				type: String,
-				notify: true,
-				computed: "_getSearhOrderOption(searchOrderOptions, indexOfSearchOrderOption)",
-			},
-			resultCount: {
-				type: Number,
-				value: 0,
-				observer: "_toggleDisplay",
-			},
-			ellapsedTime: {
-				type: Number,
-				value: 0,
-			},
-		},		
-		_getSearhOrderOption : function(options,index) {
-			obj = options[index]
-			return obj ? obj.key : "";
-		},
-		_toggleDisplay: function(newValue, oldValue) {
-			this.isHidden = (newValue == 0)
-		},
-	});
-</script></dom-module>
+  <script>
+    Polymer({
+      is: 'search-result-header',
+      ready: function() {
+      },
+      properties: {
+        isHidden: {
+          type: Boolean,
+          value: true,
+        },
+        searchOrderOptions: {
+          type: Array,
+          value: [],
+        },
+        indexOfSearchOrderOption: {
+          type: Number,
+          value: 0,
+        },
+        searchOrderOption: {
+          type: String,
+          notify: true,
+          computed: "_getSearhOrderOption(searchOrderOptions, indexOfSearchOrderOption)",
+        },
+        resultCount: {
+          type: Number,
+          value: 0,
+          observer: "_toggleDisplay",
+        },
+        ellapsedTime: {
+          type: Number,
+          value: 0,
+        },
+      },
+      _getSearhOrderOption: function(options, index) {
+        obj = options[index]
+        return obj ? obj.key : "";
+      },
+      _toggleDisplay: function(newValue, oldValue) {
+        this.isHidden = (newValue == 0)
+      },
+    });
+  </script>
+</dom-module>

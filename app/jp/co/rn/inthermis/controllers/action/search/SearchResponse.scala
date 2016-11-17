@@ -19,6 +19,7 @@ object SearchResponse {
 case class SearchResult(
     word: String,
     uri: String,
+    displayLocation: String,
     resourceName: String,
     resourceSize: Long,
     resourceTypeName: String,
@@ -33,6 +34,7 @@ case class SearchResult(
     iconCssClassName: String) {
 
   def this() = this(
+    StringUtils.EMPTY,
     StringUtils.EMPTY,
     StringUtils.EMPTY,
     StringUtils.EMPTY,
@@ -53,6 +55,7 @@ object SearchResult {
   implicit val searchResultWrites: Writes[SearchResult] = (
     (__ \ "word").write[String] and
     (__ \ "uri").write[String] and
+    (__ \ "displayLocation").write[String] and
     (__ \ "resourceName").write[String] and
     (__ \ "resourceSize").write[Long] and
     (__ \ "resourceTypeName").write[String] and

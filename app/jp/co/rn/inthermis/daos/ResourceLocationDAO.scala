@@ -12,7 +12,7 @@ import jp.co.rn.inthermis.utils.CassandraHelper
 object ResourceLocationDAO {
 
   def selectById(session: Session, id: UUID): Option[ResourceLocationDTO] = {
-    CassandraHelper.getRows(session, classOf[ResourceLocationDTO], s"SELECT * FROM resource_location WHERE id = ?", id).headOption
+    CassandraHelper.getRows(session, classOf[ResourceLocationDTO], s"SELECT * FROM resource_location WHERE resource_location_id = ?", id).headOption
   }
 
   def selectByUri(session: Session, uri: String): Option[ResourceLocationDTO] = {

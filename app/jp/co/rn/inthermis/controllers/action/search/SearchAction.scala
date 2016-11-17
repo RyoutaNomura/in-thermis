@@ -28,34 +28,38 @@ object SearchAction {
       // 単語リストを取得して、指定オーダー順に並べる
       var wordIndices = loadIndices(session, criteria).sortWith(createSortFunction(criteria.order))
       // 結果の組み立て
-      val searchResults = wordIndices.map { x =>
-        // インデクサクラス名
-        val indexer = FileIndexerFactory.create(x.resourceIndexerName)
-        // キー情報
-        val keyStr = Seq(
-          getKeyString(indexer.getKeyTitles._1, x.contentKey1),
-          getKeyString(indexer.getKeyTitles._2, x.contentKey2),
-          getKeyString(indexer.getKeyTitles._3, x.contentKey3))
-          .filter { x => !x.isEmpty }
-          .mkString(" / ")
+      val searchResults = wordIndices
+        .slice(criteria.currentPage * criteria.fetchSize,
+          (criteria.currentPage + 1) * criteria.fetchSize)
+        .map { x =>
+          // インデクサクラス名
+          val indexer = FileIndexerFactory.create(x.resourceIndexerName)
+          // キー情報
+          val keyStr = Seq(
+            getKeyString(indexer.getKeyTitles._1, x.contentKey1),
+            getKeyString(indexer.getKeyTitles._2, x.contentKey2),
+            getKeyString(indexer.getKeyTitles._3, x.contentKey3))
+            .filter { x => !x.isEmpty }
+            .mkString(" / ")
 
-        // 結果オブジェクトを生成
-        SearchResult(
-          criteria.text,
-          x.resourceUri,
-          x.resourceName,
-          x.resourceSize,
-          indexer.getResourceTypeName,
-          x.resourceLastModified,
-          x.resourceLastModified,
-          keyStr,
-          x.content,
-          x.prevContent,
-          x.nextContent,
-          x.indices.toSet,
-          x.resourceIndexerName,
-          indexer.getIconCssClassName)
-      }.toSeq
+          // 結果オブジェクトを生成
+          SearchResult(
+            criteria.text,
+            x.resourceUri,
+            x.resourceDisplayLocation,
+            x.resourceName,
+            x.resourceSize,
+            indexer.getResourceTypeName,
+            x.resourceLastModified,
+            x.resourceLastModified,
+            keyStr,
+            x.content,
+            x.prevContent,
+            x.nextContent,
+            x.indices.toSet,
+            x.resourceIndexerName,
+            indexer.getIconCssClassName)
+        }.toSeq
 
       SearchResponse(
         searchResults,

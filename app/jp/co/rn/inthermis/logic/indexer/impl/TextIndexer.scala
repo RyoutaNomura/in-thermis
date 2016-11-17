@@ -30,7 +30,7 @@ object TextIndexer extends FileIndexer {
 
   override def generateIndex(resource: IndexerResource): IndexerResult = {
     var is = resource.getInputStream
-    val source = Source.fromInputStream(is)(CharsetUtils.getCodec(is))
+    val source = Source.fromInputStream(is)(resource.getCodec)
 
     try {
       val contents = source.getLines.zipWithIndex

@@ -25,6 +25,7 @@ object ResourceWalkerFactory {
         (t.typeSymbol.fullName, walker)
       }.toMap
   }
+  cache.foreach { t => logger.info(s"walker loaded: ${t._2.walkerName}") }
 
   def create(implClassName: String): ResourceWalker = {
     cache.get(implClassName) match {

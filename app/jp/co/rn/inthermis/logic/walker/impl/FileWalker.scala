@@ -4,14 +4,13 @@ import java.io.{ BufferedInputStream, InputStream }
 import java.net.URI
 import java.nio.file.{ Files, Paths }
 import java.time.LocalDateTime
-
 import scala.collection.JavaConversions._
-
 import org.apache.commons.io.FilenameUtils
-
 import jp.co.rn.inthermis.logic.walker.{ ResourceWalker, ResourceWalkerConfig }
 import jp.co.rn.inthermis.models.IndexerResource
 import jp.co.rn.inthermis.utils.FileTimeUtils
+import scala.io.Codec
+import jp.co.rn.inthermis.utils.CharsetUtils
 
 object FileWalker extends ResourceWalker {
 
@@ -40,7 +39,6 @@ case class LocalFileResource(
   override val lastModified: LocalDateTime)
     extends IndexerResource {
 
-  override def getInputStream: InputStream = {
-    new BufferedInputStream(Files.newInputStream(Paths.get(uri)))
-  }
+  override def getInputStream: InputStream = new BufferedInputStream(Files.newInputStream(Paths.get(uri)))
+  override def getCodec: Codec = CharsetUtils.getCodec(getInputStream)
 }

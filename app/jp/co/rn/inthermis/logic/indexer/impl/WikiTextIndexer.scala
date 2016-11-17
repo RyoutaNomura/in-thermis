@@ -29,7 +29,7 @@ object WikiTextIndexer extends FileIndexer {
   override def generateIndex(resource: IndexerResource): IndexerResult = {
     var is = resource.getInputStream
     try {
-      val orgsource = Source.fromInputStream(is)(CharsetUtils.getCodec(is)).mkString
+      val orgsource = Source.fromInputStream(is)(resource.getCodec).mkString
       val converted = convert(resource.name, orgsource)
 
       val contents = converted.lines.zipWithIndex

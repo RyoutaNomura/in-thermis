@@ -7,8 +7,11 @@ import java.time.{ LocalDateTime, OffsetDateTime }
 import scala.collection.JavaConversions._
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
+import scala.io.Codec
 
 import org.apache.commons.lang3.StringUtils
+
+import com.fasterxml.jackson.databind.JsonNode
 
 import dispatch.{ Http, as, implyRequestHandlerTuple, url }
 import dispatch.Defaults.executor
@@ -17,7 +20,6 @@ import jp.co.rn.inthermis.logic.indexer.impl.WikiTextIndexer
 import jp.co.rn.inthermis.logic.walker.{ ResourceWalker, ResourceWalkerConfig }
 import jp.co.rn.inthermis.models.IndexerResource
 import play.libs.Json
-import com.fasterxml.jackson.databind.JsonNode
 
 object MediaWikiWalker extends ResourceWalker {
   val props = "PROPS"
@@ -100,7 +102,7 @@ case class MediaWikiResource(
   val content: String)
     extends IndexerResource {
 
-  override def getInputStream: InputStream = {
-    new ByteArrayInputStream(content.getBytes("utf-8"))
-  }
+  override def getInputStream: InputStream = new ByteArrayInputStream(content.getBytes("utf-8"))
+  override def getCodec: Codec = Codec.UTF8
+
 }

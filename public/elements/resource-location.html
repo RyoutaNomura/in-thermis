@@ -1,115 +1,120 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../bower_components/paper-input/paper-input.html">
-<link rel='stylesheet' href="../bower_components/font-awesome/css/font-awesome.css">
+<link rel="import"
+  href="../bower_components/polymer/polymer.html">
+<link rel="import"
+  href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import"
+  href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import"
+  href="../bower_components/paper-button/paper-button.html">
+<link rel="import"
+  href="../bower_components/paper-input/paper-input.html">
+<link rel='stylesheet'
+  href="../bower_components/font-awesome/css/font-awesome.css">
 
 <dom-module id="resource-location">
-<template>
-<div class="container flex-horizontal">
-  <div class="resource-icon">
-    <i class$="fa [[iconCssClassName]]"></i>
-  </div>
-  <div class="resource-type-name">[[resourceTypeName]]</div>
-  <div class="resource-size">[[resourceSizeFormatted]]</div>
-  <div class="flexchild"></div>
+  <template>
+    <div class="container flex-horizontal">
+      <div class="resource-icon">
+        <i class$="fa [[iconCssClassName]]"></i>
+      </div>
+      <div class="resource-type-name">[[resourceTypeName]]</div>
+      <div class="resource-size">[[resourceSizeFormatted]]</div>
+      <div class="flexchild"></div>
+    </div>
+    <!-- <div id="path-box" class="container flex-horizontal">
+<div class="flexchild">
+<paper-input id="uri-input" value$="[[uri]]" readonly="true" no-label-float="true">
+</paper-input>
 </div>
-<!-- <div id="path-box" class="container flex-horizontal">
-  <div class="flexchild">
-    <paper-input id="uri-input" value$="[[uri]]" readonly="true" no-label-float="true">
-    </paper-input>
-  </div>
-    <paper-icon-button class="fa fa-clipboard" on-tap="onCopyButtonTap">Copy</paper-icon-button>
-    <paper-icon-button class="fa fa-download" on-tap="onDownloadButtonTap"></paper-icon-button>
+<paper-icon-button class="fa fa-clipboard" on-tap="onCopyButtonTap">Copy</paper-icon-button>
+<paper-icon-button class="fa fa-download" on-tap="onDownloadButtonTap"></paper-icon-button>
 </div> -->
-</template>
+  </template>
 
-<style>
-:host {
+  <style>
+     :host {}
+    
+    .flex-horizontal {
+      @apply (--layout-horizontal);
+      @apply(--layout-center);
+    }
+    
+    .flexchild {
+      @apply (--layout-flex);
+    }
+    
+    .resource-icon {
+      margin-right: 5px;
+    }
+    
+    .resource-type-name {
+      font-size: small;
+    }
+    
+    .resource-size {
+      font-size: small;
+      margin-left: 10px;
+    }
+    /* #path-box paper-input {
+   margin-right: 14px;
+   --paper-input-container: {
+padding: 0px;
 }
-
-.flex-horizontal { 
-  @apply (--layout-horizontal);
-  @apply(--layout-center);
+--paper-input-container-underline: {
+border-bottom: none;
 }
-
-.flexchild {
-  @apply (--layout-flex);
+--paper-input-container-input:{
+font-size:small;
 }
-.resource-icon {
-  margin-right: 5px;
-}
-
-.resource-type-name{
-  font-size: small;
-}
-
-.resource-size{
-  font-size: small;
-  margin-left: 10px;
-}
-
-/* #path-box paper-input {
-  margin-right: 14px;
-  --paper-input-container: {
-    padding: 0px;
-  }
-  --paper-input-container-underline: {
-     border-bottom: none;
-  }
-  --paper-input-container-input:{
-    font-size:small;
-  }
-  --paper-input-container-focus-color: none;
-  --paper-input-container-color: none;
+--paper-input-container-focus-color: none;
+--paper-input-container-color: none;
 } */
+  </style>
 
-</style>
+  <script>
+    Polymer({
+      is: "resource-location",
+      properties: {
+        uri: String,
+        resourceSize: Number,
+        resourceSizeFormatted: {
+          type: String,
+          computed: 'formatNumber(resourceSize)'
+        },
+        resourceTypeName: String,
+        indexerClassName: String,
+        iconCssClassName: String
+      },
 
-<script>
-	Polymer({
-		is : "resource-location",
-		properties : {
-			uri : String,
-			resourceSize : Number,
-			resourceSizeFormatted: {
-				type: String,
-				computed: 'formatNumber(resourceSize)'
-			},
-			resourceTypeName : String,
-			indexerClassName: String,
-			iconCssClassName: String
-		},
-		
-		formatNumber: function(resourceSize) {
-			return Number(Math.floor(resourceSize/1000)).toLocaleString() + " KB";
-		},
-		
-/* 		onShowLinkButtonTap: function() {
-			this.$['path-box'].hidden = false;
-			this.$['show-link-button'].hidden = true;
-		},
-		
-		onDownloadButtonTap: function() {
-			var ref = window.location.href = this.uri;
-			if (ref == null) {
-				// TODO ダイアログ化
-				alert('ファイルのダウンロードに失敗しました。')
-			}
-		},
-		
-		onCopyButtonTap: function() {
-			var textArea = document.createElement("textarea");
-			textArea.value = this.uri;
-			Polymer.dom(document.body).appendChild(textArea);
-			textArea.select();
-			try {
-				document.execCommand('copy');
-			} catch (err) {
-				console.log('Oops, unable to copy');
-			}
-			Polymer.dom(document.body).removeChild(textArea);
-		} */
-	});
-</script> </dom-module>
+      formatNumber: function(resourceSize) {
+        return Number(Math.floor(resourceSize / 1000)).toLocaleString() + " KB";
+      },
+
+      /* 		onShowLinkButtonTap: function() {
+              this.$['path-box'].hidden = false;
+              this.$['show-link-button'].hidden = true;
+              },
+
+      onDownloadButtonTap: function() {
+      var ref = window.location.href = this.uri;
+      if (ref == null) {
+        // TODO ダイアログ化
+        alert('ファイルのダウンロードに失敗しました。')
+        }
+        },
+
+      onCopyButtonTap: function() {
+      var textArea = document.createElement("textarea");
+      textArea.value = this.uri;
+      Polymer.dom(document.body).appendChild(textArea);
+      textArea.select();
+      try {
+      document.execCommand('copy');
+      } catch (err) {
+      console.log('Oops, unable to copy');
+      }
+      Polymer.dom(document.body).removeChild(textArea);
+      } */
+    });
+  </script>
+</dom-module>

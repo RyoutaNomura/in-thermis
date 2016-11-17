@@ -21,8 +21,9 @@ object CharsetUtils {
     }
   }
 
-  def getCodec(is: InputStream): Codec =
+  def getCodec(is: InputStream): Codec = {
     Codec(CharsetUtils.detectEncoding(is))
       .onUnmappableCharacter(CodingErrorAction.IGNORE)
       .onMalformedInput(CodingErrorAction.IGNORE)
+  }
 }

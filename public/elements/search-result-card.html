@@ -1,200 +1,215 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../bower_components/neon-animation/neon-animation.html">
-<link rel="import" href="./resource-location.html">
+<link rel="import"
+  href="../bower_components/polymer/polymer.html">
+<link rel="import"
+  href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import"
+  href="../bower_components/neon-animation/neon-animation.html">
+<link rel="import"
+  href="./resource-location.html">
 
-<dom-module id="search-result-card"> <template>
-<div class="header">
-  <div class="container flex-horizontal">
-    <div class="resource-name">
-      <span>[[resourceName]]</span> <span class="resource-key">[[keys]]</span>
+<dom-module id="search-result-card">
+  <template>
+    <div class="header">
+      <div class="container flex-horizontal">
+        <div class="resource-name">
+          <span>[[resourceName]]</span>
+          <span class="resource-key">[[keys]]</span>
+        </div>
+        <div class="flexchild"></div>
+        <div class="date">[[resourceModified]]</div>
+      </div>
+      <div id="path-box"
+        class="container flex-horizontal">
+        <div class="flexchild">
+          <paper-input id="uri-input"
+            value$="[[uri]]"
+            readonly="true"
+            no-label-float="true"> </paper-input>
+        </div>
+        <paper-icon-button class="fa fa-clipboard"
+          on-tap="onCopyButtonTap">Copy</paper-icon-button>
+       <!--
+       <paper-icon-button class="fa fa-download"
+          on-tap="onDownloadButtonTap"></paper-icon-button>
+       -->
+      </div>
     </div>
-    <div class="flexchild"></div>
-    <div class="date">[[resourceModified]]</div>
-  </div>
-  <div id="path-box" class="container flex-horizontal">
-    <div class="flexchild">
-      <paper-input id="uri-input" value$="[[uri]]" readonly="true" no-label-float="true"> </paper-input>
+
+    <div class="content font-mincho">
+      <div id='prev-content'>[[prevContent]]</div>
+      <div id='content'></div>
+      <div id='next-content'>[[nextContent]]</div>
     </div>
-    <paper-icon-button class="fa fa-clipboard" on-tap="onCopyButtonTap">Copy</paper-icon-button>
-    <paper-icon-button class="fa fa-download" on-tap="onDownloadButtonTap"></paper-icon-button>
-  </div>
-</div>
 
-<div class="content font-mincho">
-  <div id='prev-content'>[[prevContent]]</div>
-  <div id='content'></div>
-  <div id='next-content'>[[nextContent]]</div>
-</div>
+    <div class="footer">
+      <resource-location uri=[[uri]]
+        displayLocation=[[displayLocation]]
+        resource-size=[[resourceSize]]
+        resource-type-name=[[resourceTypeName]]
+        resource-icon=[[resourceIcon]]
+        indexer-class-name=[[indexerClassName]]
+        icon-css-class-name=[[iconCssClassName]]></resource-location>
+    </div>
 
-<div class="footer">
-  <resource-location
-    uri=[[uri]]
-    resource-size=[[resourceSize]]
-    resource-type-name=[[resourceTypeName]]
-    resource-icon=[[resourceIcon]]
-    indexer-class-name=[[indexerClassName]]
-    icon-css-class-name=[[iconCssClassName]]></resource-location>
-</div>
+  </template>
 
-</template>
+  <style>
+     :host {
+      display: block;
+      background-color: white;
+      padding: 20px 40px;
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+    }
+    
+    div.flex-horizontal {
+      @apply (--layout-horizontal);
+      @apply(--layout-center);
+    }
+    
+    div.flexchild {
+      @apply (--layout-flex);
+    }
+    
+    div.header {
+      border-bottom: solid 1px;
+      padding-top: 14px;
+    }
+    
+    div.resource-name {
+      font-weight: bold;
+    }
+    
+    span.resource-key {
+      margin-left: 20px;
+      font-size: small;
+    }
+    
+    div.content {
+      font-size: smaller;
+      color: gray;
+      padding: 14px 0;
+    }
+    
+    div#prev-content {
+      background: -webkit-linear-gradient(#ccc, #000);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    div#next-content {
+      background: -webkit-linear-gradient(#000, #ccc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    div#content {
+      color: black;
+    }
+    
+    span.highlightend-text {
+      background-color: yellow;
+    }
+    
+    div.footer {
+      border-top: dashed 1px gray;
+      padding-top: 14px;
+    }
+    
+    div#path-box paper-input {
+      margin-right: 14px;
+      --paper-input-container: {
+        padding: 0px;
+      }
+      --paper-input-container-underline: {
+        border-bottom: none;
+      }
+      --paper-input-container-input: {
+        font-size: x-small;
+        color: darkgreen;
+      }
+      --paper-input-container-focus-color: none;
+      --paper-input-container-color: none;
+    }
+  </style>
 
-<style>
-:host {
-  display: block;
-  background-color: white;
-  padding: 20px 40px;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0
-    rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-}
+  <script>
+    Polymer({
+      is: "search-result-card",
+      behaviors: [Polymer.NeonAnimationRunnerBehavior],
+      properties: {
+        uri: String,
+        displayLocation: String,
+        resourceName: String,
+        resourceSize: Number,
+        resourceTypeName: String,
+        resourceIcon: String,
+        resourceCreated: Date,
+        resourceModified: Date,
+        keys: String,
+        content: {
+          type: String,
+          observer: 'contentChanged',
+        },
+        prevContent: String,
+        nextContent: String,
+        positions: Array,
+        indexerClassName: String,
+        indexGenerated: Date,
+        iconCssClassName: String,
+        animationConfig: {
+          value: function() {
+            return {
+              name: 'fade-in-animation',
+              node: this
+            }
+          }
+        },
+      },
+      contentChanged: function() {
+        if (typeof this.content === 'undefined')
+          return;
+        if (typeof this.positions === 'undefined')
+          return;
 
-div.flex-horizontal { 
-  @apply (--layout-horizontal);
-  @apply(--layout-center);
-}
+        // 検索結果の該当箇所をspan要素を利用して色付けする。
+        var html = this.content;
+        this.positions.sort(function(a, b) {
+          return b[0] - a[0];
+        })
+        this.positions.forEach(function(val, index, ar) {
+          var start = val[0];
+          var length = val[1];
+          html = html.substr(0, start) +
+            "<span class='highlightend-text'>" +
+            html.substr(start, length) + "</span>" +
+            html.substr(start + length, html.length);
+        });
+        html = html.replace(/[\n\r]/g, "</br>")
+          // エスケープされるのを防ぐために、DOMを直接操作する(※サーバーサイドでやるべきか)
+        Polymer.dom(this.$.content).innerHTML = html;
 
-div.flexchild {
-  @apply (--layout-flex);
-}
+        this.playAnimation();
+      },
+      onDownloadButtonTap: function() {
+        var ref = window.location.href = this.uri;
+        if (ref == null) {
+          // TODO ダイアログ化
+          alert('ファイルのダウンロードに失敗しました。')
+        }
+      },
 
-div.header {
-  border-bottom: solid 1px;
-  padding-top: 14px;
-}
-
-div.resource-name {
-  font-weight: bold;
-}
-
-span.resource-key {
-  margin-left: 20px;
-  font-size: small;
-}
-
-div.content {
-  font-size: smaller;
-  color: gray;
-  padding: 14px 0;
-}
-
-div#prev-content {
-  background: -webkit-linear-gradient(#ccc, #000);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-div#next-content {
-  background: -webkit-linear-gradient(#000, #ccc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-div#content {
-  color: black;
-}
-
-span.highlightend-text {
-  background-color: yellow;
-}
-
-div.footer {
-  border-top: dashed 1px gray;
-  padding-top: 14px;
-}
-
-div#path-box paper-input {
-  margin-right: 14px;
-  --paper-input-container: {
-    padding: 0px;
-  }
-  --paper-input-container-underline: {
-     border-bottom: none;
-  }
-  --paper-input-container-input:{
-    font-size:x-small;
-    color: darkgreen;
-  }
-  --paper-input-container-focus-color: none;
-  --paper-input-container-color: none;
-}
-
-</style>
-
-<script>
-	Polymer({
-		is : "search-result-card",
-		behaviors : [ Polymer.NeonAnimationRunnerBehavior ],
-		properties : {
-			uri : String,
-			resourceName : String,
-			resourceSize : Number,
-			resourceTypeName : String,
-			resourceCreated : Date,
-			resourceModified : Date,
-			keys : String,
-			content : {
-				type : String,
-				observer : 'contentChanged',
-			},
-			prevContent : String,
-			nextContent : String,
-			positions : Array,
-			indexerClassName : String,
-			indexGenerated : Date,
-			iconCssClassName: String,
-			animationConfig : {
-				value : function() {
-					return {
-						name : 'fade-in-animation',
-						node : this
-					}
-				}
-			},
-		},
-		contentChanged : function() {
-			if (typeof this.content === 'undefined')
-				return;
-			if (typeof this.positions === 'undefined')
-				return;
-
-			// 検索結果の該当箇所をspan要素を利用して色付けする。
-			var html = this.content;
-			this.positions.sort(function(a, b) {
-				return b[0] - a[0];
-			})
-			this.positions.forEach(function(val, index, ar) {
-				var start = val[0];
-				var length = val[1];
-				html = html.substr(0, start)
-						+ "<span class='highlightend-text'>"
-						+ html.substr(start, length) + "</span>"
-						+ html.substr(start + length, html.length);
-			});
-			html = html.replace(/[\n\r]/g, "</br>")
-			// エスケープされるのを防ぐために、DOMを直接操作する(※サーバーサイドでやるべきか)
-			Polymer.dom(this.$.content).innerHTML = html;
-			
-			this.playAnimation();
-		},
-		onDownloadButtonTap: function() {
-			var ref = window.location.href = this.uri;
-			if (ref == null) {
-				// TODO ダイアログ化
-				alert('ファイルのダウンロードに失敗しました。')
-			}
-		},
-		
-		onCopyButtonTap: function() {
-			var textArea = document.createElement("textarea");
-			textArea.value = this.uri;
-			Polymer.dom(document.body).appendChild(textArea);
-			textArea.select();
-			try {
-				document.execCommand('copy');
-			} catch (err) {
-				console.log('Oops, unable to copy');
-			}
-			Polymer.dom(document.body).removeChild(textArea);
-		}
-	});
-</script> </dom-module>
+      onCopyButtonTap: function() {
+        var textArea = document.createElement("textarea");
+        textArea.value = this.uri;
+        Polymer.dom(document.body).appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+        } catch (err) {
+          console.log('Oops, unable to copy');
+        }
+        Polymer.dom(document.body).removeChild(textArea);
+      }
+    });
+  </script>
+</dom-module>

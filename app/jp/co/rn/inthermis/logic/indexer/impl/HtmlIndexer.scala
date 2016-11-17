@@ -31,7 +31,7 @@ object HtmlIndexer extends FileIndexer {
 
     try {
       val charset = CharsetUtils.detectEncoding(is)
-      val document = Jsoup.parse(is, charset, resource.uri.toString)
+      val document = Jsoup.parse(is, resource.getCodec.name, resource.uri.toString)
 
       val contents = document.text().lines.zipWithIndex
         .map {

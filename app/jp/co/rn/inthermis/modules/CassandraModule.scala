@@ -22,7 +22,6 @@ class CassandraTask @Inject() (lifecycle: ApplicationLifecycle) {
 
   lifecycle.addStopHook(() => Future.successful {
     CassandraHelper.close()
-
     logger.info("Application disconnected from Cassandra cluster.")
   })
 

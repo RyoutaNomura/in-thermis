@@ -7,6 +7,7 @@ import java.net.URI
 import java.time.LocalDateTime
 import java.io.InputStream
 import java.io.ByteArrayInputStream
+import scala.io.Codec
 
 object RedmineWalker extends ResourceWalker {
 
@@ -33,8 +34,8 @@ case class RedmineResource(
   val content: String)
     extends IndexerResource {
 
-  override def getInputStream: InputStream = {
-    new ByteArrayInputStream(content.getBytes("utf-8"))
-  }
+  override def getInputStream: InputStream = new ByteArrayInputStream(content.getBytes("utf-8"))
+  override def getCodec: Codec = Codec.UTF8
+
 }
 

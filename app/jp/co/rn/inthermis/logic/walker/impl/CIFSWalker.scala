@@ -3,13 +3,14 @@ package jp.co.rn.inthermis.logic.walker.impl
 import java.io.InputStream
 import java.net.URI
 import java.time.{ Instant, LocalDateTime, ZoneOffset }
-
 import jcifs.smb.{ NtlmPasswordAuthentication, SmbFile }
 import jp.co.rn.inthermis.logic.walker.{ ResourceWalker, ResourceWalkerConfig }
 import jp.co.rn.inthermis.models.IndexerResource
 import org.apache.http.client.utils.URIUtils
 import java.net.URLEncoder
 import javax.ws.rs.core.UriBuilder
+import jp.co.rn.inthermis.utils.CharsetUtils
+import scala.io.Codec
 
 object CIFSWalker extends ResourceWalker {
 
@@ -17,9 +18,8 @@ object CIFSWalker extends ResourceWalker {
   val cifsAuthUser = "CIFS_AUTH_USER"
   val cifsAuthPass = "CIFS_AUTH_PASS"
 
-  override def walk(config: ResourceWalkerConfig, generateIndex: IndexerResource => Unit): Unit = {
-
-    val auth = new NtlmPasswordAuthentication(
+  private def auth(config: ResourceWalkerConfig): NtlmPasswordAuthentication = {
+    new NtlmPasswordAuthentication(
       config.props.get(cifsAuthDomain) match {
         case Some(s) => s
         case None    => throw new IllegalArgumentException(s"$cifsAuthDomain not found in props")
@@ -32,7 +32,10 @@ object CIFSWalker extends ResourceWalker {
         case Some(s) => s
         case None    => throw new IllegalArgumentException(s"$cifsAuthPass not found in props")
       });
-    this.walkTree(new SmbFile(config.uri.toString, auth), generateIndex)
+  }
+
+  override def walk(config: ResourceWalkerConfig, generateIndex: IndexerResource => Unit): Unit = {
+    this.walkTree(new SmbFile(config.uri.toString, auth(config)), generateIndex)
   }
 
   private def walkTree(parent: SmbFile, generateIndex: IndexerResource => Unit): Unit = {
@@ -63,7 +66,6 @@ case class CIFSResource(
   val smbFile: SmbFile)
     extends IndexerResource {
 
-  override def getInputStream: InputStream = {
-    smbFile.getInputStream
-  }
+  override def getInputStream: InputStream = smbFile.getInputStream
+  override def getCodec: Codec = Codec(smbFile.getContentEncoding)
 }
