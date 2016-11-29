@@ -1,18 +1,72 @@
 package jp.co.rn.inthermis.controllers.action.search
 
+import scala.collection.immutable.Map
+
 import org.apache.commons.lang3.StringUtils
 
+import jp.co.rn.inthermis.elasticsearch.ElasticSearchCriteria
 import jp.co.rn.inthermis.enums.{ DateRangeCriteria, SearchResultOrder }
+import jp.co.rn.inthermis.enums.SearchResultOrder._
+import play.api.libs.json._
+import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.api.mvc.RequestHeader
+import jp.co.rn.inthermis.elasticsearch._
 
 case class SearchCriteria(
-  text: String,
-  order: SearchResultOrder,
-  fetchSize: Int,
-  currentPage: Int,
-  dateRangeCriteria: DateRangeCriteria,
-  resourceWalkers: Set[String],
-  resourceIndexers: Set[String])
+    text: String,
+    order: SearchResultOrder,
+    fetchSize: Int,
+    currentPage: Int,
+    dateRangeCriteria: DateRangeCriteria,
+    resourceWalkers: Set[String],
+    resourceIndexers: Set[String]) {
+
+  def toElasticSearchCriteria: ElasticSearchCriteria = {
+    ElasticSearchCriteria(
+      Query(
+        SimpleQueryString(
+          Set("content"),
+          text)),
+      (currentPage * fetchSize),
+      fetchSize,
+      Highlight("<span class='highlightend-text'>", "</span>", Fields(Map.empty[String, String])),
+      Seq(
+        order match {
+          case SCORE                 => Map.empty
+          case RESOURCE_UPDATED_DESC => Map("resource_modified" -> "desc")
+          case RESOURCE_UPDATED_ASC  => Map("resource_modified" -> "asc")
+          case RESOURCE_URI_ASC      => Map("uri" -> "asc")
+          case RESOURCE_URI_DESC     => Map("uri" -> "desc")
+          case RESOURCE_NAME_ASC     => Map("resource_name" -> "asc")
+          case RESOURCE_NAME_DESC    => Map("resource_name" -> "desc")
+        }))
+  }
+  //
+  //  def toQueryJson: JsObject = {
+  //    Json.obj(
+  //      "query" -> Json.obj(
+  //        "simple_query_string" -> Json.obj(
+  //          "fields" -> Json.arr("content"),
+  //          "query" -> text)),
+  //      "from" -> (currentPage * fetchSize),
+  //      "size" -> fetchSize,
+  //      "highlight" -> Json.obj(
+  //        "pre_tags" -> Json.arr("<span class='highlightend-text'>"),
+  //        "post_tags" -> Json.arr("</span>"),
+  //        "fields" -> Json.obj(
+  //          "content" -> Json.obj())),
+  //      "sort" -> Json.arr(
+  //        order match {
+  //          case SCORE                 => "_score"
+  //          case RESOURCE_UPDATED_DESC => Json.obj("resource_modified" -> "desc")
+  //          case RESOURCE_UPDATED_ASC  => Json.obj("resource_modified" -> "asc")
+  //          case RESOURCE_URI_ASC      => Json.obj("uri" -> "asc")
+  //          case RESOURCE_URI_DESC     => Json.obj("uri" -> "desc")
+  //          case RESOURCE_NAME_ASC     => Json.obj("resource_name" -> "asc")
+  //          case RESOURCE_NAME_DESC    => Json.obj("resource_name" -> "desc")
+  //        }))
+  //  }
+}
 
 case object SearchCriteria {
 
@@ -20,7 +74,7 @@ case object SearchCriteria {
 
   def apply(request: RequestHeader): SearchCriteria = {
     var text = StringUtils.EMPTY
-    var order: SearchResultOrder = SearchResultOrder.COUNT_DESC
+    var order: SearchResultOrder = SearchResultOrder.SCORE
     var fetchSize = defaultFetchSize
     var currentPage = 0
     var dateRangeCriteria: DateRangeCriteria = DateRangeCriteria.THIS_YEAR

@@ -32,7 +32,7 @@ object DateRangeCriteria extends EnumObject[DateRangeCriteria] {
   object THIS_WEEK extends DateRangeCriteria("THIS_WEEK", "This week")
   object TODAY extends DateRangeCriteria("TODAY", "Today")
 
-  implicit val searchResultWrites: Writes[SearchResultOrder] = (
+  implicit val searchResultWrites: Writes[DateRangeCriteria] = (
     (__ \ "key").write[String] and
-    (__ \ "displayName").write[String])(unlift(SearchResultOrder.unapply))
+    (__ \ "displayName").write[String])(unlift(DateRangeCriteria.unapply))
 }

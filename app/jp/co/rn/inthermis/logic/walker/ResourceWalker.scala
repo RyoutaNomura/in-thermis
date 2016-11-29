@@ -3,9 +3,9 @@ package jp.co.rn.inthermis.logic.walker
 import java.time.ZoneOffset
 import java.util.{ Date, UUID }
 import com.datastax.driver.core.Session
-import jp.co.rn.inthermis.daos.{ ResourceContentDAO, ResourceLocationDAO, WordIndexDAO }
-import jp.co.rn.inthermis.logic.indexer.{ FileIndexer, FileIndexerFactory }
-import jp.co.rn.inthermis.models.{ IndexerResource, IndexerResult }
+import jp.co.rn.inthermis.daos._
+import jp.co.rn.inthermis.logic.indexer._
+import jp.co.rn.inthermis.models._
 import jp.co.rn.inthermis.utils.ReflectionUtils
 import play.Logger
 import scala.util.Try
@@ -69,11 +69,6 @@ trait ResourceWalker {
   def deleteLocationById(session: Session, id: UUID) {
     logger.debug(s"$id deleting...")
 
-    WordIndexDAO.selectByResourceLocationId(session, id)
-      .foreach { wordIndex =>
-        WordIndexDAO.delete(session, wordIndex.word, wordIndex.resourceContentId)
-      }
-
     ResourceContentDAO.selectByResourceLocationId(session, id)
       .map(_.resourceContentId)
       .distinct
@@ -87,9 +82,6 @@ trait ResourceWalker {
   private def persistIndex(session: Session, indexerResult: IndexerResult) {
     ResourceLocationDAO.insert(session, indexerResult.generateResourceLocationDTO(walkerName))
     indexerResult.generateResourceContentDTOs.foreach { dto => ResourceContentDAO.insert(session, dto) }
-    indexerResult.generateWordIndexDTOs(walkerName).foreach { dto =>
-      WordIndexDAO.insert(session, dto)
-    }
   }
 
 }

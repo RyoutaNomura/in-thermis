@@ -38,9 +38,7 @@
     </div>
 
     <div class="content font-mincho">
-      <div id='prev-content'>[[prevContent]]</div>
-      <div id='content'></div>
-      <div id='next-content'>[[nextContent]]</div>
+      <div id='content'>[[content]]</div>
     </div>
 
     <div class="footer">
@@ -92,18 +90,6 @@
       padding: 14px 0;
     }
     
-    div#prev-content {
-      background: -webkit-linear-gradient(#ccc, #000);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
-    div#next-content {
-      background: -webkit-linear-gradient(#000, #ccc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
     div#content {
       color: black;
     }
@@ -152,9 +138,6 @@
           type: String,
           observer: 'contentChanged',
         },
-        prevContent: String,
-        nextContent: String,
-        positions: Array,
         indexerClassName: String,
         indexGenerated: Date,
         iconCssClassName: String,
@@ -168,26 +151,13 @@
         },
       },
       contentChanged: function() {
-        if (typeof this.content === 'undefined')
+        if (typeof this.content === 'undefined') {
           return;
-        if (typeof this.positions === 'undefined')
-          return;
+        }
 
         // 検索結果の該当箇所をspan要素を利用して色付けする。
         var html = this.content;
-        this.positions.sort(function(a, b) {
-          return b[0] - a[0];
-        })
-        this.positions.forEach(function(val, index, ar) {
-          var start = val[0];
-          var length = val[1];
-          html = html.substr(0, start) +
-            "<span class='highlightend-text'>" +
-            html.substr(start, length) + "</span>" +
-            html.substr(start + length, html.length);
-        });
-        html = html.replace(/[\n\r]/g, "</br>")
-          // エスケープされるのを防ぐために、DOMを直接操作する(※サーバーサイドでやるべきか)
+                 // エスケープされるのを防ぐために、DOMを直接操作する(※サーバーサイドでやるべきか)
         Polymer.dom(this.$.content).innerHTML = html;
 
         this.playAnimation();

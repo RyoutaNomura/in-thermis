@@ -12,5 +12,10 @@ object ApplicationConfig {
     URI.create("https://ja.wikipedia.org/w/api.php"),
     "jp.co.rn.inthermis.logic.walker.impl.MediaWikiWalker",
     Map.empty)
+
+  val elasticSearchHost: String = "localhost"
+  val elasticSearchPort: Int = 9200
+  def generateElasticSearchUriPrefix = s"http://$elasticSearchHost:$elasticSearchPort/"
+
 }
 

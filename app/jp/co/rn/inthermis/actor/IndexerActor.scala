@@ -14,7 +14,6 @@ class IndexerActor extends Actor {
     case message: String => execute
   }
 
-  /** 処理本体 */
   def execute(): Unit = {
     val session = CassandraHelper.getSession
     try {

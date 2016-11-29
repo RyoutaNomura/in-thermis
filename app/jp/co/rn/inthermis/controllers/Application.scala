@@ -1,7 +1,8 @@
 package jp.co.rn.inthermis.controllers
 
 import jp.co.rn.inthermis.controllers.action.loadInitData.LoadInitDataAction
-import jp.co.rn.inthermis.controllers.action.search.{ SearchAction, SearchCriteria }
+import jp.co.rn.inthermis.controllers.action.search.{ SearchAction }
+import jp.co.rn.inthermis.controllers.action.search.SearchCriteria
 import jp.co.rn.inthermis.daos.ResourceLocationDAO
 import jp.co.rn.inthermis.logic.ResourceIndexer
 import jp.co.rn.inthermis.logic.walker.ResourceWalkerFactory

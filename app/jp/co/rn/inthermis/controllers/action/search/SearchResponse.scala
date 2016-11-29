@@ -2,70 +2,34 @@ package jp.co.rn.inthermis.controllers.action.search
 
 import java.util.Date
 import org.apache.commons.lang3.StringUtils
-import play.api.libs.functional.syntax.{ toFunctionalBuilderOps, unlift }
-import play.api.libs.json.{ Json, Writes, __ }
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import jp.co.rn.inthermis.utils.JsonCombinators
+import jp.co.rn.inthermis.elasticsearch.index.WordIndex
 
 case class SearchResponse(
-  searchResults: Seq[SearchResult],
+  searchResults: Seq[WordIndex],
   resultCount: Int,
   ellapsedTime: Long,
   isLastResponse: Boolean)
 
 object SearchResponse {
-  implicit val searchResponseWrites = Json.writes[SearchResponse]
-}
+  def apply(): SearchResponse = SearchResponse(Seq.empty, 0, 0, true)
 
-case class SearchResult(
-    word: String,
-    uri: String,
-    displayLocation: String,
-    resourceName: String,
-    resourceSize: Long,
-    resourceTypeName: String,
-    resourceCreated: Date,
-    resourceModified: Date,
-    keys: String,
-    content: String,
-    prevContent: String,
-    nextContent: String,
-    positions: Set[Tuple2[Int, Int]],
-    indexerClassName: String,
-    iconCssClassName: String) {
-
-  def this() = this(
-    StringUtils.EMPTY,
-    StringUtils.EMPTY,
-    StringUtils.EMPTY,
-    StringUtils.EMPTY,
-    0,
-    StringUtils.EMPTY,
-    new Date,
-    new Date,
-    StringUtils.EMPTY,
-    StringUtils.EMPTY,
-    StringUtils.EMPTY,
-    StringUtils.EMPTY,
-    Set.empty,
-    StringUtils.EMPTY,
-    StringUtils.EMPTY)
-}
-
-object SearchResult {
-  implicit val searchResultWrites: Writes[SearchResult] = (
-    (__ \ "word").write[String] and
+  implicit val searchResultWrites: Writes[WordIndex] = (
     (__ \ "uri").write[String] and
     (__ \ "displayLocation").write[String] and
     (__ \ "resourceName").write[String] and
-    (__ \ "resourceSize").write[Long] and
+    (__ \ "resourceSize").write[Int] and
     (__ \ "resourceTypeName").write[String] and
     (__ \ "resourceCreated").write[Date](Writes.dateWrites("yyyy-MM-dd")) and
     (__ \ "resourceModified").write[Date](Writes.dateWrites("yyyy-MM-dd")) and
     (__ \ "keys").write[String] and
+    OWrites[Any](_ => Json.obj()) and
     (__ \ "content").write[String] and
-    (__ \ "prevContent").write[String] and
-    (__ \ "nextContent").write[String] and
-    (__ \ "positions").lazyWrite(Writes.traversableWrites[Tuple2[Int, Int]](JsonCombinators.tuple2Writes)) and
     (__ \ "indexerClassName").write[String] and
-    (__ \ "iconCssClassName").write[String])(unlift(SearchResult.unapply))
+    (__ \ "iconCssClassName").write[String])(unlift(WordIndex.unapply))
+
+  implicit val searchResponseWrites: Writes[SearchResponse] = Json.writes[SearchResponse]
 }
+

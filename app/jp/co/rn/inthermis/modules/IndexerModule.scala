@@ -21,6 +21,6 @@ class IndexerTask @Inject() (lifecycle: ApplicationLifecycle) {
 
   val system = ActorSystem("system")
   val actor = system.actorOf(Props[IndexerActor], "indexer-actor")
-  val cancellable = system.scheduler.schedule(
-    30.second, 10.minute, actor, StringUtils.EMPTY)
+  //  val cancellable = system.scheduler.schedule(
+  //    30.second, 10.minute, actor, StringUtils.EMPTY)
 }

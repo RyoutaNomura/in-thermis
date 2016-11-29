@@ -11,8 +11,9 @@ sealed abstract case class SearchResultOrder(key: String, displayName: String) e
 }
 
 object SearchResultOrder extends EnumObject[SearchResultOrder] {
-  object COUNT_DESC extends SearchResultOrder("COUNT_DESC", "件数の多い順")
-  object COUNT_ASC extends SearchResultOrder("COUNT_ASC", "件数の少ない順")
+  //  object COUNT_DESC extends SearchResultOrder("COUNT_DESC", "件数の多い順")
+  //  object COUNT_ASC extends SearchResultOrder("COUNT_ASC", "件数の少ない順")
+  object SCORE extends SearchResultOrder("SCORE", "スコア順")
   object RESOURCE_UPDATED_DESC extends SearchResultOrder("RESOURCE_UPDATED_DESC", "更新日の新しい順")
   object RESOURCE_UPDATED_ASC extends SearchResultOrder("RESOURCE_UPDATED_ASC", "更新日の古い順")
   object RESOURCE_URI_ASC extends SearchResultOrder("RESOURCE_URI_ASC", "URI順")

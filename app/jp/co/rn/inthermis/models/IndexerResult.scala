@@ -8,7 +8,8 @@ import scala.collection.{ Seq, immutable }
 
 import org.apache.commons.lang3.StringUtils
 
-import jp.co.rn.inthermis.dtos.{ ResourceContentDTO, ResourceLocationDTO, WordIndexDTO }
+import jp.co.rn.inthermis.dtos._
+import jp.co.rn.inthermis.elasticsearch.index.WordIndex
 
 // TODO コンストラクタでやるのはわかりづらいので、utilityっぽくする
 case class IndexerResult(
@@ -54,39 +55,43 @@ case class IndexerResult(
     }.toSeq
   }
 
-  def generateWordIndexDTOs(walkerName: String): Seq[WordIndexDTO] = {
-    contentIds.map { id =>
-      val contentId = id._2
-      val content = id._1
-      content.indices.groupBy(c => c._1).map { f =>
-        val word = f._1
-        val indice = f._2
-          .foldLeft(immutable.Map.newBuilder[Int, Int]) { (map, t) =>
-            map += Tuple2(t._2, t._3)
-          }.result()
+  def generateWordIndices: Seq[WordIndex] = {
 
-        WordIndexDTO(
-          word,
-          contentId,
-          indice,
-          indice.size,
-          content.content,
-          content.prevContent,
-          content.nextContent,
-          content.key1,
-          content.key2,
-          content.key3,
-          uri.toString,
-          displayLocation,
-          name,
-          size,
-          walkerName,
-          indexerClassName,
-          Date.from(resourceModified.toInstant(ZoneOffset.UTC)),
-          locationId)
-      }
-    }.flatten.toSeq
   }
+  //
+  //  def generateWordIndexDTOs(walkerName: String): Seq[WordIndexDTO] = {
+  //    contentIds.map { id =>
+  //      val contentId = id._2
+  //      val content = id._1
+  //      content.indices.groupBy(c => c._1).map { f =>
+  //        val word = f._1
+  //        val indice = f._2
+  //          .foldLeft(immutable.Map.newBuilder[Int, Int]) { (map, t) =>
+  //            map += Tuple2(t._2, t._3)
+  //          }.result()
+  //
+  //        WordIndexDTO(
+  //          word,
+  //          contentId,
+  //          indice,
+  //          indice.size,
+  //          content.content,
+  //          content.prevContent,
+  //          content.nextContent,
+  //          content.key1,
+  //          content.key2,
+  //          content.key3,
+  //          uri.toString,
+  //          displayLocation,
+  //          name,
+  //          size,
+  //          walkerName,
+  //          indexerClassName,
+  //          Date.from(resourceModified.toInstant(ZoneOffset.UTC)),
+  //          locationId)
+  //      }
+  //    }.flatten.toSeq
+  //  }
 
   //  private def generateIndexMap: Map[String, Map[UUID, Set[Tuple2[Int, Int]]]] = {
   //    contents.map { c =>
