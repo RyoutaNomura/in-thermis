@@ -1,12 +1,15 @@
 package jp.co.rn.inthermis.daos
 
 import java.util.{ Date, UUID }
+
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.reflect.runtime.universe
+
 import com.datastax.driver.core.Session
+
 import jp.co.rn.inthermis.dtos.WordIndexDTO
 import jp.co.rn.inthermis.utils.CassandraHelper
-import scala.collection.JavaConverters._
-import scala.collection.JavaConversions._
 
 object WordIndexDAO {
 

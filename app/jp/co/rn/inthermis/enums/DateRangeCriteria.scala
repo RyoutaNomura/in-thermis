@@ -1,13 +1,14 @@
 package jp.co.rn.inthermis.enums
 
-import scala.reflect.runtime.universe
-import play.api.libs.functional.syntax.{ toFunctionalBuilderOps, unlift }
-import play.api.libs.json.{ Writes, __ }
-import jp.co.rn.inthermis.utils.{ EnumClass, EnumObject }
-import java.util.Date
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZoneId
+import java.util.Date
+
+import scala.reflect.runtime.universe
+
+import jp.co.rn.inthermis.utils.{ EnumClass, EnumObject }
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{ Writes, __ }
 
 sealed abstract case class DateRangeCriteria(key: String, displayName: String) extends EnumClass {
   override def getKey: String = key

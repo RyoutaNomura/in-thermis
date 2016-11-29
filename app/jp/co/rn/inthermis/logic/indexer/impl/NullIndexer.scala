@@ -21,4 +21,6 @@ object NullIndexer extends FileIndexer {
   override def isTarget(uri: URI): Boolean = false
 
   override def generateIndex(resource: IndexerResource): IndexerResult = IndexerResult()
+
+  override val isShowAsCriteria = false
 }

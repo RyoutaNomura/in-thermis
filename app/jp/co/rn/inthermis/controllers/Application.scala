@@ -4,12 +4,12 @@ import jp.co.rn.inthermis.controllers.action.loadInitData.LoadInitDataAction
 import jp.co.rn.inthermis.controllers.action.search.{ SearchAction, SearchCriteria }
 import jp.co.rn.inthermis.daos.ResourceLocationDAO
 import jp.co.rn.inthermis.logic.ResourceIndexer
-import jp.co.rn.inthermis.logic.walker.{ ResourceWalkerConfig, ResourceWalkerFactory }
+import jp.co.rn.inthermis.logic.walker.ResourceWalkerFactory
 import jp.co.rn.inthermis.settings.ApplicationConfig
 import jp.co.rn.inthermis.utils.CassandraHelper
 import play.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{ Action, AnyContent, Controller }
+import play.api.mvc._
 
 class Application extends Controller {
 

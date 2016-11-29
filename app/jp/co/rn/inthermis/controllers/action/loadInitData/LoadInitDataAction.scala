@@ -11,10 +11,32 @@ object LoadInitDataAction {
   val logger = Logger.of(this.getClass)
 
   def execute: LoadInitDataResponse = {
-    val searchResultOrder = SearchResultOrder.values.map { x => Map("key" -> x.getKey, "displayName" -> x.displayName) }.toSeq
-    val dateRangeCriteria = DateRangeCriteria.values.map { x => Map("key" -> x.getKey, "displayName" -> x.displayName) }.toSeq
-    val resourceWalkers = ApplicationConfig.resourceWalkerConfigs.map { x => Map("key" -> x.id.toString, "displayName" -> x.name) }.toSeq
+    val searchResultOrder = SearchResultOrder.values
+      .map { x =>
+        Map(
+          "key" -> x.getKey,
+          "displayName" -> x.displayName)
+      }
+      .toSeq
+
+    val dateRangeCriteria = DateRangeCriteria.values
+      .map { x =>
+        Map(
+          "key" -> x.getKey,
+          "displayName" -> x.displayName)
+      }
+      .toSeq
+
+    val resourceWalkers = ApplicationConfig.resourceWalkerConfigs
+      .map { x =>
+        Map(
+          "key" -> x.id.toString,
+          "displayName" -> x.name)
+      }
+      .toSeq
+
     val resourceIndexers = FileIndexerFactory.getCache
+      .filter { x => x.isShowAsCriteria }
       .map { x =>
         Map(
           "key" -> x.getClassName,

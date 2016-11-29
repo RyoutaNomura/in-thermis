@@ -28,7 +28,7 @@
  <check class="org.scalastyle.scalariform.SpacesAfterPlusChecker" level="warning" enabled="true"></check>
  <check class="org.scalastyle.file.WhitespaceEndOfLineChecker" level="warning" enabled="true"></check>
  <check class="org.scalastyle.scalariform.SpacesBeforePlusChecker" level="warning" enabled="true"></check>
- <check class="org.scalastyle.file.FileLineLengthChecker" level="warning" enabled="true">
+ <check class="org.scalastyle.file.FileLineLengthChecker" level="warning" enabled="false">
   <parameters>
    <parameter name="maxLineLength"><![CDATA[160]]></parameter>
    <parameter name="tabSize"><![CDATA[4]]></parameter>
@@ -77,6 +77,7 @@
  <check class="org.scalastyle.file.RegexChecker" level="warning" enabled="true">
   <parameters>
    <parameter name="regex"><![CDATA[println]]></parameter>
+   <parameter name="line"><![CDATA[false]]></parameter>
   </parameters>
  </check>
  <check class="org.scalastyle.scalariform.NumberOfTypesChecker" level="warning" enabled="true">
@@ -151,7 +152,11 @@
  <check class="org.scalastyle.scalariform.ProcedureDeclarationChecker" level="warning" enabled="false"></check>
  <check class="org.scalastyle.scalariform.ForBraceChecker" level="warning" enabled="true"></check>
  <check class="org.scalastyle.scalariform.SpaceAfterCommentStartChecker" level="warning" enabled="true"></check>
- <check class="org.scalastyle.scalariform.ScalaDocChecker" level="warning" enabled="false"></check>
+ <check class="org.scalastyle.scalariform.ScalaDocChecker" level="warning" enabled="false">
+  <parameters>
+   <parameter name="ignoreRegex"><![CDATA[^$]]></parameter>
+  </parameters>
+ </check>
  <check class="org.scalastyle.scalariform.DisallowSpaceAfterTokenChecker" level="warning" enabled="false"></check>
  <check class="org.scalastyle.scalariform.DisallowSpaceBeforeTokenChecker" level="warning" enabled="false"></check>
  <check class="org.scalastyle.scalariform.EnsureSingleSpaceAfterTokenChecker" level="warning" enabled="false"></check>
@@ -160,6 +165,7 @@
  <check class="org.scalastyle.file.IndentationChecker" level="warning" enabled="false">
   <parameters>
    <parameter name="tabSize"><![CDATA[2]]></parameter>
+   <parameter name="methodParamIndentSize"><![CDATA[2]]></parameter>
   </parameters>
  </check>
  <check class="org.scalastyle.scalariform.FieldNamesChecker" level="warning" enabled="true">
@@ -168,4 +174,11 @@
   </parameters>
  </check>
  <check class="org.scalastyle.scalariform.XmlLiteralChecker" level="warning" enabled="false"></check>
+ <check class="org.scalastyle.scalariform.ImportOrderChecker" level="warning" enabled="false"></check>
+ <check class="org.scalastyle.scalariform.PatternMatchAlignChecker" level="warning" enabled="false"></check>
+ <check class="org.scalastyle.scalariform.TodoCommentChecker" level="warning" enabled="false">
+  <parameters>
+   <parameter name="words"><![CDATA[TODO|FIXME]]></parameter>
+  </parameters>
+ </check>
 </scalastyle>

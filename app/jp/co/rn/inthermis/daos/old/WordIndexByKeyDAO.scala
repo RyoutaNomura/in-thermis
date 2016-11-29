@@ -1,9 +1,11 @@
 package jp.co.rn.inthermis.daos.old
 
-import com.datastax.driver.core.Session
-import jp.co.rn.inthermis.utils.CassandraHelper
-import jp.co.rn.inthermis.dtos.old.WordIndexByKeyDTO
 import scala.reflect.runtime.universe
+
+import com.datastax.driver.core.Session
+
+import jp.co.rn.inthermis.dtos.old.WordIndexByKeyDTO
+import jp.co.rn.inthermis.utils.CassandraHelper
 
 class WordindexByKeyDAO {
 

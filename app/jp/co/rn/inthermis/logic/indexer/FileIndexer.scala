@@ -7,6 +7,8 @@ import jp.co.rn.inthermis.models.{ Content, IndexerResult }
 import jp.co.rn.inthermis.utils.ReflectionUtils
 
 trait FileIndexer {
+  private val maxLengthOfResult = 60;
+
   def getResourceTypeName: String
   def getKeyTitles: Tuple3[String, String, String]
   def getPriority: Int
@@ -14,8 +16,7 @@ trait FileIndexer {
   def generateIndex(resource: IndexerResource): IndexerResult
   def getClassName: String = ReflectionUtils.toType(this.getClass).typeSymbol.fullName
   def getIconCssClassName: String
-
-  private val maxLengthOfResult = 60;
+  val isShowAsCriteria = true
 
   protected def fillSibilingContent(contents: Seq[Content]) = {
     contents.sliding(2).foreach {

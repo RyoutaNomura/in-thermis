@@ -5,23 +5,25 @@ import java.net.URI
 import java.time.{ LocalDateTime, OffsetDateTime }
 
 import scala.collection.JavaConversions._
-import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration._
 import scala.io.Codec
 
 import org.apache.commons.lang3.StringUtils
 
 import com.fasterxml.jackson.databind.JsonNode
 
-import dispatch.{ Http, as, implyRequestHandlerTuple, url }
-import dispatch.Defaults.executor
 import jp.co.rn.inthermis.logic.indexer.FileIndexer
 import jp.co.rn.inthermis.logic.indexer.impl.WikiTextIndexer
 import jp.co.rn.inthermis.logic.walker.{ ResourceWalker, ResourceWalkerConfig }
 import jp.co.rn.inthermis.models.IndexerResource
+import play.Logger
 import play.libs.Json
+import scalaj.http.Http
+import scalaj.http.HttpOptions
 
 object MediaWikiWalker extends ResourceWalker {
+  val logger = Logger.of(this.getClass)
+
   val props = "PROPS"
 
   val maxContinue = 50
@@ -47,48 +49,100 @@ object MediaWikiWalker extends ResourceWalker {
     // 限界値を超えたらとめる
     if (count > limit) return
 
-    // APIを連続してAPIを投げ過ぎないようにする
-    Thread.sleep(requestInterval)
+    val r = Http(uri).params(defaultProps).params(continueProps).option(HttpOptions.readTimeout(5000)).asString
 
-    val svc = url(uri) <<? defaultProps <<? continueProps
-    val future = Http(svc OK as.String)
-    val res = Await.result(future, 120.seconds)
+    if (r.isSuccess) {
+      Json.parse(r.body).get("query").get("pages").foreach { page =>
+        val title = page.get("title").asText
+        val url = page.get("fullurl").asText
 
-    Json.parse(res).get("query").get("pages").foreach { page =>
-      val title = page.get("title").asText
-      val url = page.get("fullurl").asText
+        page.get("revisions").foreach { rev =>
+          val timestamp = OffsetDateTime.parse(rev.get("timestamp").asText).toLocalDateTime
+          //        println(rev.get("*").asText)
+          val content = rev.get("*").asText
 
-      page.get("revisions").foreach { rev =>
-        val timestamp = OffsetDateTime.parse(rev.get("timestamp").asText).toLocalDateTime
-        //        println(rev.get("*").asText)
-        val content = rev.get("*").asText
-
-        generateIndex(MediaWikiResource(
-          URI.create(url),
-          url,
-          title,
-          content.length,
-          timestamp,
-          timestamp,
-          content))
-      }
-    }
-
-    // 繰り返し書利用のパラメータを取得
-    val newProps = Option[JsonNode](Json.parse(res).get("continue")) match {
-      case Some(s) => s.fields
-        .foldLeft(Map.newBuilder[String, String]) { (builder, elm) =>
-          builder += (elm.getKey -> elm.getValue.asText)
+          generateIndex(MediaWikiResource(
+            URI.create(url),
+            url,
+            title,
+            content.length,
+            timestamp,
+            timestamp,
+            content))
         }
-        .result
-      case None =>
-        Map.empty[String, String]
+      }
+
+      // 繰り返し書利用のパラメータを取得
+      val newProps = Option[JsonNode](Json.parse(r.body).get("continue")) match {
+        case Some(s) => s.fields
+          .foldLeft(Map.newBuilder[String, String]) { (builder, elm) =>
+            builder += (elm.getKey -> elm.getValue.asText)
+          }
+          .result
+        case None =>
+          Map.empty[String, String]
+      }
+      // 繰り返し処理が必要な場合は、処理する
+
+      // APIを連続してAPIを投げ過ぎないようにする
+      Thread.sleep(requestInterval)
+
+      newProps.get("gapcontinue") match {
+        case Some(s) if StringUtils.isNoneEmpty(s) => query(uri, newProps, limit, count + 1, generateIndex)
+        case _                                     =>
+      }
+    } else {
+      println(r.throwError)
     }
-    // 繰り返し処理が必要な場合は、処理する
-    newProps.get("gapcontinue") match {
-      case Some(s) if StringUtils.isNoneEmpty(s) => query(uri, newProps, limit, count + 1, generateIndex)
-      case _                                     =>
-    }
+
+    //    val svc = url(uri) <<? defaultProps <<? continueProps
+    //    Http(svc OK as.String).onComplete {
+    //      case Success(res) => { // www.example.com
+    //        Json.parse(res).get("query").get("pages").foreach { page =>
+    //          val title = page.get("title").asText
+    //          val url = page.get("fullurl").asText
+    //
+    //          page.get("revisions").foreach { rev =>
+    //            val timestamp = OffsetDateTime.parse(rev.get("timestamp").asText).toLocalDateTime
+    //            //        println(rev.get("*").asText)
+    //            val content = rev.get("*").asText
+    //
+    //            generateIndex(MediaWikiResource(
+    //              URI.create(url),
+    //              url,
+    //              title,
+    //              content.length,
+    //              timestamp,
+    //              timestamp,
+    //              content))
+    //          }
+    //        }
+    //
+    //        // 繰り返し書利用のパラメータを取得
+    //        val newProps = Option[JsonNode](Json.parse(res).get("continue")) match {
+    //          case Some(s) => s.fields
+    //            .foldLeft(Map.newBuilder[String, String]) { (builder, elm) =>
+    //              builder += (elm.getKey -> elm.getValue.asText)
+    //            }
+    //            .result
+    //          case None =>
+    //            Map.empty[String, String]
+    //        }
+    //        // 繰り返し処理が必要な場合は、処理する
+    //
+    //        // APIを連続してAPIを投げ過ぎないようにする
+    //        Thread.sleep(requestInterval)
+    //
+    //        newProps.get("gapcontinue") match {
+    //          case Some(s) if StringUtils.isNoneEmpty(s) => query(uri, newProps, limit, count + 1, generateIndex)
+    //          case _                                     =>
+    //        }
+    //      }
+    //      case Failure(e) => {
+    //        logger.error("An error occurred during accessing", e)
+    //      }
+    //    }
+
   }
 }
 

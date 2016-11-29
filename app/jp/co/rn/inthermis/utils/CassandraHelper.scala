@@ -3,14 +3,15 @@ package jp.co.rn.inthermis.utils
 import scala.collection.JavaConversions._
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{ universe => ru }
-import ru._
+import scala.reflect.runtime.universe._
 import scala.util.{ Failure, Success }
-import com.datastax.driver.core.{ BoundStatement, Cluster, DataType, Metadata, PreparedStatement, ResultSet, Row, Session }
-import com.google.common.base.CaseFormat
-import play.Logger
-import java.lang.Boolean
+
+import com.datastax.driver.core._
 import com.datastax.driver.core.ResultSetFuture
+import com.google.common.base.CaseFormat
+
 import jp.co.rn.inthermis.settings.ApplicationConfig
+import play.Logger
 
 object CassandraHelper {
 

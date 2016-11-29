@@ -55,9 +55,8 @@ object WikiTextIndexer extends FileIndexer {
     val engine = new WtEngineImpl(config)
     val pageTitle = PageTitle.make(config, title)
     val pageId = new PageId(pageTitle, -1)
-
+    // scalastyle:off null
     val cp = engine.postprocess(pageId, wikitext, null)
-
     val wrapCol = 80
     val p = new TextConverter(config, wrapCol);
     p.go(cp.getPage()).asInstanceOf[String]

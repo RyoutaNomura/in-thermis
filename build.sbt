@@ -35,6 +35,7 @@ libraryDependencies += "com.ibm.icu" % "icu4j" % "57.1"
 libraryDependencies += "org.jsoup" % "jsoup" % "1.9.1"
 libraryDependencies += "jcifs" % "jcifs" % "1.3.17"
 libraryDependencies += "net.databinder.dispatch" % "dispatch-core_2.11" % "0.11.3"
+libraryDependencies +=  "org.scalaj" %% "scalaj-http" % "2.3.0"
 
 // https://mvnrepository.com/artifact/org.sweble.wikitext/swc-engine
 libraryDependencies += "org.sweble.wikitext" % "swc-engine" % "2.1.0"
