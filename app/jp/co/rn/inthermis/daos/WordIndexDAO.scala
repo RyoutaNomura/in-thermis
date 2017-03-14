@@ -10,10 +10,13 @@ import com.datastax.driver.core.Session
 
 import jp.co.rn.inthermis.dtos.WordIndexDTO
 import jp.co.rn.inthermis.utils.CassandraHelper
+import play.Logger
 
 object WordIndexDAO {
 
+  val logger = Logger.of(this.getClass)
   def select(session: Session, word: String): Seq[WordIndexDTO] = {
+    
     CassandraHelper.getRows(session, classOf[WordIndexDTO], "SELECT * FROM word_index WHERE word = ? ", word)
   }
 
