@@ -33,14 +33,14 @@ object FileIndexerFactory {
   def create(className: String): FileIndexer = {
     cache.find { x => StringUtils.equals(x.getClassName, className) } match {
       case Some(s) => s
-      case None    => NullIndexer
+      case None => NullIndexer
     }
   }
 
-  def create(uri: URI): FileIndexer = {
+  def create(uri: URI): Option[FileIndexer] = {
     cache.find { x => x.isTarget(uri) } match {
-      case Some(indexer) => indexer
-      case None          => NullIndexer
+      case Some(indexer) => Option(indexer)
+      case None => Option.empty
     }
   }
 

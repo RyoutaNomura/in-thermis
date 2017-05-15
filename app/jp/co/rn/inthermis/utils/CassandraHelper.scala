@@ -12,6 +12,7 @@ import com.google.common.base.CaseFormat
 
 import jp.co.rn.inthermis.settings.ApplicationConfig
 import play.Logger
+import scala.concurrent.Future
 
 object CassandraHelper {
 
@@ -54,17 +55,9 @@ object CassandraHelper {
   }
 
   def execCqlAsync(session: Session, cql: String, params: AnyRef*): ResultSetFuture = {
-    try {
       val stmt = this.stmtCache.getOrElseUpdate(cql, session.prepare(cql))
       val bs = new BoundStatement(stmt).bind(params: _*)
       session.executeAsync(bs)
-
-    } catch {
-      case t: Throwable => {
-        logger.error(s"cql: $cql, params: $params", t)
-        throw t
-      }
-    }
   }
 
   def getRows[T: TypeTag: ClassTag](session: Session, clazz: Class[T], cql: String, params: AnyRef*): Seq[T] = {

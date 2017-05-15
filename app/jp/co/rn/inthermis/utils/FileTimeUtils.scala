@@ -6,10 +6,13 @@ import java.util.Date
 import java.time.LocalDateTime
 import java.time.Instant
 import java.time.ZoneOffset
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 object FileTimeUtils {
   def getCreated(uri: URI): LocalDateTime = getLastModified(uri)
   def getLastModified(uri: URI): LocalDateTime = {
-    LocalDateTime.ofInstant(Instant.ofEpochMilli(Files.getLastModifiedTime(Paths.get(uri)).toMillis), ZoneOffset.UTC)
+    val filetime = Files.getLastModifiedTime(Paths.get(uri))
+    LocalDateTime.ofInstant(filetime.toInstant, ZoneOffset.UTC)
   }
 }

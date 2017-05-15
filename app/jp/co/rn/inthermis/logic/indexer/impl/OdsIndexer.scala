@@ -2,16 +2,28 @@ package jp.co.rn.inthermis.logic.indexer.impl
 
 import java.net.URI
 
+import scala.collection.JavaConversions._
+import scala.util.control.Exception._
+
 import org.apache.commons.lang3.StringUtils
-import org.odftoolkit.odfdom.dom.element.table.{ TableTableCellElementBase, TableTableRowElement }
+import org.odftoolkit.odfdom.dom.element.table.TableTableCellElementBase
+import org.odftoolkit.odfdom.dom.element.table.TableTableRowElement
 import org.odftoolkit.simple.SpreadsheetDocument
-import org.odftoolkit.simple.table.{ Cell, Row, Table }
+import org.odftoolkit.simple.table.Cell
+import org.odftoolkit.simple.table.Row
+import org.odftoolkit.simple.table.Table
 
 import jp.co.rn.inthermis.logic.analyzer.StringAnalyzer
 import jp.co.rn.inthermis.logic.indexer.FileIndexer
-import jp.co.rn.inthermis.models.{ Content, IndexerResource, IndexerResult }
+import jp.co.rn.inthermis.models.Content
+import jp.co.rn.inthermis.models.ContentIndexerResult
+import jp.co.rn.inthermis.models.IndexerResource
+import jp.co.rn.inthermis.models.LineIndexerResult
+import play.Logger
 
 object OdsIndexer extends FileIndexer {
+
+  private val logger = Logger.of(this.getClass)
 
   override def getResourceTypeName: String = "OpenDocument SpreadSheet"
 
@@ -23,10 +35,37 @@ object OdsIndexer extends FileIndexer {
 
   override def isTarget(uri: URI): Boolean = uri.toString match {
     case v if v.endsWith(".ods") => true
-    case _                       => false
+    case _ => false
   }
 
-  override def generateIndex(resource: IndexerResource): IndexerResult = {
+  override def generateContentIndex(resource: IndexerResource): Option[ContentIndexerResult] = {
+    
+    val is = resource.getInputStream
+
+    allCatch withApply {e =>
+      logger.error(s"error occurred during indexing ${resource.uri}", e)
+      Option.empty
+      
+    } andFinally {
+      is.close()
+      
+    } apply {
+      val document = SpreadsheetDocument.loadDocument(is)
+      val contents = for (sheetNo <- (0 until document.getSheetCount)) yield {
+        val sheet = document.getSheetByIndex(sheetNo)
+        val content = for (row <- this.getRows(sheet)) yield {
+          this.getCells(row).map { _.getStringValue }.mkString(StringUtils.EMPTY) match {
+            case s if StringUtils.isNotEmpty(s) => s
+            case _ => StringUtils.EMPTY
+          }
+        }
+        (Seq(sheet.getTableName), content.mkString(System.lineSeparator))
+      }
+      Option(ContentIndexerResult(resource, contents.toMap, this.getClassName))
+    }
+  }
+
+  override def generateIndex(resource: IndexerResource): LineIndexerResult = {
     var is = resource.getInputStream
 
     try {
@@ -36,7 +75,7 @@ object OdsIndexer extends FileIndexer {
         .flatMap { sheet => generateIndex(resource.uri, sheet) }
         .toSeq
 
-      IndexerResult(
+      LineIndexerResult(
         resource,
         contents,
         this.getClassName)

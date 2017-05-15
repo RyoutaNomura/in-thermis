@@ -2,18 +2,25 @@ package jp.co.rn.inthermis.logic.indexer
 
 import java.net.URI
 
+import scala.util.control.Exception._
+
+import jp.co.rn.inthermis.models.Content
+import jp.co.rn.inthermis.models.ContentIndexerResult
 import jp.co.rn.inthermis.models.IndexerResource
-import jp.co.rn.inthermis.models.{ Content, IndexerResult }
+import jp.co.rn.inthermis.models.LineIndexerResult
 import jp.co.rn.inthermis.utils.ReflectionUtils
 
 trait FileIndexer {
   private val maxLengthOfResult = 60;
+    
 
   def getResourceTypeName: String
   def getKeyTitles: Tuple3[String, String, String]
   def getPriority: Int
   def isTarget(uri: URI): Boolean
-  def generateIndex(resource: IndexerResource): IndexerResult
+  def generateIndex(resource: IndexerResource): LineIndexerResult
+  def generateContentIndex(resource: IndexerResource): Option[ContentIndexerResult]
+  
   def getClassName: String = ReflectionUtils.toType(this.getClass).typeSymbol.fullName
   def getIconCssClassName: String
   val isShowAsCriteria = true

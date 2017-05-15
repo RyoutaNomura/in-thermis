@@ -8,6 +8,7 @@ import com.datastax.driver.core.Session
 
 import jp.co.rn.inthermis.dtos.ResourceLocationDTO
 import jp.co.rn.inthermis.utils.CassandraHelper
+import com.datastax.driver.core.ResultSetFuture
 
 object ResourceLocationDAO {
 
@@ -27,11 +28,11 @@ object ResourceLocationDAO {
     CassandraHelper.getRows(session, classOf[ResourceLocationDTO], "SELECT * FROM resource_location")
   }
 
-  def delete(session: Session, id: UUID) {
+  def delete(session: Session, id: UUID): ResultSetFuture = {
     CassandraHelper.execCqlAsync(session, s"DELETE FROM resource_location WHERE resource_location_id = ?", id)
   }
 
-  def insert(session: Session, dto: ResourceLocationDTO) {
+  def insert(session: Session, dto: ResourceLocationDTO): ResultSetFuture = {
     val cql = "INSERT INTO resource_location(" +
       "resource_location_id, " +
       "resource_uri," +

@@ -5,7 +5,9 @@ import java.net.URI
 import org.apache.commons.lang3.StringUtils
 
 import jp.co.rn.inthermis.logic.indexer.FileIndexer
-import jp.co.rn.inthermis.models.{ IndexerResource, IndexerResult }
+import jp.co.rn.inthermis.models.IndexerResource
+import jp.co.rn.inthermis.models.LineIndexerResult
+import jp.co.rn.inthermis.models.ContentIndexerResult
 
 object NullIndexer extends FileIndexer {
 
@@ -20,7 +22,9 @@ object NullIndexer extends FileIndexer {
 
   override def isTarget(uri: URI): Boolean = false
 
-  override def generateIndex(resource: IndexerResource): IndexerResult = IndexerResult()
+  override def generateIndex(resource: IndexerResource): LineIndexerResult = LineIndexerResult()
 
+  override def generateContentIndex(resource: IndexerResource): Option[ContentIndexerResult] = Option.empty[ContentIndexerResult]
+  
   override val isShowAsCriteria = false
 }

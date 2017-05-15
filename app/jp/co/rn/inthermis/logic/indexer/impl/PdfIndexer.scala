@@ -3,6 +3,7 @@ package jp.co.rn.inthermis.logic.indexer.impl
 import java.net.URI
 
 import scala.collection.JavaConversions._
+import scala.util.control.Exception._
 
 import org.apache.commons.lang3.StringUtils
 import org.apache.pdfbox.io.RandomAccessBufferedFileInputStream
@@ -13,9 +14,16 @@ import com.google.common.base.Splitter
 
 import jp.co.rn.inthermis.logic.analyzer.StringAnalyzer
 import jp.co.rn.inthermis.logic.indexer.FileIndexer
-import jp.co.rn.inthermis.models.{ Content, IndexerResource, IndexerResult }
+import jp.co.rn.inthermis.models.Content
+import jp.co.rn.inthermis.models.IndexerResource
+import jp.co.rn.inthermis.models.LineIndexerResult
+import jp.co.rn.inthermis.models.ContentIndexerResult
+import play.Logger
+import org.apache.pdfbox.pdmodel.PDDocument
 
 object PdfIndexer extends FileIndexer {
+  
+  private val logger = Logger.of(this.getClass)
 
   override def getResourceTypeName: String = "Adobe PDF"
 
@@ -27,7 +35,36 @@ object PdfIndexer extends FileIndexer {
 
   override def isTarget(uri: URI): Boolean = uri.toString().endsWith(".pdf")
 
-  override def generateIndex(resource: IndexerResource): IndexerResult = {
+  override def generateContentIndex(resource: IndexerResource): Option[ContentIndexerResult] = {
+    val is = resource.getInputStream
+    val rabfis = new RandomAccessBufferedFileInputStream(is)
+    var pd: PDDocument = null
+
+    allCatch withApply { e =>
+      logger.error(s"error occurred during indexing ${resource.uri}", e)
+      Option.empty
+      
+    } andFinally {
+      rabfis.close
+      is.close
+      if (pd != null) pd.close
+      
+    } apply {
+      val parser = new PDFParser(rabfis)
+      parser.parse
+      pd = parser.getPDDocument
+
+      val stripper = new PDFTextStripper
+      stripper.setStartPage(1)
+      stripper.setEndPage(pd.getNumberOfPages)
+
+      val content = stripper.getText(pd)
+
+      Option(ContentIndexerResult(resource, Map(Seq.empty -> content), this.getClassName))
+    }
+  }
+
+  override def generateIndex(resource: IndexerResource): LineIndexerResult = {
 
     val is = resource.getInputStream
     val rabfis = new RandomAccessBufferedFileInputStream(is)
@@ -59,7 +96,7 @@ object PdfIndexer extends FileIndexer {
               pageContents
             }
 
-        IndexerResult(
+        LineIndexerResult(
           resource,
           contents,
           this.getClassName)

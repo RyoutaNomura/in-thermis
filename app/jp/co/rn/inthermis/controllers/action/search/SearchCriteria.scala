@@ -4,13 +4,13 @@ import scala.collection.immutable.Map
 
 import org.apache.commons.lang3.StringUtils
 
+import jp.co.rn.inthermis.elasticsearch._
 import jp.co.rn.inthermis.elasticsearch.ElasticSearchCriteria
-import jp.co.rn.inthermis.enums.{ DateRangeCriteria, SearchResultOrder }
+import jp.co.rn.inthermis.enums.DateRangeCriteria
+import jp.co.rn.inthermis.enums.SearchResultOrder
 import jp.co.rn.inthermis.enums.SearchResultOrder._
 import play.api.libs.json._
-import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.api.mvc.RequestHeader
-import jp.co.rn.inthermis.elasticsearch._
 
 case class SearchCriteria(
     text: String,
@@ -23,7 +23,7 @@ case class SearchCriteria(
 
   def toElasticSearchCriteria: ElasticSearchCriteria = {
     ElasticSearchCriteria(
-      Query(
+      SimpleQuery(
         SimpleQueryString(
           Set("content"),
           text)),

@@ -1,21 +1,22 @@
-package jp.co.rn.inthermis.elasticsearch.index
+package jp.co.rn.inthermis.elasticsearch.types
 
-import java.util.Date
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.syntax._
-
 import play.api.libs.json._
 
 case class WordIndex(
     uri: String,
+    resourceLocationId: String,
     displayLocation: String,
     resourceName: String,
-    resourceSize: Int,
+    resourceSize: Long,
     resourceTypeName: String,
-    resourceCreated: Date,
-    resourceModified: Date,
-    keys: String,
+    resourceCreated: LocalDateTime,
+    resourceModified: LocalDateTime,
+    keys: Seq[String],
     content: String,
     highlightendContent: String,
     indexerClassName: String,
@@ -33,27 +34,32 @@ object WordIndex {
 
   implicit val elasticsearchRead: Reads[WordIndex] = (
     (__ \ "_source" \ "uri").read[String] and
+    (__ \ "_source" \ "resource_location_id").read[String] and
     (__ \ "_source" \ "display_location").read[String] and
     (__ \ "_source" \ "resource_name").read[String] and
-    (__ \ "_source" \ "resource_size").read[Int] and
+    (__ \ "_source" \ "resource_size").read[Long] and
     (__ \ "_source" \ "resource_type_name").read[String] and
-    (__ \ "_source" \ "resource_created").read[Date](Reads.dateReads("yyyy-MM-dd")) and
-    (__ \ "_source" \ "resource_modified").read[Date](Reads.dateReads("yyyy-MM-dd")) and
-    (__ \ "_source" \ "keys").read[String] and
+    (__ \ "_source" \ "resource_created").read[LocalDateTime](Reads.localDateTimeReads("yyyy-MM-dd HH:mm:ss")) and
+    (__ \ "_source" \ "resource_modified").read[LocalDateTime](Reads.localDateTimeReads("yyyy-MM-dd HH:mm:ss")) and
+    (__ \ "_source" \ "keys").read[Seq[String]] and
     (__ \ "_source" \ "content").read[String] and
     (__ \ "highlight" \ "content").read[String](contentArrayRead) and
     (__ \ "_source" \ "indexer_class_name").read[String] and
     (__ \ "_source" \ "icon_css_class_name").read[String])(WordIndex.apply _)
 
+  implicit val localDateTimeWrites = Writes.temporalWrites[LocalDateTime, DateTimeFormatter](
+    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+
   implicit val elasticsearchWrite: Writes[WordIndex] = (
     (__ \ "uri").write[String] and
+    (__ \ "resource_location_id").write[String] and
     (__ \ "display_location").write[String] and
     (__ \ "resource_name").write[String] and
-    (__ \ "resource_size").write[Int] and
+    (__ \ "resource_size").write[Long] and
     (__ \ "resource_type_name").write[String] and
-    (__ \ "resource_created").write[Date](Writes.dateWrites("yyyy-MM-dd")) and
-    (__ \ "resource_modified").write[Date](Writes.dateWrites("yyyy-MM-dd")) and
-    (__ \ "keys").write[String] and
+    (__ \ "resource_created").write[LocalDateTime] and
+    (__ \ "resource_modified").write[LocalDateTime] and
+    (__ \ "keys").write[Seq[String]] and
     (__ \ "content").write[String] and
     OWrites[Any](_ => Json.obj()) and
     (__ \ "indexer_class_name").write[String] and

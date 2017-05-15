@@ -1,9 +1,10 @@
 package jp.co.rn.inthermis.logic
 
 import com.datastax.driver.core.Session
-import jp.co.rn.inthermis.logic.walker.{ ResourceWalkerConfig, ResourceWalkerFactory }
+
+import jp.co.rn.inthermis.logic.walker.ResourceWalkerConfig
+import jp.co.rn.inthermis.logic.walker.ResourceWalkerFactory
 import play.Logger
-import jp.co.rn.inthermis.daos.ResourceLocationDAO
 
 object ResourceIndexer {
 

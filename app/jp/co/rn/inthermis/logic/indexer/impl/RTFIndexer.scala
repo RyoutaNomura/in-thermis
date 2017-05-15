@@ -3,19 +3,31 @@ package jp.co.rn.inthermis.logic.indexer.impl
 import java.io.StringWriter
 import java.net.URI
 
+import scala.util.control.Exception._
+
 import org.apache.commons.lang3.StringUtils
 import org.apache.tika.metadata.Metadata
 import org.apache.tika.parser.ParseContext
 import org.apache.tika.parser.rtf.RTFParser
 
-import javax.xml.transform.{ OutputKeys, TransformerFactory }
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.TransformerFactory
 import javax.xml.transform.sax.SAXTransformerFactory
 import javax.xml.transform.stream.StreamResult
 import jp.co.rn.inthermis.logic.analyzer.StringAnalyzer
 import jp.co.rn.inthermis.logic.indexer.FileIndexer
-import jp.co.rn.inthermis.models.{ Content, IndexerResource, IndexerResult }
+import jp.co.rn.inthermis.models.Content
+import jp.co.rn.inthermis.models.IndexerResource
+import jp.co.rn.inthermis.models.LineIndexerResult
+import java.util.Properties
+import javax.swing.text.rtf.RTFParser
+import jp.co.rn.inthermis.models.ContentIndexerResult
+import play.Logger
 
 object RTFIndexer extends FileIndexer {
+  
+  private val logger = Logger.of(this.getClass)
+  
   override def getResourceTypeName: String = "Rich Text Format"
 
   override def getKeyTitles: Tuple3[String, String, String] = ("Line", StringUtils.EMPTY, StringUtils.EMPTY)
@@ -26,10 +38,38 @@ object RTFIndexer extends FileIndexer {
 
   override def isTarget(uri: URI): Boolean = uri.toString() match {
     case s if s.endsWith(".rtf") => true
-    case _                       => false
+    case _ => false
   }
 
-  override def generateIndex(resource: IndexerResource): IndexerResult = {
+  override def generateContentIndex(resource: IndexerResource): Option[ContentIndexerResult] = {
+    val is = resource.getInputStream
+    val sw = new StringWriter
+
+    allCatch withApply { e =>
+      logger.error(s"error occurred during indexing ${resource.uri}", e)
+      Option.empty
+
+    } andFinally {
+      sw.close
+      is.close
+
+    } apply {
+      val meta = new Metadata
+      val factory = TransformerFactory.newInstance.asInstanceOf[SAXTransformerFactory]
+      val handler = factory.newTransformerHandler
+      handler.getTransformer.setOutputProperty(OutputKeys.METHOD, "text")
+      handler.getTransformer.setOutputProperty(OutputKeys.INDENT, "no")
+      handler.setResult(new StreamResult(sw));
+
+      val parser = new RTFParser
+      parser.parse(is, handler, meta, new ParseContext)
+      val content = sw.toString
+      Option(ContentIndexerResult(resource, Map(Seq.empty -> content), this.getClassName))
+      
+    }
+  }
+
+  override def generateIndex(resource: IndexerResource): LineIndexerResult = {
     var is = resource.getInputStream
 
     val metadata = new Metadata
@@ -53,7 +93,7 @@ object RTFIndexer extends FileIndexer {
         }.toList
       fillSibilingContent(contents)
 
-      IndexerResult(
+      LineIndexerResult(
         resource,
         contents,
         this.getClassName)

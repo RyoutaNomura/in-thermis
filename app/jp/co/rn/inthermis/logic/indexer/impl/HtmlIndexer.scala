@@ -2,15 +2,23 @@ package jp.co.rn.inthermis.logic.indexer.impl
 
 import java.net.URI
 
+import scala.util.control.Exception._
+
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.Jsoup
 
 import jp.co.rn.inthermis.logic.analyzer.StringAnalyzer
 import jp.co.rn.inthermis.logic.indexer.FileIndexer
-import jp.co.rn.inthermis.models.{ Content, IndexerResource, IndexerResult }
+import jp.co.rn.inthermis.models.Content
+import jp.co.rn.inthermis.models.ContentIndexerResult
+import jp.co.rn.inthermis.models.IndexerResource
+import jp.co.rn.inthermis.models.LineIndexerResult
 import jp.co.rn.inthermis.utils.CharsetUtils
+import play.Logger
 
 object HtmlIndexer extends FileIndexer {
+
+  private val logger = Logger.of(this.getClass)
 
   override def getResourceTypeName: String = "HTML"
 
@@ -22,11 +30,29 @@ object HtmlIndexer extends FileIndexer {
 
   override def isTarget(uri: URI): Boolean = uri.toString match {
     case s if s.endsWith(".html") => true
-    case s if s.endsWith(".htm")  => true
-    case _                        => false
+    case s if s.endsWith(".htm") => true
+    case _ => false
   }
 
-  override def generateIndex(resource: IndexerResource): IndexerResult = {
+  override def generateContentIndex(resource: IndexerResource): Option[ContentIndexerResult] = {
+    val is = resource.getInputStream
+
+    allCatch withApply { e =>
+      logger.error(s"error occurred during indexing ${resource.uri}", e)
+      Option.empty
+      
+    } andFinally {
+      is.close
+      
+    } apply {
+      val charset = CharsetUtils.detectEncoding(is)
+      val document = Jsoup.parse(is, resource.getCodec.name, resource.uri.toString)
+      Option(ContentIndexerResult(resource, Map(Seq.empty -> document.text), this.getClassName))
+    }
+
+  }
+
+  override def generateIndex(resource: IndexerResource): LineIndexerResult = {
     val is = resource.getInputStream
 
     try {
@@ -41,7 +67,7 @@ object HtmlIndexer extends FileIndexer {
         }.toList
       fillSibilingContent(contents)
 
-      IndexerResult(
+      LineIndexerResult(
         resource,
         contents,
         this.getClassName)

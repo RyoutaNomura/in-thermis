@@ -3,16 +3,21 @@ package jp.co.rn.inthermis.logic.indexer.impl
 import java.net.URI
 
 import scala.io.Source
+import scala.util.control.Exception._
 
 import org.apache.commons.lang3.StringUtils
 
 import jp.co.rn.inthermis.logic.analyzer.StringAnalyzer
 import jp.co.rn.inthermis.logic.indexer.FileIndexer
-import jp.co.rn.inthermis.models.{ Content, IndexerResource, IndexerResult }
-import jp.co.rn.inthermis.utils.CharsetUtils
-import scala.io.Codec
+import jp.co.rn.inthermis.models.Content
+import jp.co.rn.inthermis.models.IndexerResource
+import jp.co.rn.inthermis.models.LineIndexerResult
+import jp.co.rn.inthermis.models.ContentIndexerResult
+import play.Logger
 
 object TextIndexer extends FileIndexer {
+  
+  private val logger = Logger.of(this.getClass)
 
   override def getResourceTypeName: String = "Plain Text"
 
@@ -28,7 +33,26 @@ object TextIndexer extends FileIndexer {
     case _                       => false
   }
 
-  override def generateIndex(resource: IndexerResource): IndexerResult = {
+  override def generateContentIndex(resource: IndexerResource): Option[ContentIndexerResult] = {
+    val is = resource.getInputStream
+    val source = Source.fromInputStream(is)(resource.getCodec)
+    
+    allCatch withApply { e=>
+            logger.error(s"error occurred during indexing ${resource.uri}", e)
+            Option.empty
+            
+    } andFinally {
+      source.close
+      is.close
+      
+    } apply {
+      val content = source.getLines().mkString(System.lineSeparator)
+      Option(ContentIndexerResult(resource, Map(Seq.empty -> content), this.getClassName))
+      
+    }
+  }
+  
+  override def generateIndex(resource: IndexerResource): LineIndexerResult = {
     var is = resource.getInputStream
     val source = Source.fromInputStream(is)(resource.getCodec)
 
@@ -41,7 +65,7 @@ object TextIndexer extends FileIndexer {
         }.toList
       fillSibilingContent(contents)
 
-      IndexerResult(
+      LineIndexerResult(
         resource,
         contents,
         this.getClassName)

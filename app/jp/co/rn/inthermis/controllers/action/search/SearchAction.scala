@@ -1,28 +1,10 @@
 package jp.co.rn.inthermis.controllers.action.search
 
-import java.util.UUID
-
-import scala.collection.{ Seq, mutable }
-
 import org.apache.commons.lang3.StringUtils
 
-import com.datastax.driver.core.Session
-
-import jp.co.rn.inthermis.enums.SearchResultOrder
-import jp.co.rn.inthermis.logic.analyzer.StringAnalyzer
-import jp.co.rn.inthermis.logic.indexer.FileIndexerFactory
-import jp.co.rn.inthermis.utils.CassandraHelper
-import play.Logger
-import scalaj.http.Http
-import scalaj.http.HttpOptions
-import play.api.libs.json.Json
-import play.api.libs.json.JsDefined
-import play.api.libs.json.JsUndefined
-import play.api.libs.json.JsNumber
-import play.api.libs.json.JsArray
-import jp.co.rn.inthermis.elasticsearch.index.WordIndex
-import scalaj.http.HttpResponse
 import jp.co.rn.inthermis.elasticsearch.ElasticSearchRequestHandler
+import jp.co.rn.inthermis.elasticsearch.types.WordIndex
+import play.Logger
 
 object SearchAction {
 

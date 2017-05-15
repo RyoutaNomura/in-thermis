@@ -3,18 +3,26 @@ package jp.co.rn.inthermis.logic.indexer.impl
 import java.net.URI
 
 import scala.io.Source
+import scala.util.control.Exception._
 
 import org.apache.commons.lang3.StringUtils
-import org.sweble.wikitext.engine.{ PageId, PageTitle, WtEngineImpl }
+import org.sweble.wikitext.engine.PageId
+import org.sweble.wikitext.engine.PageTitle
+import org.sweble.wikitext.engine.WtEngineImpl
 import org.sweble.wikitext.engine.utils.DefaultConfigEnWp
 import org.sweble.wikitext.example.TextConverter
 
 import jp.co.rn.inthermis.logic.analyzer.StringAnalyzer
 import jp.co.rn.inthermis.logic.indexer.FileIndexer
-import jp.co.rn.inthermis.models.{ Content, IndexerResource, IndexerResult }
-import jp.co.rn.inthermis.utils.CharsetUtils
+import jp.co.rn.inthermis.models.Content
+import jp.co.rn.inthermis.models.ContentIndexerResult
+import jp.co.rn.inthermis.models.IndexerResource
+import jp.co.rn.inthermis.models.LineIndexerResult
+import play.Logger
 
 object WikiTextIndexer extends FileIndexer {
+
+  private val logger = Logger.of(this.getClass)
 
   override def getResourceTypeName: String = "WikiText"
 
@@ -26,7 +34,25 @@ object WikiTextIndexer extends FileIndexer {
 
   override def isTarget(uri: URI): Boolean = false
 
-  override def generateIndex(resource: IndexerResource): IndexerResult = {
+  override def generateContentIndex(resource: IndexerResource): Option[ContentIndexerResult] = {
+    val is = resource.getInputStream
+
+    allCatch withApply { e =>
+      logger.error(s"error occurred during indexing ${resource.uri}", e)
+      Option.empty
+
+    } andFinally {
+      is.close
+
+    } apply {
+      val orgsource = Source.fromInputStream(is)(resource.getCodec).mkString
+      val content = convert(resource.name, orgsource)
+      Option(ContentIndexerResult(resource, Map(Seq.empty -> content), this.getClassName))
+
+    }
+  }
+
+  override def generateIndex(resource: IndexerResource): LineIndexerResult = {
     var is = resource.getInputStream
     try {
       val orgsource = Source.fromInputStream(is)(resource.getCodec).mkString
@@ -40,7 +66,7 @@ object WikiTextIndexer extends FileIndexer {
         }.toList
       fillSibilingContent(contents)
 
-      IndexerResult(
+      LineIndexerResult(
         resource,
         contents,
         this.getClassName)
